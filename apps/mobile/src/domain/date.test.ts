@@ -1,4 +1,4 @@
-import { formatDate, plural } from './date';
+import { formatDate, pluralize } from './date';
 
 describe('formatDate', () => {
   it('formats an ISO date in French', () => {
@@ -13,8 +13,8 @@ describe('formatDate', () => {
 
 describe('plural', () => {
   it('pluralises above one', () => {
-    expect(plural(1, 'jour')).toBe('1 jour');
-    expect(plural(3, 'jour')).toBe('3 jours');
-    expect(plural(2, 'étape')).toBe('2 étapes');
+    expect(pluralize(1, 'jour')).toBe('1 jour');
+    expect(pluralize(3, 'jour')).toBe('3 jours');
+    expect(pluralize(2, 'étape')).toBe('2 étapes');
   });
 });

@@ -12,6 +12,6 @@ export function formatDate(
 }
 
 /** "1 jour", "3 jours" — French pluralisation for counted nouns. */
-export function plural(count: number, singular: string, pluralForm = `${singular}s`): string {
+export function pluralize(count: number, singular: string, pluralForm = `${singular}s`): string {
   return `${count} ${count > 1 ? pluralForm : singular}`;
 }

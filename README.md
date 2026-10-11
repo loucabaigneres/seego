@@ -141,6 +141,12 @@ pnpm turbo run dev --filter=@voyagr/web
 pnpm turbo run dev --filter=@voyagr/mobile
 ```
 
+Or
+
+```bash
+pnpm turbo run dev --filter=@voyagr/mobile --ui=tui
+```
+
 ✅ Scan the QR code in your terminal with the Expo Go app on your phone, or press `i` to open the iOS simulator / `a` for the Android emulator.
 
 ---

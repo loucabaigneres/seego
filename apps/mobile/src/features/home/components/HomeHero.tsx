@@ -2,16 +2,16 @@ import { View } from 'react-native';
 
 import { Text } from '@/ui';
 
-import { HOME_COPY } from '../constants';
-
 export function HomeHero() {
   return (
     <View className="gap-3">
-      <Text variant="overline">{HOME_COPY.overline}</Text>
+      <Text variant="overline">Ton voyage commence ici</Text>
       <Text variant="title" role="heading">
-        {HOME_COPY.title}
+        Comment veux-tu trouver ta prochaine escapade ?
       </Text>
-      <Text tone="muted">{HOME_COPY.subtitle}</Text>
+      <Text tone="muted">
+        {"Trouve ton séjour sur mesure en quelques swipes, ou laisse l'inspiration faire le reste."}
+      </Text>
     </View>
   );
 }

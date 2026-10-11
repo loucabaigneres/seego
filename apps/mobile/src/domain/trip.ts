@@ -1,4 +1,4 @@
-import { plural } from './date';
+import { pluralize } from './date';
 
 /**
  * `trip_day.dayIndex` conventions shared with the API:
@@ -25,8 +25,8 @@ export function daySummary(activities: { category: string | null }[]): string {
   const activityCount = count('activité');
   const restaurantCount = count('restaurant');
   return [
-    activityCount > 0 && plural(activityCount, 'activité'),
-    restaurantCount > 0 && plural(restaurantCount, 'restaurant'),
+    activityCount > 0 && pluralize(activityCount, 'activité'),
+    restaurantCount > 0 && pluralize(restaurantCount, 'restaurant'),
   ]
     .filter(Boolean)
     .join(' · ');
