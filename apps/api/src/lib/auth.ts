@@ -38,9 +38,9 @@ export const auth = betterAuth({
     //   : {}),
   },
   trustedOrigins: [
-    'https://voyagr-web-mu.vercel.app',
-    'https://voyagr-web-*.vercel.app',
-    'voyagr-*-arthurgramonts-projects.vercel.app',
+    'https://app.seego.fr',
+    'https://seego-app.vercel.app',
+    'seego-*-arthurgramonts-projects.vercel.app/',
     env.FRONTEND_URL,
     // Mobile app scheme (`scheme` in apps/mobile/app.json).
     'seego://',

@@ -51,3 +51,8 @@ export function Text({ variant = 'body', tone, className, ...props }: TextProps)
     />
   );
 }
+
+/** Italic serif for the words that carry emotion, nested in a title: `ta prochaine <Em>escapade</Em>`. */
+export function Em({ className, ...props }: RNTextProps & { className?: string }) {
+  return <RNText className={cn('font-display-italic', className)} {...props} />;
+}
