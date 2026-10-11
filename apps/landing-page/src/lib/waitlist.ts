@@ -1,5 +1,8 @@
 import { useCallback, useState } from 'react';
+import { trpc } from './trpc';
 
+// sessionStorage (not localStorage): the "already joined" hint should only last
+// for the current tab/session, not be kept around for days.
 const STORAGE_KEY = 'seego_waitlist_email';
 
 /** Pragmatic email check — good enough to catch typos without rejecting valid addresses. */
@@ -9,7 +12,7 @@ export function isValidEmail(value: string): boolean {
 
 function readStoredEmail(): string | null {
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    return sessionStorage.getItem(STORAGE_KEY);
   } catch {
     return null;
   }
@@ -17,43 +20,51 @@ function readStoredEmail(): string | null {
 
 function storeEmail(email: string): void {
   try {
-    localStorage.setItem(STORAGE_KEY, email);
+    sessionStorage.setItem(STORAGE_KEY, email);
   } catch {
     // Private mode / storage disabled — non blocking.
   }
 }
 
 /**
- * Submits a waitlist sign-up.
+ * Reads marketing attribution from the current URL / navigation context.
  *
- * When `VITE_WAITLIST_ENDPOINT` is configured the email is POSTed there.
- * Otherwise it is only persisted locally, so the page stays fully functional
- * during local dev / preview without any backend.
+ * `utm_content` falls back to the form's position (hero vs. footer) so we can
+ * compare the conversion of the two sign-up forms even without a campaign URL.
  */
-export async function submitWaitlist(email: string): Promise<void> {
-  const normalized = email.trim().toLowerCase();
-  const endpoint = import.meta.env.VITE_WAITLIST_ENDPOINT;
+function collectAttribution(position: string) {
+  const params = new URLSearchParams(window.location.search);
+  const get = (key: string) => params.get(key)?.trim() || undefined;
 
-  if (endpoint) {
-    const res = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: normalized, source: 'landing-page' }),
-    });
-    if (!res.ok) {
-      throw new Error(`Waitlist request failed with status ${res.status}`);
-    }
-  } else {
-    // Simulate a short round-trip so the UI feedback feels real.
-    await new Promise((resolve) => setTimeout(resolve, 650));
-  }
+  return {
+    utmSource: get('utm_source'),
+    utmMedium: get('utm_medium'),
+    utmCampaign: get('utm_campaign'),
+    utmTerm: get('utm_term'),
+    utmContent: get('utm_content') ?? position,
+    referrer: document.referrer || undefined,
+    landingPageUrl: window.location.href,
+  };
+}
+
+/**
+ * Submits a waitlist sign-up through tRPC (type-safe, end-to-end).
+ * `position` identifies which form was used ('hero' | 'footer').
+ */
+export async function submitWaitlist(email: string, position: string): Promise<void> {
+  const normalized = email.trim().toLowerCase();
+
+  await trpc.waitlist.join.mutate({
+    email: normalized,
+    ...collectAttribution(position),
+  });
 
   storeEmail(normalized);
 }
 
-/** Tracks whether this visitor has already joined the waitlist (persisted locally). */
+/** Tracks whether this visitor has already joined the waitlist (persisted for the session). */
 export function useWaitlistStatus() {
-  // Client-only SPA: reading localStorage lazily at init is safe (no SSR hydration).
+  // Client-only SPA: reading sessionStorage lazily at init is safe (no SSR hydration).
   const [joinedEmail, setJoinedEmail] = useState<string | null>(() => readStoredEmail());
 
   const markJoined = useCallback((email: string) => {

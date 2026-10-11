@@ -8,6 +8,8 @@ type Status = 'idle' | 'loading' | 'error';
 type WaitlistFormProps = {
   joinedEmail: string | null;
   onJoined: (email: string) => void;
+  /** Which form this is ('hero' | 'footer') — recorded as utm_content for conversion stats. */
+  position: string;
   /** 'dark' tweaks the helper text for use on a dark background (CTA band). */
   tone?: 'light' | 'dark';
   /** 'start' aligns the form left on desktop; 'center' keeps it centered. */
@@ -17,6 +19,7 @@ type WaitlistFormProps = {
 export function WaitlistForm({
   joinedEmail,
   onJoined,
+  position,
   tone = 'light',
   align = 'center',
 }: WaitlistFormProps) {
@@ -59,7 +62,7 @@ export function WaitlistForm({
     setStatus('loading');
     setError(null);
     try {
-      await submitWaitlist(email);
+      await submitWaitlist(email, position);
       onJoined(email);
     } catch {
       setStatus('error');

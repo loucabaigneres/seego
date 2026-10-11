@@ -41,7 +41,12 @@ export function Hero({ joinedEmail, onJoined }: HeroProps) {
           </p>
 
           <div className="mt-8">
-            <WaitlistForm joinedEmail={joinedEmail} onJoined={onJoined} align="start" />
+            <WaitlistForm
+              joinedEmail={joinedEmail}
+              onJoined={onJoined}
+              position="hero"
+              align="start"
+            />
           </div>
 
           <SocialProof className="mt-6 lg:justify-start" align="center" />

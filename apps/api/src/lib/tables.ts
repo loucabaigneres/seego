@@ -8,5 +8,5 @@ export const {
   activity,
   swipes,
   user,
-  waitlistSubscriber,
+  waitlistLeads,
 } = schema;

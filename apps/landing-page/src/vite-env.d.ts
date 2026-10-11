@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Optional endpoint that receives waitlist sign-ups via POST. */
-  readonly VITE_WAITLIST_ENDPOINT?: string;
+  /** Base URL of the Voyagr API (tRPC endpoint lives at `${VITE_API_URL}/trpc`). */
+  readonly VITE_API_URL?: string;
 }
 
 interface ImportMeta {

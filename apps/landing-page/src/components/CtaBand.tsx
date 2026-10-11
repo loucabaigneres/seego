@@ -28,7 +28,12 @@ export function CtaBand({ joinedEmail, onJoined }: CtaBandProps) {
           </p>
 
           <div className="mt-7">
-            <WaitlistForm joinedEmail={joinedEmail} onJoined={onJoined} tone="dark" />
+            <WaitlistForm
+              joinedEmail={joinedEmail}
+              onJoined={onJoined}
+              position="footer"
+              tone="dark"
+            />
           </div>
         </div>
       </div>

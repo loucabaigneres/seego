@@ -1,5 +1,5 @@
 {
-  "id": "390faea3-7cc2-4bf5-abaf-8046b12879d0",
+  "id": "ef3178f6-c0c2-470a-b107-954e113448c1",
   "prevId": "73f21199-e27a-42ad-95e3-1b81eebe512e",
   "version": "7",
   "dialect": "postgresql",
@@ -1169,8 +1169,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.waitlist_subscriber": {
-      "name": "waitlist_subscriber",
+    "public.waitlist_leads": {
+      "name": "waitlist_leads",
       "schema": "",
       "columns": {
         "id": {
@@ -1186,8 +1186,44 @@
           "primaryKey": false,
           "notNull": true
         },
-        "source": {
-          "name": "source",
+        "utm_source": {
+          "name": "utm_source",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_medium": {
+          "name": "utm_medium",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_campaign": {
+          "name": "utm_campaign",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_term": {
+          "name": "utm_term",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_content": {
+          "name": "utm_content",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referrer": {
+          "name": "referrer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "landing_page_url": {
+          "name": "landing_page_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -1200,12 +1236,58 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "waitlist_email_idx": {
+          "name": "waitlist_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "waitlist_source_idx": {
+          "name": "waitlist_source_idx",
+          "columns": [
+            {
+              "expression": "utm_source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "waitlist_campaign_idx": {
+          "name": "waitlist_campaign_idx",
+          "columns": [
+            {
+              "expression": "utm_campaign",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "waitlist_subscriber_email_unique": {
-          "name": "waitlist_subscriber_email_unique",
+        "waitlist_leads_email_unique": {
+          "name": "waitlist_leads_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
