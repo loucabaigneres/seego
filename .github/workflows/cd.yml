@@ -56,7 +56,7 @@ jobs:
             turbo-${{ github.job }}-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
         run: pnpx turbo run format lint build typecheck --filter=@voyagr/api --filter=@voyagr/database --filter=@voyagr/web
@@ -103,7 +103,7 @@ jobs:
         uses: pnpm/action-setup@v6
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Drizzle Push to Supabase
         run: pnpm --filter @voyagr/database db:migrate
@@ -135,7 +135,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
