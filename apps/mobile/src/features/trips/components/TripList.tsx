@@ -4,7 +4,6 @@ import { View } from 'react-native';
 import { EmptyState, ErrorState, Skeleton } from '@/ui';
 import { MapTrifoldIcon } from '@/ui/icons';
 
-import { TRIPS_COPY } from '../constants';
 import { useMyTrips } from '../hooks/useMyTrips';
 import { TripCard } from './TripCard';
 
@@ -24,8 +23,8 @@ export function TripList() {
     return (
       <ErrorState
         className="flex-none"
-        title={TRIPS_COPY.error.title}
-        message={TRIPS_COPY.error.message}
+        title="Voyages indisponibles"
+        message="Impossible de charger tes voyages. Vérifie ta connexion, puis on réessaie."
         onRetry={retry}
       />
     );
@@ -36,9 +35,9 @@ export function TripList() {
       <EmptyState
         className="flex-none rounded-card bg-surface py-10"
         icon={MapTrifoldIcon}
-        title={TRIPS_COPY.empty.title}
-        description={TRIPS_COPY.empty.description}
-        action={{ label: TRIPS_COPY.empty.cta, onPress: () => router.navigate('/') }}
+        title="Pas encore de voyage"
+        description="Lance le quiz ou swipe quelques destinations pour créer ton premier itinéraire."
+        action={{ label: 'Découvrir des destinations', onPress: () => router.navigate('/') }}
       />
     );
   }

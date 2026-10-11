@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
 import { trpc } from '@/lib/trpc';
 
-import { PROFILE_COPY } from '../constants';
 import { nameChange } from '../lib/profile';
 
 /** Draft + save for the display name. The draft follows the server value until edited. */
@@ -25,7 +24,7 @@ export function useEditName(currentName: string | undefined) {
         // The cached session carries the name too.
         await session.refetch();
       },
-      onError: () => setError(PROFILE_COPY.editName.error),
+      onError: () => setError('Impossible d’enregistrer pour le moment. Réessaie dans un instant.'),
     }),
   );
 

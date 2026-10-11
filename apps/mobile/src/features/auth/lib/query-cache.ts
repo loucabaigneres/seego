@@ -8,5 +8,7 @@ export function syncQueriesWithSession(event: 'signed-in' | 'signed-out') {
   if (event === 'signed-in') {
     return queryClient.invalidateQueries();
   }
+  // Every router that returns account data must be listed here.
   queryClient.removeQueries({ queryKey: trpc.user.pathKey() });
+  queryClient.removeQueries({ queryKey: trpc.inspiration.pathKey() });
 }

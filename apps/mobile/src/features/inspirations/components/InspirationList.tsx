@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { EmptyState, ErrorState, Skeleton } from '@/ui';
 import { SparkleIcon } from '@/ui/icons';
 
-import { INSPIRATIONS_COPY } from '../constants';
 import { useMyInspirations } from '../hooks/useMyInspirations';
 import { InspirationCard } from './InspirationCard';
 
@@ -24,8 +23,8 @@ export function InspirationList() {
     return (
       <ErrorState
         className="flex-none"
-        title={INSPIRATIONS_COPY.error.title}
-        message={INSPIRATIONS_COPY.error.message}
+        title="Inspirations indisponibles"
+        message="Impossible de charger tes inspirations. Vérifie ta connexion, puis on réessaie."
         onRetry={retry}
       />
     );
@@ -36,8 +35,8 @@ export function InspirationList() {
       <EmptyState
         className="flex-none rounded-card bg-surface py-10"
         icon={SparkleIcon}
-        title={INSPIRATIONS_COPY.empty.title}
-        description={INSPIRATIONS_COPY.empty.description}
+        title="Pas encore d’inspiration"
+        description="Les vidéos TikTok ou Instagram que tu importes depuis le site apparaîtront ici. L’import arrive bientôt sur mobile."
       />
     );
   }

@@ -2,9 +2,14 @@ import { View } from 'react-native';
 
 import { InspirationList } from '@/features/inspirations/components/InspirationList';
 import { TripList } from '@/features/trips/components/TripList';
-import { SegmentedControl } from '@/ui';
+import { SegmentedControl, type Segment } from '@/ui';
 
-import { PROFILE_SEGMENTS, type ProfileSegment } from '../constants';
+export type ProfileSegment = 'trips' | 'inspirations';
+
+const SEGMENTS: readonly Segment<ProfileSegment>[] = [
+  { value: 'trips', label: 'Voyages' },
+  { value: 'inspirations', label: 'Inspirations' },
+];
 
 export interface ProfileContentProps {
   segment: ProfileSegment;
@@ -15,7 +20,7 @@ export interface ProfileContentProps {
 export function ProfileContent({ segment, onSegmentChange }: ProfileContentProps) {
   return (
     <View className="gap-4">
-      <SegmentedControl segments={PROFILE_SEGMENTS} value={segment} onChange={onSegmentChange} />
+      <SegmentedControl segments={SEGMENTS} value={segment} onChange={onSegmentChange} />
       {segment === 'trips' ? <TripList /> : <InspirationList />}
     </View>
   );

@@ -4,10 +4,9 @@ import { View, type TextInput } from 'react-native';
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
 
-import { AUTH_COPY } from '../constants';
 import { useAuthForm } from '../hooks/useAuthForm';
 import { signInSchema } from '../lib/validation';
-import { closeAuth } from '../navigation';
+import { closeAuth } from '../lib/navigation';
 
 export function SignInForm() {
   const passwordRef = useRef<TextInput>(null);
@@ -17,13 +16,12 @@ export function SignInForm() {
     request: (credentials) => authClient.signIn.email(credentials),
     onSuccess: closeAuth,
   });
-  const { fields } = AUTH_COPY;
 
   return (
     <View className="gap-5">
       <TextField
-        label={fields.email.label}
-        placeholder={fields.email.placeholder}
+        label="Email"
+        placeholder="lea@exemple.fr"
         value={form.values.email}
         onChangeText={(value) => form.setField('email', value)}
         error={form.fieldErrors.email}
@@ -39,7 +37,7 @@ export function SignInForm() {
       />
       <TextField
         ref={passwordRef}
-        label={fields.password.label}
+        label="Mot de passe"
         value={form.values.password}
         onChangeText={(value) => form.setField('password', value)}
         error={form.fieldErrors.password}
@@ -54,7 +52,7 @@ export function SignInForm() {
       {form.formError && <Notice message={form.formError} />}
 
       <Button
-        label={AUTH_COPY.signIn.submit}
+        label="Se connecter"
         loading={form.isSubmitting}
         onPress={form.submit}
         className="mt-1"

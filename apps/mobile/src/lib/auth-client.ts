@@ -15,7 +15,7 @@ export const authClient = createAuthClient({
   plugins: [
     expoClient({
       // Must match `scheme` in app.json and `trustedOrigins` in the API.
-      scheme: 'voyagr',
+      scheme: 'seego',
       storagePrefix: 'seego',
       storage: SecureStore,
     }),

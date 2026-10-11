@@ -5,8 +5,6 @@ import { colors } from '@/theme/tokens';
 import { Text } from '@/ui';
 import { CaretRightIcon, GearSixIcon } from '@/ui/icons';
 
-import { PROFILE_COPY } from '../constants';
-
 export function SettingsLink() {
   return (
     <Pressable
@@ -16,7 +14,7 @@ export function SettingsLink() {
     >
       <GearSixIcon size={24} color={colors.brand} />
       <Text variant="label" className="flex-1">
-        {PROFILE_COPY.settings.title}
+        Paramètres
       </Text>
       <CaretRightIcon size={20} color={colors.ink.muted} />
     </Pressable>

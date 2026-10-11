@@ -2,8 +2,8 @@ import { useState } from 'react';
 import type * as z from 'zod';
 
 import { authErrorMessage, type AuthError } from '../lib/errors';
+import { syncQueriesWithSession } from '../lib/query-cache';
 import { validate, type FieldErrors } from '../lib/validation';
-import { syncQueriesWithSession } from '../query-cache';
 
 interface UseAuthFormOptions<S extends z.ZodObject> {
   schema: S;

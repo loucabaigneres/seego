@@ -5,8 +5,8 @@ import { authClient } from '@/lib/auth-client';
 
 import { authCallbackURL } from '../lib/callback-url';
 import { authErrorMessage } from '../lib/errors';
-import { closeAuth } from '../navigation';
-import { syncQueriesWithSession } from '../query-cache';
+import { closeAuth } from '../lib/navigation';
+import { syncQueriesWithSession } from '../lib/query-cache';
 
 const CALLBACK_PATH = '/profile';
 

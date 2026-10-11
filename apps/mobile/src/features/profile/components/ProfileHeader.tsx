@@ -5,7 +5,6 @@ import { formatDate } from '@/domain/date';
 import type { RouterOutputs } from '@/lib/trpc';
 import { Text } from '@/ui';
 
-import { PROFILE_COPY } from '../constants';
 import { avatarInitial } from '../lib/profile';
 
 type ProfileUser = NonNullable<RouterOutputs['user']['getProfile']['user']>;
@@ -39,16 +38,12 @@ export function ProfileHeader({ user }: { user: ProfileUser }) {
 
       <View className="flex-1 gap-1">
         <Text variant="section" role="heading" numberOfLines={1}>
-          {user.name || PROFILE_COPY.fallbackName}
+          {user.name || 'Voyageur'}
         </Text>
         <Text tone="muted" numberOfLines={1}>
           {user.email}
         </Text>
-        {since && (
-          <Text variant="caption">
-            {PROFILE_COPY.memberSince} {since}
-          </Text>
-        )}
+        {since && <Text variant="caption">Membre depuis le {since}</Text>}
       </View>
     </View>
   );

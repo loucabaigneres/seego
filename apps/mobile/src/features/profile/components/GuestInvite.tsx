@@ -3,25 +3,23 @@ import { View } from 'react-native';
 
 import { Button, Text } from '@/ui';
 
-import { PROFILE_COPY } from '../constants';
-
 export function GuestInvite() {
-  const copy = PROFILE_COPY.guest;
-
   return (
     <View className="flex-1 justify-center gap-8">
       <View className="gap-3">
-        <Text variant="overline">{copy.overline}</Text>
+        <Text variant="overline">Ton profil</Text>
         <Text variant="title" role="heading">
-          {copy.title}
+          Garde tes voyages sous la main
         </Text>
-        <Text tone="muted">{copy.description}</Text>
+        <Text tone="muted">
+          Crée un compte pour enregistrer tes itinéraires et les retrouver sur tous tes appareils.
+        </Text>
       </View>
 
       <View className="gap-3">
-        <Button label={copy.signIn} onPress={() => router.push('/auth/sign-in')} />
+        <Button label="Se connecter" onPress={() => router.push('/auth/sign-in')} />
         <Button
-          label={copy.signUp}
+          label="Créer un compte"
           variant="outline"
           onPress={() => router.push('/auth/sign-up')}
         />

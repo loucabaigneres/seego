@@ -4,10 +4,9 @@ import { View, type TextInput } from 'react-native';
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
 
-import { AUTH_COPY } from '../constants';
 import { useAuthForm } from '../hooks/useAuthForm';
 import { signUpSchema } from '../lib/validation';
-import { closeAuth } from '../navigation';
+import { closeAuth } from '../lib/navigation';
 
 export function SignUpForm() {
   const emailRef = useRef<TextInput>(null);
@@ -19,13 +18,12 @@ export function SignUpForm() {
     request: (account) => authClient.signUp.email(account),
     onSuccess: closeAuth,
   });
-  const { fields } = AUTH_COPY;
 
   return (
     <View className="gap-5">
       <TextField
-        label={fields.name.label}
-        placeholder={fields.name.placeholder}
+        label="Prénom"
+        placeholder="Léa"
         value={form.values.name}
         onChangeText={(value) => form.setField('name', value)}
         error={form.fieldErrors.name}
@@ -39,8 +37,8 @@ export function SignUpForm() {
       />
       <TextField
         ref={emailRef}
-        label={fields.email.label}
-        placeholder={fields.email.placeholder}
+        label="Email"
+        placeholder="lea@exemple.fr"
         value={form.values.email}
         onChangeText={(value) => form.setField('email', value)}
         error={form.fieldErrors.email}
@@ -56,8 +54,8 @@ export function SignUpForm() {
       />
       <TextField
         ref={passwordRef}
-        label={fields.password.label}
-        placeholder={fields.password.placeholder}
+        label="Mot de passe"
+        placeholder="8 caractères minimum"
         value={form.values.password}
         onChangeText={(value) => form.setField('password', value)}
         error={form.fieldErrors.password}
@@ -72,7 +70,7 @@ export function SignUpForm() {
       {form.formError && <Notice message={form.formError} />}
 
       <Button
-        label={AUTH_COPY.signUp.submit}
+        label="Créer mon compte"
         loading={form.isSubmitting}
         onPress={form.submit}
         className="mt-1"

@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { RefreshControl } from 'react-native';
 
 import { GuestInvite } from '@/features/profile/components/GuestInvite';
-import { ProfileContent } from '@/features/profile/components/ProfileContent';
+import { ProfileContent, type ProfileSegment } from '@/features/profile/components/ProfileContent';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { ProfileSkeleton } from '@/features/profile/components/ProfileSkeleton';
 import { ProfileStats } from '@/features/profile/components/ProfileStats';
 import { SettingsLink } from '@/features/profile/components/SettingsLink';
-import { PROFILE_COPY, type ProfileSegment } from '@/features/profile/constants';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { colors } from '@/theme/tokens';
@@ -38,8 +37,8 @@ export default function ProfileScreen() {
     return (
       <Screen edges={['top']}>
         <ErrorState
-          title={PROFILE_COPY.loadError.title}
-          message={PROFILE_COPY.loadError.message}
+          title="Profil indisponible"
+          message="On n’arrive pas à charger ton profil. Vérifie ta connexion, puis on réessaie."
           onRetry={retry}
         />
       </Screen>

@@ -43,7 +43,7 @@ export const auth = betterAuth({
     'voyagr-*-arthurgramonts-projects.vercel.app',
     env.FRONTEND_URL,
     // Mobile app scheme (`scheme` in apps/mobile/app.json).
-    'voyagr://',
+    'seego://',
     ...(env.NODE_ENV === 'development' ? mobileDevOrigins : []),
   ],
 });

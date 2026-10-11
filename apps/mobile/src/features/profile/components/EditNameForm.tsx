@@ -2,18 +2,16 @@ import { View } from 'react-native';
 
 import { Button, Notice, Text, TextField } from '@/ui';
 
-import { PROFILE_COPY } from '../constants';
 import { useEditName } from '../hooks/useEditName';
 
 export function EditNameForm({ currentName }: { currentName: string | undefined }) {
   const form = useEditName(currentName);
-  const copy = PROFILE_COPY.editName;
 
   return (
     <View className="gap-4">
-      <Text variant="section">{copy.title}</Text>
+      <Text variant="section">Ton prénom</Text>
       <TextField
-        label={copy.label}
+        label="Prénom affiché"
         value={form.value}
         onChangeText={form.setValue}
         error={form.error ?? undefined}
@@ -24,9 +22,9 @@ export function EditNameForm({ currentName }: { currentName: string | undefined 
         returnKeyType="done"
         onSubmitEditing={form.save}
       />
-      {form.saved && <Notice tone="success" message={copy.saved} />}
+      {form.saved && <Notice tone="success" message="C’est noté, ton prénom est à jour." />}
       <Button
-        label={copy.save}
+        label="Enregistrer"
         loading={form.isSaving}
         disabled={!form.canSave}
         onPress={form.save}

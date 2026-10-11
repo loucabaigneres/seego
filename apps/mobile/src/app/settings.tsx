@@ -3,7 +3,6 @@ import { Redirect, router } from 'expo-router';
 import { useSignOut } from '@/features/auth/hooks/useSignOut';
 import { EditNameForm } from '@/features/profile/components/EditNameForm';
 import { SettingsHeader } from '@/features/profile/components/SettingsHeader';
-import { PROFILE_COPY } from '@/features/profile/constants';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { Button, LoadingState, Screen } from '@/ui';
 import { SignOutIcon } from '@/ui/icons';
@@ -14,7 +13,13 @@ export default function SettingsScreen() {
     onSignedOut: () => router.dismissTo('/profile'),
   });
 
-  if (isSessionPending) return <LoadingState />;
+  if (isSessionPending) {
+    return (
+      <Screen>
+        <LoadingState />
+      </Screen>
+    );
+  }
   if (!isSignedIn) return <Redirect href="/profile" />;
 
   return (
@@ -22,7 +27,7 @@ export default function SettingsScreen() {
       <SettingsHeader />
       <EditNameForm currentName={profile?.user?.name} />
       <Button
-        label={PROFILE_COPY.signOut}
+        label="Se déconnecter"
         variant="outline"
         icon={SignOutIcon}
         loading={isSigningOut}

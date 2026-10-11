@@ -7,7 +7,6 @@ import { colors } from '@/theme/tokens';
 import { Badge, Text } from '@/ui';
 import { ArrowSquareOutIcon } from '@/ui/icons';
 
-import { INSPIRATIONS_COPY } from '../constants';
 import { formatHashtags, platformLabel, shortUrl } from '../lib/inspiration';
 
 export type InspirationItem = RouterOutputs['inspiration']['listMine'][number];
@@ -19,7 +18,7 @@ export function InspirationCard({ inspiration }: { inspiration: InspirationItem 
   return (
     <Pressable
       role="link"
-      aria-label={`${INSPIRATIONS_COPY.open} ${platformLabel(inspiration.platform)}`}
+      aria-label={`Ouvrir le lien ${platformLabel(inspiration.platform)}`}
       accessibilityHint={shortUrl(inspiration.originalUrl)}
       onPress={() => WebBrowser.openBrowserAsync(inspiration.originalUrl)}
       className="gap-3 rounded-card bg-surface p-5 active:opacity-80"
@@ -39,7 +38,7 @@ export function InspirationCard({ inspiration }: { inspiration: InspirationItem 
       ) : null}
 
       <Text variant="caption" tone={hashtags.length ? 'brand' : 'muted'}>
-        {hashtags.length ? hashtags.join('  ') : INSPIRATIONS_COPY.noTags}
+        {hashtags.length ? hashtags.join('  ') : 'Aucun hashtag détecté'}
       </Text>
     </Pressable>
   );

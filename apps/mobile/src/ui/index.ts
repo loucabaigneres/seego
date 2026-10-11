@@ -9,6 +9,7 @@ export { Card } from './Card';
 export { Chip } from './Chip';
 export { cn } from './cn';
 export { ComingSoonScreen } from './ComingSoonScreen';
+export { GoogleLogo } from './GoogleLogo';
 export { Notice } from './Notice';
 export { ProgressBar } from './ProgressBar';
 export { Reveal } from './Reveal';

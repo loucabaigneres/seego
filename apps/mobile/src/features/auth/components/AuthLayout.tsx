@@ -7,19 +7,28 @@ import { colors } from '@/theme/tokens';
 import { Button, Screen, Text } from '@/ui';
 import { XIcon } from '@/ui/icons';
 
-import { AUTH_COPY } from '../constants';
-import { closeAuth } from '../navigation';
+import { closeAuth } from '../lib/navigation';
 import { GoogleSignIn } from './GoogleSignIn';
 
-type AuthCopy = (typeof AUTH_COPY)[keyof Pick<typeof AUTH_COPY, 'signIn' | 'signUp'>];
-
 export interface AuthLayoutProps {
-  copy: AuthCopy;
+  overline: string;
+  title: string;
+  subtitle: string;
+  switchPrompt: string;
+  switchCta: string;
   switchHref: Href;
   children: ReactNode;
 }
 
-export function AuthLayout({ copy, switchHref, children }: AuthLayoutProps) {
+export function AuthLayout({
+  overline,
+  title,
+  subtitle,
+  switchPrompt,
+  switchCta,
+  switchHref,
+  children,
+}: AuthLayoutProps) {
   return (
     <KeyboardAvoidingView
       className="flex-1"
@@ -28,7 +37,7 @@ export function AuthLayout({ copy, switchHref, children }: AuthLayoutProps) {
       <Screen scroll contentClassName="gap-8">
         <Pressable
           role="button"
-          aria-label={AUTH_COPY.close}
+          aria-label="Fermer"
           onPress={closeAuth}
           hitSlop={8}
           className="-mr-2 size-11 items-center justify-center self-end active:opacity-60"
@@ -37,11 +46,11 @@ export function AuthLayout({ copy, switchHref, children }: AuthLayoutProps) {
         </Pressable>
 
         <View className="gap-3">
-          <Text variant="overline">{copy.overline}</Text>
+          <Text variant="overline">{overline}</Text>
           <Text variant="title" role="heading">
-            {copy.title}
+            {title}
           </Text>
-          <Text tone="muted">{copy.subtitle}</Text>
+          <Text tone="muted">{subtitle}</Text>
         </View>
 
         {children}
@@ -49,9 +58,9 @@ export function AuthLayout({ copy, switchHref, children }: AuthLayoutProps) {
         <GoogleSignIn />
 
         <View className="mt-auto flex-row flex-wrap items-center justify-center">
-          <Text tone="muted">{copy.switchPrompt}</Text>
+          <Text tone="muted">{switchPrompt}</Text>
           <Button
-            label={copy.switchCta}
+            label={switchCta}
             variant="ghost"
             size="sm"
             // Tight padding keeps prompt and link on one line on small phones.

@@ -3,8 +3,6 @@ import { Pressable, View } from 'react-native';
 import type { RouterOutputs } from '@/lib/trpc';
 import { Card, Text } from '@/ui';
 
-import { PROFILE_COPY } from '../constants';
-
 type Stats = RouterOutputs['user']['getProfile']['stats'];
 
 interface StatProps {
@@ -39,8 +37,15 @@ function Stat({ value, label, onPress }: StatProps) {
 export function ProfileStats({ stats, onPressTrips }: { stats: Stats; onPressTrips?: () => void }) {
   return (
     <View className="flex-row gap-3">
-      <Stat value={stats.tripsCount} label={PROFILE_COPY.stats.trips} onPress={onPressTrips} />
-      <Stat value={stats.likedPlacesCount} label={PROFILE_COPY.stats.likes} />
+      <Stat
+        value={stats.tripsCount}
+        label={{ singular: 'Voyage créé', plural: 'Voyages créés' }}
+        onPress={onPressTrips}
+      />
+      <Stat
+        value={stats.likedPlacesCount}
+        label={{ singular: 'Lieu liké', plural: 'Lieux likés' }}
+      />
     </View>
   );
 }

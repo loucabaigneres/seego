@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { authClient } from '@/lib/auth-client';
 
-import { syncQueriesWithSession } from '../query-cache';
+import { syncQueriesWithSession } from '../lib/query-cache';
 
 export function useSignOut({ onSignedOut }: { onSignedOut?: () => void } = {}) {
   const mutation = useMutation({
