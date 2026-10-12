@@ -27,7 +27,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     'https://app.seego.fr',
     'https://seego-app.vercel.app',
-    'seego-*-arthurgramonts-projects.vercel.app/',
+    'https://seego-*-arthurgramonts-projects.vercel.app',
     env.FRONTEND_URL,
   ],
 });
