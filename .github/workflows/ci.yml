@@ -31,7 +31,7 @@ jobs:
             turbo-${{ github.job }}-
       
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
         run: pnpx turbo run format lint build typecheck --filter=@voyagr/api --filter=@voyagr/database --filter=@voyagr/web
