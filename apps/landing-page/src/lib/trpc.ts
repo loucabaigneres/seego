@@ -1,8 +1,7 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 // Only the AppRouter *type* is imported, so no server code is bundled into the client.
 import type { AppRouter } from '@voyagr/api/src/trpc/router';
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+import { env } from '../env';
 
 /**
  * Vanilla, fully-typed tRPC client. The landing page only needs a single public
@@ -11,7 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: `${API_URL}/trpc`,
+      url: `${env.VITE_API_URL}/trpc`,
     }),
   ],
 });
