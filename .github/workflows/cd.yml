@@ -56,7 +56,7 @@ jobs:
             turbo-${{ github.job }}-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
         run: pnpx turbo run format lint build typecheck --filter=@voyagr/api --filter=@voyagr/database --filter=@voyagr/web
@@ -102,19 +102,24 @@ jobs:
       - name: pnpm configuration
         uses: pnpm/action-setup@v6
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+      - name: Node.js configuration
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
 
-      - name: Drizzle Push to Supabase
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply Drizzle migrations to Supabase
         run: pnpm --filter @voyagr/database db:migrate
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
-          EXTENSIONS_FILTERS: '["postgis"]'
 
       - name: Trigger Deploy Hook
         run: |
           echo "Notification sent to Render to load the new Docker image"
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          curl -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
   
   deploy-frontend:
     name: Deploy Web to Vercel
@@ -135,7 +140,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter="!website"
+        run: pnpm install --frozen-lockfile
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
