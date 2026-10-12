@@ -10,3 +10,7 @@ packages/database/data.json
 apps/mobile/AGENTS.md
 
 TODO.md
+
+.claude
+graphify-out/
+CLAUDE.md
