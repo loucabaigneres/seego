@@ -1,5 +1,5 @@
-import L from 'leaflet'
-import { useEffect, useRef, useState } from 'react'
+import L from 'leaflet';
+import { useEffect, useRef, useState } from 'react';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -180,6 +180,7 @@ export function TripMap({ days }: TripMapProps) {
 
     const map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: true })
     mapRef.current = map
+    const markers = markersRef.current
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -196,7 +197,7 @@ export function TripMap({ days }: TripMapProps) {
         bounds.push(coords)
 
         const marker = L.marker(coords, { icon: makeIcon(act.category), riseOnHover: true }).addTo(map)
-        markersRef.current.set(act.id, { marker, dayIndex: day.dayIndex, category: act.category })
+        markers.set(act.id, { marker, dayIndex: day.dayIndex, category: act.category })
 
         // Built as a text node: titles come from scraped data and must not be
         // parsed as HTML.
@@ -228,7 +229,7 @@ export function TripMap({ days }: TripMapProps) {
     return () => {
       map.remove()
       mapRef.current = null
-      markersRef.current.clear()
+      markers.clear()
     }
   }, [days])
 
@@ -317,7 +318,7 @@ export function TripMap({ days }: TripMapProps) {
 
         {/* ── Detail panel ── */}
         {activePin && (
-          <div className="absolute inset-x-3 bottom-3 z-[1000] overflow-hidden rounded-[20px] border border-[#eee] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
+          <div className="absolute inset-x-3 bottom-3 z-1000 overflow-hidden rounded-[20px] border border-[#eee] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
             {/* Image */}
             {activePin.activity.mainMediaUrl && (
               <div className="relative h-36 w-full overflow-hidden">
@@ -326,7 +327,7 @@ export function TripMap({ days }: TripMapProps) {
                   alt={activePin.activity.title}
                   className="h-full w-full object-cover"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/30 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/30 to-transparent" />
               </div>
             )}
 

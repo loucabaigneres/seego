@@ -86,7 +86,7 @@ function DiscoveryPage() {
   const queryClient = useQueryClient()
 
   const feedQuery = useQuery(trpc.discovery.feed.queryOptions())
-  const feed = feedQuery.data ?? []
+  const feed = useMemo(() => feedQuery.data ?? [], [feedQuery.data])
 
   const [cursor, setCursor] = useState(0)
   const [likes, setLikes] = useState(0)
@@ -286,7 +286,7 @@ function DiscoveryPage() {
 
   return (
     <div className="flex h-[calc(100dvh-61px)] w-full justify-center overflow-hidden bg-[#F2EDE8] px-4 pb-4 pt-3 md:pb-6 md:pt-5">
-      <div className="flex h-full w-full max-w-[420px] flex-col">
+      <div className="flex h-full w-full max-w-105 flex-col">
         {/* ── Progress & destination ── */}
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
@@ -430,8 +430,8 @@ function DiscoveryPage() {
                     className="pointer-events-none absolute inset-0 h-full w-full object-cover"
                   />
 
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-linear-to-b from-black/45 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-black/85 via-black/40 to-transparent" />
 
                   <div className="pointer-events-none absolute inset-x-0 top-0 p-3">
                     {photos.length > 1 && (
@@ -654,16 +654,16 @@ function DetailSheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[28px] bg-[#F2EDE8] shadow-2xl transition-transform duration-300 ease-out sm:max-h-[88vh] sm:rounded-[28px]"
+        className="relative flex max-h-[92dvh] w-full max-w-120 flex-col overflow-hidden rounded-t-[28px] bg-[#F2EDE8] shadow-2xl transition-transform duration-300 ease-out sm:max-h-[88vh] sm:rounded-[28px]"
         style={{ transform: shown ? 'translateY(0)' : 'translateY(48px)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none]">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none">
           <div className="relative h-72 bg-[#1a1a1a] sm:h-80">
             <div
               ref={galleryRef}
               onScroll={onGalleryScroll}
-              className="flex h-full snap-x snap-mandatory overflow-x-auto [scrollbar-width:none]"
+              className="flex h-full snap-x snap-mandatory overflow-x-auto scrollbar-none"
             >
               {photos.map((src, i) => (
                 <img
@@ -677,8 +677,8 @@ function DetailSheet({
               ))}
             </div>
 
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/45 to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-linear-to-b from-black/45 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-black/45 to-transparent" />
             <div className="pointer-events-none absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-white/70 sm:hidden" />
 
             <button
@@ -906,7 +906,7 @@ function ResultOverlay({
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex items-end justify-center bg-black/55 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
+      className={`fixed inset-0 z-100 flex items-end justify-center bg-black/55 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
         shown ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={onClose}
@@ -915,7 +915,7 @@ function ResultOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-[92dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-[28px] bg-[#F2EDE8] shadow-2xl transition-transform duration-300 ease-out sm:max-h-[90vh] sm:rounded-[28px]"
+        className="relative flex max-h-[92dvh] w-full max-w-120 flex-col overflow-hidden rounded-t-[28px] bg-[#F2EDE8] shadow-2xl transition-transform duration-300 ease-out sm:max-h-[90vh] sm:rounded-[28px]"
         style={{ transform: shown ? 'translateY(0)' : 'translateY(48px)' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -971,12 +971,12 @@ function ResultOverlay({
           </ResultState>
         ) : (
           <>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none]">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain scrollbar-none">
               <div className="relative h-72 bg-[#1a1a1a] sm:h-80">
                 {top.heroImage && (
                   <img src={top.heroImage} alt="" className="h-full w-full object-cover" />
                 )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/20" />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/25 to-black/20" />
                 <div className="pointer-events-none absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-white/70 sm:hidden" />
                 <div className="absolute inset-x-0 bottom-0 p-6">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
@@ -1000,7 +1000,7 @@ function ResultOverlay({
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[#888]">
                       Tes coups de cœur à {top.city}
                     </h3>
-                    <ul className="-mx-5 mt-2.5 flex snap-x gap-3 overflow-x-auto px-5 pb-1 [scrollbar-width:none]">
+                    <ul className="-mx-5 mt-2.5 flex snap-x gap-3 overflow-x-auto px-5 pb-1 scrollbar-none">
                       {top.likedHere.map((place: LikedPlace) => (
                         <li key={place.id} className="w-36 shrink-0 snap-start">
                           <a
