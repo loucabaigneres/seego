@@ -5,8 +5,8 @@ import { fastifyTRPCPlugin, FastifyTRPCPluginOptions } from '@trpc/server/adapte
 import { fromNodeHeaders } from 'better-auth/node';
 import { sql } from 'drizzle-orm';
 import Fastify from 'fastify';
-import { db } from './lib/db.js';
 import { auth } from './lib/auth.js';
+import { db } from './lib/db.js';
 import { registerImageProxy } from './routes/image-proxy.js';
 import { createContext } from './trpc/context.js';
 import { AppRouter, appRouter } from './trpc/router.js';
@@ -16,6 +16,10 @@ const server = Fastify({ logger: true });
 await server.register(cors, {
   origin: (origin, callback) => {
     if (!origin) {
+      return callback(null, true);
+    }
+
+    if (origin === 'https://seego.fr' || origin === 'https://seego-landing-page.vercel.app') {
       return callback(null, true);
     }
 
