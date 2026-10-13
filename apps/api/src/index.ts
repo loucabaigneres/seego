@@ -19,7 +19,7 @@ await server.register(cors, {
       return callback(null, true);
     }
 
-    if (origin === 'https://seego.fr' || origin === 'https://seego-landing-page.vercel.app') {
+    if (origin === 'https://www.seego.fr' || origin === 'https://seego-landing-page.vercel.app') {
       return callback(null, true);
     }
 
