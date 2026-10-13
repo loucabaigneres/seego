@@ -1,6 +1,6 @@
 {
-  "id": "b9a7cec9-3717-46e6-a0c0-93bd46c9808b",
-  "prevId": "73f21199-e27a-42ad-95e3-1b81eebe512e",
+  "id": "9b2d6c20-8b57-4c39-adcd-e17c7d13b21f",
+  "prevId": "05c58a8e-38b2-4148-b763-c9665e541b08",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1079,39 +1079,12 @@
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
-        },
-        "is_group": {
-          "name": "is_group",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "invite_code": {
-          "name": "invite_code",
-          "type": "varchar(12)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "invite_code_expires_at": {
-          "name": "invite_code_expires_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "trip_invite_code_unique": {
-          "name": "trip_invite_code_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "invite_code"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1196,8 +1169,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.trip_members": {
-      "name": "trip_members",
+    "public.waitlist_leads": {
+      "name": "waitlist_leads",
       "schema": "",
       "columns": {
         "id": {
@@ -1207,27 +1180,56 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "trip_id": {
-          "name": "trip_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
+        "email": {
+          "name": "email",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "role": {
-          "name": "role",
+        "utm_source": {
+          "name": "utm_source",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_medium": {
+          "name": "utm_medium",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_campaign": {
+          "name": "utm_campaign",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_term": {
+          "name": "utm_term",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "utm_content": {
+          "name": "utm_content",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referrer": {
+          "name": "referrer",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'member'"
+          "notNull": false
         },
-        "joined_at": {
-          "name": "joined_at",
+        "landing_page_url": {
+          "name": "landing_page_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
@@ -1235,58 +1237,63 @@
         }
       },
       "indexes": {
-        "trip_user_unique_idx": {
-          "name": "trip_user_unique_idx",
+        "waitlist_email_idx": {
+          "name": "waitlist_email_idx",
           "columns": [
             {
-              "expression": "trip_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "user_id",
+              "expression": "email",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
-          "isUnique": true,
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "waitlist_source_idx": {
+          "name": "waitlist_source_idx",
+          "columns": [
+            {
+              "expression": "utm_source",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "waitlist_campaign_idx": {
+          "name": "waitlist_campaign_idx",
+          "columns": [
+            {
+              "expression": "utm_campaign",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
         }
       },
-      "foreignKeys": {
-        "trip_members_trip_id_trip_id_fk": {
-          "name": "trip_members_trip_id_trip_id_fk",
-          "tableFrom": "trip_members",
-          "tableTo": "trip",
-          "columnsFrom": [
-            "trip_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "trip_members_user_id_user_id_fk": {
-          "name": "trip_members_user_id_user_id_fk",
-          "tableFrom": "trip_members",
-          "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "waitlist_leads_email_unique": {
+          "name": "waitlist_leads_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
