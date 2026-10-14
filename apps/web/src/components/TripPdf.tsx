@@ -1,4 +1,4 @@
-import { Document, Image, Link, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { Document, Image, Link, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { env } from '../env'
 
 // ─── Types (mirrors getTrip output) ──────────────────────────────────────────
@@ -356,7 +356,7 @@ export function TripPdfDocument({ trip, days }: TripPdfProps) {
     null
 
   return (
-    <Document title={trip.title ?? 'Itinéraire'} author="Voyagr">
+    <Document title={trip.title ?? 'Itinéraire'} author="Seego">
       <Page size="A4" style={s.page}>
 
         {/* Hero */}
@@ -478,7 +478,7 @@ export function TripPdfDocument({ trip, days }: TripPdfProps) {
         {/* Footer */}
         <View style={s.footer} fixed>
           <Text style={s.footerBrand}>
-            Voyagr<Text style={{ color: '#FF4D4D' }}>.</Text>
+            Seego<Text style={{ color: '#FF4D4D' }}>.</Text>
           </Text>
           <Text style={s.footerText} render={({ pageNumber, totalPages }) =>
             `${pageNumber} / ${totalPages}`

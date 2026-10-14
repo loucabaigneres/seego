@@ -1,4 +1,4 @@
-import type { DiscoveryTags } from '@voyagr/database';
+import type { DiscoveryTags } from '@seego/database';
 import { motion, useMotionValue, useTransform, type PanInfo } from 'motion/react';
 import type { RouterInputs, RouterOutputs } from '../lib/trpc';
 

@@ -1,4 +1,4 @@
-import { baseConfig } from '@voyagr/eslint-config';
+import { baseConfig } from '@seego/eslint-config';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 

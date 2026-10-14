@@ -1,4 +1,4 @@
-import { baseConfig } from '@voyagr/eslint-config';
+import { baseConfig } from '@seego/eslint-config';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
