@@ -1,5 +1,5 @@
 {
-  "name": "@voyagr/api",
+  "name": "@seego/api",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -21,7 +21,7 @@
     "@better-auth/drizzle-adapter": "^1.6.17",
     "@fastify/cors": "^11.2.0",
     "@trpc/server": "^11.19.0",
-    "@voyagr/database": "workspace:*",
+    "@seego/database": "workspace:*",
     "better-auth": "^1.6.17",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@voyagr/eslint-config": "workspace:*",
+    "@seego/eslint-config": "workspace:*",
     "eslint": "^10.2.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",

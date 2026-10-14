@@ -1,7 +1,6 @@
-// import type { VoyagrDb } from '#/db/voyagr';
+import type { DiscoveryContentData } from '@seego/database';
 import type { TRPCRouterRecord } from '@trpc/server';
 import { TRPCError } from '@trpc/server';
-import type { DiscoveryContentData } from '@voyagr/database';
 import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DiscoveryItem, SwipeRecord } from '../../lib/recommendation/algorithm.js';
@@ -378,7 +377,7 @@ export const discoveryRouter = {
   // ─── Admin ─────────────────────────────────────────────────────────────────────
 
   /** Throws FORBIDDEN if the calling user is not an admin. */
-  // async function requireAdmin(ctx: { db: VoyagrDb; userId: string }) {
+  // async function requireAdmin(ctx: { db: SeegoDb; userId: string }) {
   //   if (ctx.userId === 'guest') {
   //     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Non authentifié.' });
   //   }

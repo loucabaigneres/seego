@@ -59,7 +59,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
-        run: pnpx turbo run format lint build typecheck --filter=@voyagr/api --filter=@voyagr/database --filter=@voyagr/web
+        run: pnpx turbo run format lint build typecheck --filter=@seego/api --filter=@seego/database --filter=@seego/web
 
   build-and-push-docker:
     name: Build and Push Docker Image
@@ -86,9 +86,9 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/voyagr-api:${{ needs.setup-environment.outputs.docker_tag }}
-          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/voyagr-api:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/voyagr-api:buildcache,mode=max
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/seego-api:${{ needs.setup-environment.outputs.docker_tag }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/seego-api:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/seego-api:buildcache,mode=max
 
   deploy-backend:
     name: Deploy Backend & Database
@@ -112,7 +112,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Apply Drizzle migrations to Supabase
-        run: pnpm --filter @voyagr/database db:migrate
+        run: pnpm --filter @seego/database db:migrate
         env:
           DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
 
@@ -146,7 +146,7 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pre-build Monorepo Dependencies
-        run: pnpm run build --filter="@voyagr/database" --filter="@voyagr/api"
+        run: pnpm run build --filter="@seego/database" --filter="@seego/api"
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=${{ needs.setup-environment.outputs.vercel_env }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/web

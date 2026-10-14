@@ -1,5 +1,5 @@
 {
-  "name": "@voyagr/mobile",
+  "name": "@seego/mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
@@ -41,8 +41,8 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/react": "~19.2.2",
-    "@voyagr/api": "workspace:*",
-    "@voyagr/eslint-config": "workspace:*",
+    "@seego/api": "workspace:*",
+    "@seego/eslint-config": "workspace:*",
     "babel-preset-expo": "~57.0.14",
     "eslint": "^10.12.0",
     "eslint-plugin-react-hooks": "^7.1.1",
