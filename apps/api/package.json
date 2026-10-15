@@ -18,10 +18,12 @@
   "license": "ISC",
   "packageManager": "pnpm@10.33.2",
   "dependencies": {
+    "@ai-sdk/google": "^4.0.97",
     "@better-auth/drizzle-adapter": "^1.6.17",
     "@fastify/cors": "^11.2.0",
     "@trpc/server": "^11.17.0",
     "@voyagr/database": "workspace:*",
+    "ai": "^7.0.142",
     "better-auth": "^1.6.17",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

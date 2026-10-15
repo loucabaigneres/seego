@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Link2, Loader2, MapPin, Plus, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useInspirationMutations } from '../hooks/useInspirationMutations';
 import { trpc, type RouterOutputs } from '../lib/trpc';
 import type { ImportInspirationValues } from '../lib/validations/inspiration';
 import {
@@ -27,7 +28,6 @@ export function ImportInspirationForm({
   compact = false,
   className = '',
 }: ImportInspirationFormProps) {
-  const queryClient = useQueryClient();
   const [showCaptionField, setShowCaptionField] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -48,14 +48,9 @@ export function ImportInspirationForm({
     defaultValues: { url: '', caption: '' },
   });
 
-  const addToTripMutation = useMutation(
-    trpc.inspiration.addToTrip.mutationOptions({
-      onSuccess: (data) => {
-        setAddedTo({ tripId: data.tripId, count: data.added });
-        queryClient.invalidateQueries(trpc.discovery.getTrip.queryFilter({ tripId: data.tripId }));
-      },
-    }),
-  );
+  const { addToTrip: addToTripMutation } = useInspirationMutations({
+    onAddedToTrip: (data) => setAddedTo({ tripId: data.tripId, count: data.added }),
+  });
 
   const analyzeMutation = useMutation(
     trpc.inspiration.analyzeFromUrl.mutationOptions({
@@ -173,24 +168,24 @@ export function ImportInspirationForm({
             </p>
           )}
 
-          {result.inspiration.report && (
+          {result.inspiration.aiReport && (
             <div>
               <p className="text-xs font-bold tracking-wide text-[#1a1a1a] uppercase">
                 Compte rendu
               </p>
               <p className="mt-1 text-sm leading-relaxed text-[#1a1a1a]">
-                {result.inspiration.report}
+                {result.inspiration.aiReport}
               </p>
             </div>
           )}
 
-          {result.inspiration.places.length > 0 && (
+          {result.inspiration.extractedPlaces.length > 0 && (
             <div>
               <p className="text-xs font-bold tracking-wide text-[#1a1a1a] uppercase">
                 Lieux détectés
               </p>
               <ul className="mt-2 space-y-2">
-                {result.inspiration.places.map((place, index) => (
+                {result.inspiration.extractedPlaces.map((place, index) => (
                   <li
                     key={`${place.name}-${index}`}
                     className="flex gap-2 rounded-lg bg-white p-3 shadow-sm"
@@ -230,7 +225,7 @@ export function ImportInspirationForm({
             </div>
           )}
 
-          {result.inspiration.places.length > 0 && (
+          {result.inspiration.extractedPlaces.length > 0 && (
             <div className="border-t border-[#2ecc71]/20 pt-3">
               {addedTo ? (
                 <p className="text-xs font-semibold text-[#2ecc71]">

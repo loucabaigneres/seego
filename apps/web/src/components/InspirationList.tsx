@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { Check, ChevronDown, ExternalLink, Loader2, MapPin, Plus, Trash2 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
+import { useInspirationMutations } from '../hooks/useInspirationMutations';
 import { trpc, type RouterOutputs } from '../lib/trpc';
 import { ConfirmDialog } from './ConfirmDialog';
 
@@ -25,12 +26,12 @@ const typeLabel = (type: string | null): string =>
 
 // Un titre lisible à partir de l'analyse, à la place de l'URL brute.
 function inspirationTitle(item: Inspiration): string {
-  if (item.places.length > 0) {
-    const first = item.places[0]!.name;
-    return item.places.length > 1 ? `${first} +${item.places.length - 1}` : first;
+  if (item.extractedPlaces.length > 0) {
+    const first = item.extractedPlaces[0]!.name;
+    return item.extractedPlaces.length > 1 ? `${first} +${item.extractedPlaces.length - 1}` : first;
   }
-  if (item.report) {
-    return item.report.length > 60 ? `${item.report.slice(0, 60).trimEnd()}…` : item.report;
+  if (item.aiReport) {
+    return item.aiReport.length > 60 ? `${item.aiReport.slice(0, 60).trimEnd()}…` : item.aiReport;
   }
   return item.platform === 'tiktok' ? 'Publication TikTok' : 'Publication Instagram';
 }
@@ -40,7 +41,6 @@ export function InspirationList({
   emptyAction,
   className = '',
 }: InspirationListProps) {
-  const queryClient = useQueryClient();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [tripId, setTripId] = useState('');
   const [typeFilter, setTypeFilter] = useState<Set<string>>(new Set());
@@ -50,24 +50,13 @@ export function InspirationList({
   const importsQuery = useQuery({ ...trpc.inspiration.listMine.queryOptions(), enabled });
   const tripsQuery = useQuery({ ...trpc.user.getTrips.queryOptions(), enabled });
 
-  const addToTripMutation = useMutation(
-    trpc.inspiration.addToTrip.mutationOptions({
-      onSuccess: (data) => {
-        setAddedTo({ tripId: data.tripId, count: data.added });
-        setSelected(new Set());
-        queryClient.invalidateQueries(trpc.discovery.getTrip.queryFilter({ tripId: data.tripId }));
-      },
-    }),
-  );
-
-  const deleteMutation = useMutation(
-    trpc.inspiration.delete.mutationOptions({
-      onSuccess: () => {
-        setConfirmDeleteId(null);
-        queryClient.invalidateQueries(trpc.inspiration.listMine.queryFilter());
-      },
-    }),
-  );
+  const { addToTrip: addToTripMutation, remove: deleteMutation } = useInspirationMutations({
+    onAddedToTrip: (data) => {
+      setAddedTo({ tripId: data.tripId, count: data.added });
+      setSelected(new Set());
+    },
+    onDeleted: () => setConfirmDeleteId(null),
+  });
 
   const toggle = (id: string) => {
     setAddedTo(null);
@@ -162,7 +151,7 @@ export function InspirationList({
         </p>
       ) : (
         visible.map((item) => {
-          const selectable = item.places.length > 0;
+          const selectable = item.extractedPlaces.length > 0;
           const isSelected = selected.has(item.id);
           const label = typeLabel(item.type);
           return (
@@ -230,9 +219,9 @@ export function InspirationList({
                     </div>
                   </div>
 
-                  {item.report ? (
+                  {item.aiReport ? (
                     <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-[#555]">
-                      {item.report}
+                      {item.aiReport}
                     </p>
                   ) : (
                     item.description && (
@@ -242,9 +231,9 @@ export function InspirationList({
                     )
                   )}
 
-                  {item.places.length > 0 && (
+                  {item.extractedPlaces.length > 0 && (
                     <ul className="mt-3 space-y-1.5">
-                      {item.places.map((place, index) => (
+                      {item.extractedPlaces.map((place, index) => (
                         <li
                           key={`${place.name}-${index}`}
                           className="flex items-start gap-2 text-xs"

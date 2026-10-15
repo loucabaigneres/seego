@@ -552,14 +552,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "report": {
-          "name": "report",
+        "ai_report": {
+          "name": "ai_report",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "places": {
-          "name": "places",
+        "extracted_places": {
+          "name": "extracted_places",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": false

@@ -34,14 +34,10 @@ export const importedInspiration = pgTable('imported_inspiration', {
   description: text('description'),
   extracted_location: text('extracted_location').notNull(),
   extracted_tags: jsonb('extracted_tags').notNull(),
-  // Compte rendu rédigé par l'IA à partir du contenu (légende + image d'aperçu).
-  report: text('report'),
-  // Type global de la publication, déduit par l'IA (sert au filtre par type).
+  aiReport: text('ai_report'),
   type: text('type').$type<PlaceCategory>(),
-  // Ville principale de la publication, déduite par l'IA.
   city: text('city'),
-  // Lieux détectés, avec leur adresse quand elle est connue. Voir `ExtractedPlace`.
-  places: jsonb('places').$type<ExtractedPlace[]>(),
+  extractedPlaces: jsonb('extracted_places').$type<ExtractedPlace[]>(),
   status: processingStatus('status').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });

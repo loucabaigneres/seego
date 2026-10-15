@@ -133,10 +133,10 @@ export const inspirationRouter = createTRPCRouter({
           platform: importedInspiration.platform,
           originalUrl: importedInspiration.originalUrl,
           description: importedInspiration.description,
-          report: importedInspiration.report,
+          aiReport: importedInspiration.aiReport,
           type: importedInspiration.type,
           city: importedInspiration.city,
-          places: importedInspiration.places,
+          extractedPlaces: importedInspiration.extractedPlaces,
           tags: importedInspiration.extracted_tags,
         })
         .from(importedInspiration)
@@ -152,10 +152,12 @@ export const inspirationRouter = createTRPCRouter({
             platform: existing.platform,
             originalUrl: existing.originalUrl,
             description: existing.description,
-            report: existing.report,
+            aiReport: existing.aiReport,
             type: existing.type,
             city: existing.city,
-            places: Array.isArray(existing.places) ? (existing.places as ExtractedPlace[]) : [],
+            extractedPlaces: Array.isArray(existing.extractedPlaces)
+              ? (existing.extractedPlaces as ExtractedPlace[])
+              : [],
             tags: Array.isArray(existing.tags) ? (existing.tags as string[]) : [],
           },
         };
@@ -221,10 +223,10 @@ export const inspirationRouter = createTRPCRouter({
           description: caption ? stripHashtags(caption) || null : null,
           extracted_location: summariseLocation(analysis.places),
           extracted_tags: tags,
-          report: analysis.summary || null,
+          aiReport: analysis.summary || null,
           type: analysis.type,
           city: analysis.city,
-          places: analysis.places,
+          extractedPlaces: analysis.places,
           status: 'analyzed',
         })
         .returning();
@@ -237,10 +239,10 @@ export const inspirationRouter = createTRPCRouter({
           platform: inspiration.platform,
           originalUrl: inspiration.originalUrl,
           description: inspiration.description,
-          report: inspiration.report,
+          aiReport: inspiration.aiReport,
           type: inspiration.type,
           city: inspiration.city,
-          places: analysis.places,
+          extractedPlaces: analysis.places,
           tags,
         },
       };
@@ -270,7 +272,7 @@ export const inspirationRouter = createTRPCRouter({
       }
 
       const inspirations = await ctx.db
-        .select({ places: importedInspiration.places })
+        .select({ extractedPlaces: importedInspiration.extractedPlaces })
         .from(importedInspiration)
         .where(
           and(
@@ -280,7 +282,7 @@ export const inspirationRouter = createTRPCRouter({
         );
 
       const places = inspirations.flatMap((row) =>
-        Array.isArray(row.places) ? (row.places as ExtractedPlace[]) : [],
+        Array.isArray(row.extractedPlaces) ? (row.extractedPlaces as ExtractedPlace[]) : [],
       );
 
       if (places.length === 0) {
@@ -346,10 +348,10 @@ export const inspirationRouter = createTRPCRouter({
         platform: importedInspiration.platform,
         originalUrl: importedInspiration.originalUrl,
         description: importedInspiration.description,
-        report: importedInspiration.report,
+        aiReport: importedInspiration.aiReport,
         type: importedInspiration.type,
         city: importedInspiration.city,
-        places: importedInspiration.places,
+        extractedPlaces: importedInspiration.extractedPlaces,
         tags: importedInspiration.extracted_tags,
         status: importedInspiration.status,
         createdAt: importedInspiration.createdAt,
@@ -359,11 +361,13 @@ export const inspirationRouter = createTRPCRouter({
       .orderBy(desc(importedInspiration.createdAt))
       .limit(100);
 
-    // `extracted_tags` / `places` sont des jsonb : on normalise à la lecture.
+    // `extracted_tags` / `extracted_places` sont des jsonb : on normalise à la lecture.
     return rows.map((row) => ({
       ...row,
       tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-      places: Array.isArray(row.places) ? (row.places as ExtractedPlace[]) : [],
+      extractedPlaces: Array.isArray(row.extractedPlaces)
+        ? (row.extractedPlaces as ExtractedPlace[])
+        : [],
     }));
   }),
 
