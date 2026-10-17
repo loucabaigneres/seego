@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import type { TripFormValues } from '../lib/validations/trip';
 import { DIETARY_OPTIONS, MEDICAL_OPTIONS, tripFormSchema } from '../lib/validations/trip';
 
@@ -14,7 +14,7 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
   const [step, setStep] = useState(1);
   const totalSteps = 3;
 
-  const { register, handleSubmit, watch, control, setValue, trigger, formState: { errors } } = useForm<TripFormValues>({
+  const { register, handleSubmit, control, setValue, trigger, formState: { errors } } = useForm<TripFormValues>({
     resolver: zodResolver(tripFormSchema as never),
     defaultValues: {
       destination: initialDestination,
@@ -35,7 +35,7 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
     name: "ages",
   });
 
-  const numberOfPeople = watch("numberOfPeople");
+  const numberOfPeople = useWatch({ control, name: "numberOfPeople" });
 
   useEffect(() => {
     const currentCount = ageFields.length;
@@ -48,8 +48,8 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
     }
   }, [numberOfPeople, ageFields.length, append, remove]);
 
-  const currentDietary = watch("dietaryOptions");
-  const currentMedical = watch("medicalOptions");
+  const currentDietary = useWatch({ control, name: "dietaryOptions" });
+  const currentMedical = useWatch({ control, name: "medicalOptions" });
 
   const toggleArrayItem = (fieldName: "dietaryOptions" | "medicalOptions", itemId: string, currentArray: string[]) => {
     if (currentArray.includes(itemId)) {
