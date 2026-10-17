@@ -93,7 +93,7 @@ The mobile app signs in through the API's Better Auth, with the `@better-auth/ex
   - **iOS simulator**: `http://localhost:3000` works as is.
   - **Android emulator or USB device**: run `adb reverse tcp:3000 tcp:3000`, then use `EXPO_PUBLIC_API_URL=http://localhost:3000`.
   - **Physical iPhone**: expose the API through an HTTPS tunnel (e.g. `ngrok http 3000`), set the tunnel URL as `BETTER_AUTH_URL` (API) and `EXPO_PUBLIC_API_URL` (mobile), and add `<tunnel>/api/auth/callback/google` to the Google console.
-- The API trusts the app scheme `voyagr://` and, in development, Expo Go (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
+- The API trusts the app scheme `seego://` and, in development, Expo Go (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
 
 Create `packages/database/.env`:
 
