@@ -1,0 +1,48 @@
+name: Deploy Landing Page (Website)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-website:
+    name: Deploy Website to Vercel
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pre-build Monorepo Dependencies
+        run: pnpm run build --filter="@voyagr/database" --filter="@voyagr/api"
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/landing-page
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_LANDING_PAGE }}
+
+      - name: Build Project Artifacts (Vercel)
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/landing-page
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_LANDING_PAGE }}
+
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/landing-page
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_LANDING_PAGE }}

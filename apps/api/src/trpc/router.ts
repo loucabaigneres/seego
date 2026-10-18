@@ -1,14 +1,16 @@
 import { TRPCError } from '@trpc/server';
-import { swipeDirectionEnum, discoveryContent, swipes, trip } from '@voyagr/database';
+import { discoveryContent, swipeDirectionEnum, swipes, trip } from '@voyagr/database';
 import { and, eq, notExists } from 'drizzle-orm';
 import * as z from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from './init.js';
 import { discoveryRouter } from './routers/discovery.js';
+import { groupRouter } from './routers/group.js';
 import { inspirationRouter } from './routers/inspiration.js';
 import { itineraryRouter } from './routers/itinerary.js';
-import { userRouter } from './routers/user.js';
-import { tripFormSchema } from './schemas/trip.js';
 import { onboardingRouter } from './routers/onboarding.js';
+import { userRouter } from './routers/user.js';
+import { waitlistRouter } from './routers/waitlist.js';
+import { tripFormSchema } from './schemas/trip.js';
 
 export const appRouter = createTRPCRouter({
   // Example route that requires authentication
@@ -157,9 +159,11 @@ export const appRouter = createTRPCRouter({
     ...itineraryRouter,
   }),
 
+  group: groupRouter,
   user: userRouter,
   inspiration: inspirationRouter,
   onboarding: onboardingRouter,
+  waitlist: waitlistRouter,
 });
 
 export type AppRouter = typeof appRouter;

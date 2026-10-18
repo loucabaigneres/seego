@@ -7,6 +7,7 @@ Welcome to the main repository for the Voyagr project! This repository uses a **
 - **Package Manager:** pnpm
 - **Monorepo Orchestrator:** Turborepo
 - **Frontend (`apps/web`):** React (Vite), TypeScript, TanStack Router, Tailwind CSS, Motion (`motion/react`), tRPC Client
+- **Mobile (`apps/mobile`):** React Native (React 19), Expo SDK 57, Expo Router, tRPC Client
 - **Backend (`apps/api`):** Node.js 24 (ESM), Fastify, tRPC, Zod, Better Auth
 - **Database (`packages/database`):** PostgreSQL, Drizzle ORM, `postgres.js`
 - **Code Quality:** ESLint v10 (Flat Config), Prettier, Husky, Commitlint, lint-staged
@@ -22,6 +23,7 @@ The codebase is divided into executable applications and shared packages.
 voyagr/
 ├── apps/
 │   ├── api/              # The backend server (Fastify + tRPC + Better Auth)
+│   ├── mobile/           # The mobile application (React Native + Expo)
 │   └── web/              # The frontend web application (Vite + React)
 ├── packages/
 │   ├── database/         # Drizzle schema, DB instance, and migrations
@@ -40,6 +42,7 @@ Ensure you have the following tools installed on your machine:
 - [Node.js](https://nodejs.org/) (Version 24 LTS)
 - [pnpm](https://pnpm.io/installation) (`npm install -g pnpm@10.33.2`)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Docker-Compose)
+- **Expo Go** installed on your physical device (iOS or Android), or a local emulator/simulator (Xcode/Android Studio).
 
 ### 2. Install Dependencies
 
@@ -77,6 +80,25 @@ Create `apps/web/.env`:
 VITE_API_URL=http://localhost:3000
 ```
 
+Create `apps/mobile/.env`:
+
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
+```
+
+> ⚠️ **Note for Mobile testing:** _If you are testing the mobile app on a physical device using Expo Go, `localhost` will not work. You must replace it with your computer's local IP address (e.g., `EXPO_PUBLIC_API_URL=http://192.168.1.X:3000`)._
+
+#### Mobile authentication (Better Auth)
+
+The mobile app signs in through the API's Better Auth, with the `@better-auth/expo` plugin: the session lives in SecureStore, and everything runs in Expo Go (no development build).
+
+- **Email / password** works on every target, including a LAN IP.
+- **Google** uses the browser redirect flow, so Google must reach the API's callback (`<BETTER_AUTH_URL>/api/auth/callback/google`, listed in the Google Cloud Console). Google refuses private IPs, so:
+  - **iOS simulator**: `http://localhost:3000` works as is.
+  - **Android emulator or USB device**: run `adb reverse tcp:3000 tcp:3000`, then use `EXPO_PUBLIC_API_URL=http://localhost:3000`.
+  - **Physical iPhone**: expose the API through an HTTPS tunnel (e.g. `ngrok http 3000`), set the tunnel URL as `BETTER_AUTH_URL` (API) and `EXPO_PUBLIC_API_URL` (mobile), and add `<tunnel>/api/auth/callback/google` to the Google console.
+- The API trusts the app scheme `seego://` and, in development, Expo Go (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
+
 Create `packages/database/.env`:
 
 ```env
@@ -105,15 +127,31 @@ pnpm --filter @voyagr/database db:seed
 
 > ℹ️ Note on `data.json`: The discovery content seed (`discovery.seed.ts`) imports extra locations from `packages/database/data.json` if the file is present. This file is gitignored (large scraped dataset) — without it, the seed simply skips this step and only inserts the test data.
 
-### 6. Run the Web Frontend
+### 6. Run the Frontends
 
-Since the backend is already running via Docker, you only need to start the Vite frontend locally:
+Since the backend is already running via Docker, you only need to start the frontends locally. You can run one or both depending on what you are working on.
+
+#### Run the Web App:
 
 ```bash
 pnpm turbo run dev --filter=@voyagr/web
 ```
 
 ✅ The Web App will be accessible at `http://localhost:5173`
+
+#### Run the Mobile App:
+
+```bash
+pnpm turbo run dev --filter=@voyagr/mobile
+```
+
+Or
+
+```bash
+pnpm turbo run dev --filter=@voyagr/mobile --ui=tui
+```
+
+✅ Scan the QR code in your terminal with the Expo Go app on your phone, or press `i` to open the iOS simulator / `a` for the Android emulator.
 
 ---
 
@@ -157,6 +195,7 @@ Thanks to Turborepo, you can run commands from the root to target specific proje
 | ----------------------------- | -------------------------------------------- |
 | **Start the API**             | `pnpm turbo run dev --filter=@voyagr/api`    |
 | **Start the Web App**         | `pnpm turbo run dev --filter=@voyagr/web`    |
+| **Start the Mobile App**      | `pnpm turbo run dev --filter=@voyagr/mobile` |
 | **Format the entire project** | `pnpm run format`                            |
 | **Lint the entire project**   | `pnpm run lint`                              |
 | **Generate DB migration**     | `pnpm --filter @voyagr/database db:generate` |
