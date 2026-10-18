@@ -5,8 +5,8 @@ import * as z from 'zod';
 import {
   AnalysisError,
   analyzeInspiration,
-  InspirationAnalysis,
   type InlineImage,
+  type InspirationAnalysis,
 } from '../../lib/aiAnalysis.js';
 import { upsertImportedPlace, type ImportedPlaceRef } from '../../lib/importedPlaces.js';
 import {
