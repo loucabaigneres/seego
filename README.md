@@ -65,6 +65,10 @@ BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=found_in_your_google_cloud_console
 GOOGLE_CLIENT_SECRET=found_in_your_google_cloud_console
 FRONTEND_URL=http://localhost:5173
+
+# AI Analysis Configuration (optional to start the server, required to analyze posts)
+AI_MODEL=google:gemini-flash-lite-latest
+GEMINI_API_KEY=your_google_ai_studio_api_key
 ```
 
 Create `apps/web/.env`:

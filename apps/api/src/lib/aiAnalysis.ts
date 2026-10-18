@@ -1,19 +1,11 @@
-/**
- * Socle de l'analyse d'inspiration, indépendant du fournisseur d'IA. On s'appuie sur le
- * Vercel AI SDK (`generateObject`) : un unique schéma Zod décrit la sortie attendue et
- * sert à la fois de contrainte pour le modèle, de validation et de typage — plus besoin
- * de synchroniser un schéma « maison » avec un parseur. Le retry et l'auth (via headers)
- * sont pris en charge par le SDK. Un fournisseur concret (cf. `gemini.ts`) ne fournit que
- * son `LanguageModel` et appelle `runInspirationAnalysis`.
- */
-
 import type { PlaceCategory } from '@voyagr/database';
-import { generateObject, type LanguageModel } from 'ai';
-import { z } from 'zod';
+import { generateText, NoObjectGeneratedError, Output, type LanguageModel } from 'ai';
+import * as z from 'zod';
+import { getAnalysisModel } from './aiProvider.js';
 
 export interface InlineImage {
   mimeType: string;
-  /** Contenu de l'image encodé en base64 (sans préfixe `data:`). */
+  /** Content of the image in base64 format */
   data: string;
 }
 
@@ -23,7 +15,12 @@ export interface AnalysisInput {
   transcript?: string | null;
 }
 
-export type AnalysisErrorReason = 'missing_key' | 'blocked' | 'api_error' | 'bad_response';
+export type AnalysisErrorReason =
+  | 'missing_key'
+  | 'empty_input'
+  | 'blocked'
+  | 'api_error'
+  | 'bad_response';
 
 export class AnalysisError extends Error {
   readonly reason: AnalysisErrorReason;
@@ -39,65 +36,75 @@ const CATEGORIES = ['restaurant', 'hotel', 'activité', 'autre'] as const satisf
   PlaceCategory,
   ...PlaceCategory[],
 ];
+
+const CATEGORY_DESCRIPTION =
+  '"restaurant" (restaurant, bar, café, street-food), "hotel" (hôtel, hébergement), "activité" (monument, musée, parc, visite, point d\'intérêt), ou "autre".';
+
 const categorySchema = z.enum(CATEGORIES);
 
 const placeSchema = z.object({
-  name: z.string(),
-  address: z.string().nullable(),
-  city: z.string().nullable(),
-  country: z.string().nullable(),
-  description: z.string().nullable(),
-  category: categorySchema.nullable(),
+  name: z.string().describe('Nom précis du lieu.'),
+  address: z
+    .string()
+    .nullable()
+    .describe(
+      'Adresse postale complète SEULEMENT si connue avec certitude, sinon null. Ne jamais inventer.',
+    ),
+  city: z.string().nullable().describe('Ville du lieu si déductible, sinon null.'),
+  country: z.string().nullable().describe('Pays du lieu si déductible, sinon null.'),
+  description: z
+    .string()
+    .nullable()
+    .describe("Une phrase expliquant l'intérêt du lieu pour un voyageur, sinon null."),
+  category: categorySchema.nullable().describe(`Catégorie du lieu : ${CATEGORY_DESCRIPTION}`),
 });
 
-const analysisSchema = z.object({
-  /** Compte rendu rédigé du contenu de la publication. */
-  summary: z.string(),
-  /** Type global de la publication (hôtel / restaurant / activité), pour le filtre. */
-  type: categorySchema.nullable(),
-  /** Ville principale de la publication. */
-  city: z.string().nullable(),
-  /** Lieux détectés, avec adresse quand elle est connue. */
-  places: z.array(placeSchema),
-  /** Mots-clés thématiques (sans le `#`), utiles pour nourrir les voyages. */
-  tags: z.array(z.string()),
+export const analysisSchema = z.object({
+  summary: z
+    .string()
+    .describe(
+      'Compte rendu clair et concis (3 à 6 phrases, en français) de ce que montre ou raconte la publication, en citant les lieux précis.',
+    ),
+  type: categorySchema
+    .nullable()
+    .describe('Thème global dominant de la publication (restaurant, hotel, activité ou autre).'),
+  city: z
+    .string()
+    .nullable()
+    .describe('Ville principale de la publication (ex. "Paris"), sinon null.'),
+  places: z
+    .array(placeSchema)
+    .describe(
+      'Tous les lieux mentionnés ou visibles (une entrée distincte par lieu). Liste vide si aucun.',
+    ),
+  tags: z
+    .array(z.string())
+    .describe('3 à 8 mots-clés thématiques en minuscules, sans le caractère #.'),
 });
 
 export type InspirationAnalysis = z.infer<typeof analysisSchema>;
 
-export const ANALYSIS_SYSTEM_PROMPT = `Tu es un assistant de voyage. On te donne le contenu d'une publication TikTok ou Instagram : sa légende, une ou plusieurs images d'aperçu, et parfois la transcription de sa bande-son (sous-titres). La transcription est souvent la source la plus riche : elle nomme des lieux précis absents de la légende.
+export const ANALYSIS_SYSTEM_PROMPT = `Tu es un assistant de voyage chargé d'extraire les lieux d'intérêt d'une publication TikTok ou Instagram.
+Croise toutes les sources fournies (légende, transcription audio et images) : la transcription nomme souvent des lieux précis absents de la légende.
+Si la publication présente une liste (ex. « top 3 », « mes bonnes adresses »), crée une entrée distincte pour chaque lieu.
+Reste factuel : n'invente jamais d'adresse postale si tu n'en es pas certain.`;
 
-Ta tâche :
-1. Rédige un compte rendu clair et concis (3 à 6 phrases, en français) de ce que montre ou raconte la publication. Si des lieux précis sont nommés, cite-les dans le compte rendu.
-2. Identifie TOUS les lieux mentionnés ou visibles (restaurants, monuments, villes, points d'intérêt, hébergements...). Si la publication présente une liste (ex. « top 3 », « 3 activités »), crée une entrée DISTINCTE par lieu. Pour chaque lieu :
-   - "name" : le nom du lieu.
-   - "address" : l'adresse postale complète SEULEMENT si tu la connais avec une confiance raisonnable. Sinon null. N'invente jamais une adresse.
-   - "city" et "country" : renseigne-les quand tu peux les déduire, sinon null.
-   - "description" : une phrase expliquant l'intérêt du lieu pour un voyageur, sinon null.
-   - "category" : classe le lieu dans EXACTEMENT une de ces valeurs : "restaurant" (restaurant, bar, café, street-food), "hotel" (hôtel, hébergement), "activité" (monument, musée, parc, visite, point d'intérêt). Si rien ne correspond, "autre".
-3. "type" : le type GLOBAL de la publication, dans EXACTEMENT une de ces valeurs : "restaurant", "hotel", "activité" (ou "autre" si rien ne correspond). C'est le thème dominant du post, pas forcément d'un lieu précis.
-4. "city" : le nom de la ville principale de la publication (ex. "Paris"), sinon null.
-5. "tags" : 3 à 8 mots-clés thématiques en minuscules, sans le caractère #.
-
-Si aucun lieu n'est identifiable, renvoie une liste "places" vide.`;
-
-/** Assemble la légende et la transcription (quand elles existent) en un seul bloc de texte. */
 export const buildUserText = (caption: string | null, transcript: string | null): string => {
   const blocks: string[] = [];
-  if (caption) blocks.push(`Légende de la publication :\n"""${caption}"""`);
-  if (transcript) blocks.push(`Transcription de la bande-son (sous-titres) :\n"""${transcript}"""`);
-  if (blocks.length === 0) {
-    return "La publication n'a pas de texte exploitable : appuie-toi sur les images.";
+  if (caption?.trim()) blocks.push(`Légende de la publication :\n"""${caption.trim()}"""`);
+  if (transcript?.trim()) {
+    blocks.push(`Transcription de la bande-son (sous-titres) :\n"""${transcript.trim()}"""`);
   }
-  return blocks.join('\n\n');
+  return blocks.length > 0
+    ? blocks.join('\n\n')
+    : "La publication n'a pas de texte exploitable : appuie-toi uniquement sur les images jointes.";
 };
 
-const REQUEST_TIMEOUT_MS = 30_000;
-const MAX_RETRIES = 3;
+const REQUEST_TIMEOUT_MS = 30_000; // 30 seconds timeout for the AI analysis request.
+const MAX_RETRIES = 3; // Maximum number of attempts in case of error.
 
 const trimToNull = (value: string | null): string | null => value?.trim() || null;
 
-/** Nettoie la sortie du modèle : trim, lieux sans nom écartés, tags dédupliqués. */
 const normalize = (raw: InspirationAnalysis): InspirationAnalysis => ({
   summary: raw.summary.trim(),
   type: raw.type,
@@ -118,21 +125,32 @@ const normalize = (raw: InspirationAnalysis): InspirationAnalysis => ({
 });
 
 /**
- * Analyse une publication (légende + transcription + images) avec le modèle fourni.
- * Le SDK gère le retry et la validation du schéma ; on se contente de normaliser la
- * sortie et de mapper les échecs sur `AnalysisError`. `label` contextualise les messages.
+ * Analyzes a publication (caption + transcript + images) with the configured model
+ * and returns structured information about the content.
  */
-export const runInspirationAnalysis = async (
-  model: LanguageModel,
+export const analyzeInspiration = async (
   { caption, images, transcript = null }: AnalysisInput,
-  label: string,
+  model?: LanguageModel,
 ): Promise<InspirationAnalysis> => {
-  let result: InspirationAnalysis;
+  const hasText = Boolean(caption?.trim() || transcript?.trim());
+  if (!hasText && images.length === 0) {
+    throw new AnalysisError(
+      'empty_input',
+      'Cannot analyze inspiration: caption, transcript, and images are all empty.',
+    );
+  }
+
+  const resolvedModel = model ?? getAnalysisModel();
+  const modelLabel =
+    typeof resolvedModel === 'string'
+      ? resolvedModel
+      : `${resolvedModel.provider}/${resolvedModel.modelId}`;
+
   try {
-    const { object } = await generateObject({
-      model,
-      schema: analysisSchema,
-      system: ANALYSIS_SYSTEM_PROMPT,
+    const { output, finishReason } = await generateText({
+      model: resolvedModel,
+      output: Output.object({ schema: analysisSchema }),
+      instructions: ANALYSIS_SYSTEM_PROMPT,
       messages: [
         {
           role: 'user',
@@ -150,14 +168,37 @@ export const runInspirationAnalysis = async (
       maxRetries: MAX_RETRIES,
       abortSignal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
-    result = normalize(object);
+
+    if (finishReason === 'content-filter') {
+      throw new AnalysisError(
+        'blocked',
+        `${modelLabel} blocked the content due to safety filters.`,
+      );
+    }
+
+    const result = normalize(output);
+
+    if (!result.summary) {
+      throw new AnalysisError('bad_response', `${modelLabel} returned an empty summary.`);
+    }
+
+    return result;
   } catch (error) {
-    throw new AnalysisError('api_error', `${label} analysis failed: ${(error as Error).message}`);
+    if (error instanceof AnalysisError) {
+      throw error;
+    }
+    if (NoObjectGeneratedError.isInstance(error)) {
+      if (error.finishReason === 'content-filter') {
+        throw new AnalysisError('blocked', `${modelLabel} blocked the response.`);
+      }
+      throw new AnalysisError(
+        'bad_response',
+        `${modelLabel} failed to generate valid structured output: ${error.message}`,
+      );
+    }
+    throw new AnalysisError(
+      'api_error',
+      `${modelLabel} analysis failed: ${(error as Error).message}`,
+    );
   }
-
-  if (!result.summary && result.places.length === 0) {
-    throw new AnalysisError('bad_response', `${label} output is empty.`);
-  }
-
-  return result;
 };

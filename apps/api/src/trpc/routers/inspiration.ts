@@ -1,9 +1,14 @@
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, inArray, max } from 'drizzle-orm';
-import { z } from 'zod';
 import type { ExtractedPlace } from '@voyagr/database';
-import { AnalysisError, type InlineImage } from '../../lib/aiAnalysis.js';
-import { analyzeInspiration } from '../../lib/gemini.js';
+import { and, desc, eq, inArray, max } from 'drizzle-orm';
+import * as z from 'zod';
+import {
+  AnalysisError,
+  analyzeInspiration,
+  InspirationAnalysis,
+  type InlineImage,
+} from '../../lib/aiAnalysis.js';
+import { upsertImportedPlace, type ImportedPlaceRef } from '../../lib/importedPlaces.js';
 import {
   detectPlatform,
   downloadImageAsInline,
@@ -13,7 +18,6 @@ import {
   normalizeContentUrl,
   stripHashtags,
 } from '../../lib/socialImport.js';
-import { upsertImportedPlace, type ImportedPlaceRef } from '../../lib/importedPlaces.js';
 import { activity, importedInspiration, trip, tripDay } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
@@ -174,19 +178,20 @@ export const inspirationRouter = createTRPCRouter({
         (image): image is InlineImage => image !== null,
       );
 
-      // Sans légende, ni transcription, ni image, l'IA n'aurait rien à analyser :
-      // on propose la saisie manuelle de la légende.
-      if (!caption && !media.transcript && images.length === 0) {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: CAPTION_UNAVAILABLE });
-      }
-
-      let analysis;
+      let analysis: InspirationAnalysis;
       try {
-        analysis = await analyzeInspiration({ caption, images, transcript: media.transcript });
+        analysis = await analyzeInspiration({
+          caption,
+          images,
+          transcript: media.transcript,
+        });
       } catch (error) {
         if (error instanceof AnalysisError) {
           if (error.reason === 'missing_key') {
             throw new TRPCError({ code: 'PRECONDITION_FAILED', message: AI_UNAVAILABLE });
+          }
+          if (error.reason === 'empty_input') {
+            throw new TRPCError({ code: 'BAD_REQUEST', message: CAPTION_UNAVAILABLE });
           }
           if (error.reason === 'blocked') {
             throw new TRPCError({
