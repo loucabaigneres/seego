@@ -9,10 +9,14 @@ import { ErrorState, Screen } from '@/ui';
 
 export default function DiscoveryScreen() {
   const { tripId } = useLocalSearchParams<{ tripId?: string }>();
-  const feed = useDiscoveryFeed();
-
   // Same guard as the web's `beforeLoad`: the deck always belongs to a trip.
+  // The deck is a child so its feed query only starts once the guard has passed.
   if (!tripId) return <Redirect href="/onboarding" />;
+  return <DiscoveryDeck />;
+}
+
+function DiscoveryDeck() {
+  const feed = useDiscoveryFeed();
 
   return (
     <Screen contentClassName="gap-5 pt-3 pb-4">
