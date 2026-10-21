@@ -80,6 +80,7 @@ export function useSwipeDeck(places: DiscoveryPlace[]) {
     decide,
     like: () => decide(true),
     skip: () => decide(false),
+    toggleDetails: () => topCardRef.current?.toggleDetails(),
     restart,
   };
 }

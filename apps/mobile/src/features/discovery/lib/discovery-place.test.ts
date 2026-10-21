@@ -1,4 +1,16 @@
-import { placeCategory, placeSubcategories } from './discovery-place';
+import { placeCategory, placePrice, placeSubcategories } from './discovery-place';
+
+describe('placePrice', () => {
+  it('reads the price tag', () => {
+    expect(placePrice({ tags: { price: ' €€ ' } })).toBe('€€');
+  });
+
+  it('returns null when the tag is missing, blank or not a string', () => {
+    expect(placePrice({ tags: null })).toBeNull();
+    expect(placePrice({ tags: { price: '  ' } })).toBeNull();
+    expect(placePrice({ tags: { price: 3 } })).toBeNull();
+  });
+});
 
 describe('placeCategory', () => {
   it('reads the category tag', () => {
