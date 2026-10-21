@@ -1,5 +1,5 @@
 import { createAuthClient } from 'better-auth/react';
-import { env } from '../env';
+import { env } from '@/config/env';
 
 export const authClient = createAuthClient({
   // L'URL racine de ton API Fastify où est branché le handler Better Auth
