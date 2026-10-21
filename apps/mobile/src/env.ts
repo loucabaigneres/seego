@@ -25,8 +25,9 @@ const env = parsedEnv.data;
 /**
  * The API to call. On web the browser runs on the dev machine and keeps `localhost`
  * (which also keeps the session cookie same-site); on a device it becomes the machine's IP.
+ * Release builds never rewrite it.
  */
 export const API_URL = resolveApiUrl(
   env.EXPO_PUBLIC_API_URL,
-  Platform.OS === 'web' ? null : Constants.expoConfig?.hostUri,
+  __DEV__ && Platform.OS !== 'web' ? Constants.expoConfig?.hostUri : null,
 );

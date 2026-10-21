@@ -3,6 +3,7 @@ import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
 import { env } from '../env.js';
 import { db } from './db.js';
+import { sendTransactional } from './email.js';
 
 // Origins only reachable while developing the mobile app.
 const mobileDevOrigins = [
@@ -20,9 +21,6 @@ export const auth = betterAuth({
   }),
   // Lets the mobile app send its session cookie and receive OAuth redirects on its deep link.
   plugins: [expo()],
-  emailAndPassword: {
-    enabled: true,
-  },
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -46,4 +44,28 @@ export const auth = betterAuth({
     'seego://',
     ...(env.NODE_ENV === 'development' ? mobileDevOrigins : []),
   ],
+
+  emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      void sendTransactional({
+        to: user.email,
+        subject: 'Réinitialise ton mot de passe Seego',
+        html: `<p>Bonjour,</p>
+              <p>Clique ici pour choisir un nouveau mot de passe : <a href="${url}">Réinitialiser</a></p>
+              <p>Si tu n'es pas à l'origine de cette demande, ignore cet email.</p>`,
+      });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      void sendTransactional({
+        to: user.email,
+        subject: 'Confirme ton adresse email',
+        html: `<p>Bienvenue sur Seego !</p>
+              <p><a href="${url}">Confirmer mon adresse</a></p>`,
+      });
+    },
+  },
 });
