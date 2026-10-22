@@ -9,6 +9,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withSequence,
   withSpring,
   withTiming,
   type SharedValue,
@@ -32,11 +33,13 @@ export interface SwipeCardHandle {
   toggleDetails: () => void;
 }
 
-// Values taken from the web deck.
-/** Vertical offset and scale step between stacked cards. */
-const STACK_OFFSET = 10;
+/** How far, in px, each card behind peeks out under the one before it. */
+const STACK_PEEK = 10;
 const STACK_SCALE_STEP = 0.04;
 const STACK_TIMING = { duration: 300, easing: Easing.bezier(0.2, 0.8, 0.2, 1) };
+/** The card that reaches the top grows past full size (scale 1.02), then settles. */
+const POP_OVERSHOOT = -0.5;
+const POP_TIMING = { duration: 200, easing: Easing.out(Easing.cubic) };
 const FLY_OUT_TIMING = { duration: 320, easing: Easing.in(Easing.ease) };
 /** The card tilts 0.05° per dragged pixel, up to 20° when it flies out. */
 const MAX_TILT = 20;
@@ -96,7 +99,11 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
   const location = [place.city, place.country].filter(Boolean).join(', ');
 
   useEffect(() => {
-    stackPosition.set(withTiming(position, STACK_TIMING));
+    stackPosition.set(
+      position === 0
+        ? withSequence(withTiming(POP_OVERSHOOT, POP_TIMING), withSpring(0))
+        : withTiming(position, STACK_TIMING),
+    );
   }, [position, stackPosition]);
 
   // The other photos only show on tap: load them as soon as the card reaches the top.
@@ -197,7 +204,12 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
       opacity: opacity.get(),
       transform: [
         { translateX: x },
-        { translateY: stack * STACK_OFFSET + translateY.get() * VERTICAL_FOLLOW },
+        {
+          // The scale lifts the bottom edge by half the height lost: move down that much more.
+          translateY:
+            stack * (STACK_PEEK + (cardHeight.get() * STACK_SCALE_STEP) / 2) +
+            translateY.get() * VERTICAL_FOLLOW,
+        },
         { rotate: `${tilt}deg` },
         { scale: 1 - stack * STACK_SCALE_STEP },
       ],
@@ -235,7 +247,8 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
       // Motion only: on web, Reanimated's prebuilt views ignore `className`.
       style={[StyleSheet.absoluteFill, animatedStyle]}
     >
-      <View className="flex-1 overflow-hidden rounded-card bg-ink">
+      {/* The border keeps the crema details apart from the crema screen. */}
+      <View className="flex-1 overflow-hidden rounded-card border border-line bg-ink">
         <GestureDetector gesture={Gesture.Race(createPan(), tap)}>
           <Animated.View style={[styles.photo, photoStyle]}>
             {/* Shows through when the photo is missing or fails to load. */}

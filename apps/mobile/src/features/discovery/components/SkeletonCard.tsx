@@ -5,7 +5,7 @@ import { Skeleton } from '@/ui';
 /** Placeholder with the shape of a card while the feed loads. */
 export function SkeletonCard() {
   return (
-    <View aria-busy className="flex-1 justify-end gap-3 rounded-card bg-surface-raised p-5">
+    <View aria-busy className="mb-5 flex-1 justify-end gap-3 rounded-card bg-surface-raised p-5">
       <Skeleton className="h-3 w-28 rounded-full" />
       <Skeleton className="h-7 w-3/4" />
       <Skeleton className="h-4 w-full" />
