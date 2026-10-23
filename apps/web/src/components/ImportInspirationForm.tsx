@@ -1,13 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
-import { Link2, Loader2, Sparkles } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
+import { Link2, Loader2, MapPin, Plus, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useInspirationMutations } from '../hooks/useInspirationMutations';
 import { trpc, type RouterOutputs } from '../lib/trpc';
 import type { ImportInspirationValues } from '../lib/validations/inspiration';
-import { CAPTION_UNAVAILABLE, importInspirationSchema } from '../lib/validations/inspiration';
+import {
+  AI_UNAVAILABLE,
+  CAPTION_UNAVAILABLE,
+  importInspirationSchema,
+} from '../lib/validations/inspiration';
 
-type ImportResult = RouterOutputs['inspiration']['importFromUrl'];
+type ImportResult = RouterOutputs['inspiration']['analyzeFromUrl'];
 
 interface ImportInspirationFormProps {
   onSuccess?: (result: ImportResult) => void;
@@ -25,6 +31,12 @@ export function ImportInspirationForm({
   const [showCaptionField, setShowCaptionField] = useState(false);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [tripId, setTripId] = useState('');
+  const [addedTo, setAddedTo] = useState<{ tripId: string; count: number } | null>(null);
+
+  const tripsQuery = useQuery(trpc.user.getTrips.queryOptions());
+  const trips = tripsQuery.data ?? [];
+  const effectiveTripId = tripId || trips[0]?.id || '';
 
   const {
     register,
@@ -36,12 +48,17 @@ export function ImportInspirationForm({
     defaultValues: { url: '', caption: '' },
   });
 
-  const importMutation = useMutation(
-    trpc.inspiration.importFromUrl.mutationOptions({
+  const { addToTrip: addToTripMutation } = useInspirationMutations({
+    onAddedToTrip: (data) => setAddedTo({ tripId: data.tripId, count: data.added }),
+  });
+
+  const analyzeMutation = useMutation(
+    trpc.inspiration.analyzeFromUrl.mutationOptions({
       onSuccess: (data) => {
         setResult(data);
         setErrorMessage(null);
         setShowCaptionField(false);
+        setAddedTo(null);
         reset({ url: '', caption: '' });
         onSuccess?.(data);
       },
@@ -52,7 +69,14 @@ export function ImportInspirationForm({
           // La récupération automatique a échoué : on déplie la saisie manuelle.
           setShowCaptionField(true);
           setErrorMessage(
-            "Impossible de récupérer la description automatiquement. Colle-la ci-dessous pour continuer.",
+            "Impossible de récupérer le contenu automatiquement. Colle la description ci-dessous pour lancer l'analyse.",
+          );
+          return;
+        }
+
+        if (error.message === AI_UNAVAILABLE) {
+          setErrorMessage(
+            "L'analyse IA n'est pas disponible pour le moment (configuration serveur manquante).",
           );
           return;
         }
@@ -64,7 +88,7 @@ export function ImportInspirationForm({
 
   const onSubmit = (values: ImportInspirationValues) => {
     const caption = values.caption?.trim();
-    importMutation.mutate({ url: values.url, caption: caption || undefined });
+    analyzeMutation.mutate({ url: values.url, caption: caption || undefined });
   };
 
   return (
@@ -74,7 +98,7 @@ export function ImportInspirationForm({
     >
       <div>
         <label htmlFor="inspirationUrl" className="mb-2 block text-sm font-medium text-[#1a1a1a]">
-          Lien TikTok
+          Lien TikTok ou Instagram
         </label>
         <div className="relative">
           <Link2 className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-[#bbb]" />
@@ -88,7 +112,9 @@ export function ImportInspirationForm({
             {...register('url')}
           />
         </div>
-        {errors.url && <p className="mt-2 text-xs font-medium text-[#FF4D4D]">{errors.url.message}</p>}
+        {errors.url && (
+          <p className="mt-2 text-xs font-medium text-[#FF4D4D]">{errors.url.message}</p>
+        )}
       </div>
 
       {!showCaptionField && (
@@ -103,7 +129,10 @@ export function ImportInspirationForm({
 
       {showCaptionField && (
         <div className="mt-4">
-          <label htmlFor="inspirationCaption" className="mb-2 block text-sm font-medium text-[#1a1a1a]">
+          <label
+            htmlFor="inspirationCaption"
+            className="mb-2 block text-sm font-medium text-[#1a1a1a]"
+          >
             Colle la description du post
           </label>
           <textarea
@@ -129,12 +158,62 @@ export function ImportInspirationForm({
       )}
 
       {result && (
-        <div className="mt-4 rounded-xl bg-[#e8f8f0] p-4">
+        <div className="mt-4 space-y-4 rounded-xl bg-[#e8f8f0] p-4">
           <p className="text-xs font-semibold text-[#2ecc71]">
-            ✓ Inspiration importée depuis {result.inspiration.platform === 'tiktok' ? 'TikTok' : 'Instagram'}
+            ✓ Analysé depuis {result.inspiration.platform === 'tiktok' ? 'TikTok' : 'Instagram'}
           </p>
-          {result.inspiration.tags.length > 0 ? (
-            <div className="mt-3 flex flex-wrap gap-2">
+          {result.alreadyImported && (
+            <p className="text-xs font-medium text-[#888]">
+              Cette vidéo avait déjà été analysée : voici son analyse (aucun doublon créé).
+            </p>
+          )}
+
+          {result.inspiration.aiReport && (
+            <div>
+              <p className="text-xs font-bold tracking-wide text-[#1a1a1a] uppercase">
+                Compte rendu
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-[#1a1a1a]">
+                {result.inspiration.aiReport}
+              </p>
+            </div>
+          )}
+
+          {result.inspiration.extractedPlaces.length > 0 && (
+            <div>
+              <p className="text-xs font-bold tracking-wide text-[#1a1a1a] uppercase">
+                Lieux détectés
+              </p>
+              <ul className="mt-2 space-y-2">
+                {result.inspiration.extractedPlaces.map((place, index) => (
+                  <li
+                    key={`${place.name}-${index}`}
+                    className="flex gap-2 rounded-lg bg-white p-3 shadow-sm"
+                  >
+                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#FF4D4D]" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-[#1a1a1a]">{place.name}</p>
+                      {place.address ? (
+                        <p className="text-xs text-[#555]">{place.address}</p>
+                      ) : (
+                        [place.city, place.country].filter(Boolean).length > 0 && (
+                          <p className="text-xs text-[#555]">
+                            {[place.city, place.country].filter(Boolean).join(', ')}
+                          </p>
+                        )
+                      )}
+                      {place.description && (
+                        <p className="mt-1 text-xs text-[#888]">{place.description}</p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {result.inspiration.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
               {result.inspiration.tags.map((tag) => (
                 <span
                   key={tag}
@@ -144,10 +223,60 @@ export function ImportInspirationForm({
                 </span>
               ))}
             </div>
-          ) : (
-            <p className="mt-2 text-xs font-medium text-[#888]">
-              Aucun hashtag trouvé dans cette publication.
-            </p>
+          )}
+
+          {result.inspiration.extractedPlaces.length > 0 && (
+            <div className="border-t border-[#2ecc71]/20 pt-3">
+              {addedTo ? (
+                <p className="text-xs font-semibold text-[#2ecc71]">
+                  ✓ {addedTo.count} lieu{addedTo.count > 1 ? 'x' : ''} ajouté
+                  {addedTo.count > 1 ? 's' : ''} à ton voyage.{' '}
+                  <Link
+                    to="/trip/$tripId"
+                    params={{ tripId: addedTo.tripId }}
+                    className="font-bold text-[#1a1a1a] underline underline-offset-2 hover:text-[#FF4D4D]"
+                  >
+                    Voir le voyage
+                  </Link>
+                </p>
+              ) : trips.length === 0 ? (
+                <p className="text-xs font-medium text-[#888]">
+                  Crée d'abord un voyage pour y ajouter ces lieux.
+                </p>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={effectiveTripId}
+                    onChange={(e) => setTripId(e.target.value)}
+                    className="max-w-[55vw] cursor-pointer truncate rounded-xl border border-[#ddd] bg-white px-3 py-2 text-sm text-[#1a1a1a] outline-none focus:border-[#FF4D4D] sm:max-w-[220px]"
+                  >
+                    {trips.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.title || t.destination || 'Voyage sans titre'}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={!effectiveTripId || addToTripMutation.isPending}
+                    onClick={() =>
+                      addToTripMutation.mutate({
+                        tripId: effectiveTripId,
+                        inspirationIds: [result.inspiration.id],
+                      })
+                    }
+                    className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#FF4D4D] px-4 py-2 text-sm font-bold text-white shadow-md shadow-red-500/25 transition hover:brightness-105 active:scale-95 disabled:opacity-50"
+                  >
+                    {addToTripMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" strokeWidth={3} />
+                    )}
+                    Ajouter au voyage
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -164,10 +293,10 @@ export function ImportInspirationForm({
         )}
         <button
           type="submit"
-          disabled={importMutation.isPending}
+          disabled={analyzeMutation.isPending}
           className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#FF4D4D] py-3.5 text-sm font-bold text-white shadow-lg shadow-red-500/25 transition hover:brightness-105 active:scale-95 disabled:opacity-50"
         >
-          {importMutation.isPending ? (
+          {analyzeMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
               Analyse en cours…
@@ -175,7 +304,7 @@ export function ImportInspirationForm({
           ) : (
             <>
               <Sparkles className="h-4 w-4" />
-              Importer l'inspiration
+              Analyser l'inspiration
             </>
           )}
         </button>

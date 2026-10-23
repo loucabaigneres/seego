@@ -20,6 +20,16 @@ const envSchema = z.object({
 
   // Frontend URL configuration
   FRONTEND_URL: z.url().default('http://localhost:5173'),
+
+  AI_MODEL: z
+    .string()
+    .regex(
+      /^(google|mistral):.+$/,
+      'AI_MODEL must follow the "provider:model" format (e.g., "google:gemini-flash-lite-latest")',
+    )
+    .default('google:gemini-flash-lite-latest'),
+  GEMINI_API_KEY: z.string().min(1).optional(),
+  // MISTRAL_API_KEY: z.string().min(1).optional(),
 });
 
 // Parse and validate environment variables
