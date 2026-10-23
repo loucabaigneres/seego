@@ -3,6 +3,9 @@ import * as z from 'zod';
 // Define strict schema for environment variables
 const envSchema = z.object({
   VITE_API_URL: z.url(),
+  // PostHog is optional: without a key (local dev, previews without secrets) tracking is simply off.
+  VITE_POSTHOG_KEY: z.string().optional(),
+  VITE_POSTHOG_HOST: z.url().default('https://eu.i.posthog.com'),
 });
 
 // Parse and validate environment variables

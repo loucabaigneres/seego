@@ -1,4 +1,4 @@
-# @voyagr/landing-page
+# @seego/landing-page
 
 Teaser / "coming soon" landing page for **Seego**, the mobile travel app. Presents the
 product and captures e-mail sign-ups for the launch waitlist.
@@ -13,15 +13,15 @@ product and captures e-mail sign-ups for the launch waitlist.
 ## Development
 
 ```bash
-pnpm --filter @voyagr/landing-page dev
+pnpm --filter @seego/landing-page dev
 ```
 
 Served on **http://localhost:5174** (the `web` app owns `5173`).
 
 ```bash
-pnpm --filter @voyagr/landing-page build      # type-check + production build to dist/
-pnpm --filter @voyagr/landing-page preview     # preview the production build
-pnpm --filter @voyagr/landing-page lint
+pnpm --filter @seego/landing-page build      # type-check + production build to dist/
+pnpm --filter @seego/landing-page preview     # preview the production build
+pnpm --filter @seego/landing-page lint
 ```
 
 ## Waitlist CTA
@@ -29,7 +29,7 @@ pnpm --filter @voyagr/landing-page lint
 The e-mail form lives in [`src/components/WaitlistForm.tsx`](src/components/WaitlistForm.tsx)
 and its logic in [`src/lib/waitlist.ts`](src/lib/waitlist.ts).
 
-- Sign-ups are submitted through **tRPC** (`waitlist.join`) to the Voyagr API — fully
+- Sign-ups are submitted through **tRPC** (`waitlist.join`) to the Seego API — fully
   type-safe end to end. The client lives in [`src/lib/trpc.ts`](src/lib/trpc.ts); set
   `VITE_API_URL` (see [`.env.example`](.env.example)) to point at the API.
 - Each sign-up is stored as a **lead** with marketing attribution: the UTM parameters

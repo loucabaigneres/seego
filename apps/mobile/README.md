@@ -1,4 +1,4 @@
-# Voyagr — mobile
+# Seego — mobile
 
 Expo (SDK 57) + Expo Router app. Same journey and design as `apps/web`, rebuilt for native.
 
@@ -6,7 +6,7 @@ Expo (SDK 57) + Expo Router app. Same journey and design as `apps/web`, rebuilt 
 
 ```bash
 cp .env.example .env   # then set EXPO_PUBLIC_API_URL (see comments in the file)
-pnpm --filter @voyagr/mobile start
+pnpm --filter @seego/mobile start
 ```
 
 | Script      | What it does                                   |

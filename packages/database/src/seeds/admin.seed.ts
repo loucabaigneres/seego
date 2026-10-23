@@ -1,10 +1,10 @@
 import { randomBytes, scrypt } from 'crypto';
-import { user, account } from '../schemas/auth.js';
+import { account, user } from '../schemas/auth.js';
 
 export const ADMIN_USER_ID = '00000000-0000-0000-0000-000000000001';
-const ADMIN_EMAIL = 'admin@voyagr.app';
+const ADMIN_EMAIL = 'admin@seego.app';
 const ADMIN_PASSWORD = 'Admin1234!';
-const ADMIN_NAME = 'Admin Voyagr';
+const ADMIN_NAME = 'Admin Seego';
 
 /**
  * Mirrors exactly @better-auth/utils/password (password.node.mjs):
