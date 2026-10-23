@@ -1,4 +1,4 @@
-import { photoTapTarget, swipeOutcome } from './swipe-gesture';
+import { dragIntent, photoTapTarget, settlesExpanded, swipeOutcome } from './swipe-gesture';
 
 describe('swipeOutcome', () => {
   it('swipes once the card is dragged past the threshold', () => {
@@ -23,17 +23,43 @@ describe('swipeOutcome', () => {
   });
 });
 
-describe('photoTapTarget', () => {
-  it('browses the photos from the edges of the card', () => {
-    expect(photoTapTarget(0.1, 3)).toBe('previous');
-    expect(photoTapTarget(0.9, 3)).toBe('next');
+describe('dragIntent', () => {
+  it('opens the details when a collapsed card is dragged mostly upwards', () => {
+    expect(dragIntent(3, -8, false)).toBe('expand');
   });
 
-  it('does nothing in the middle of the card', () => {
-    expect(photoTapTarget(0.5, 3)).toBeNull();
+  it('swipes a collapsed card dragged sideways or downwards', () => {
+    expect(dragIntent(8, -3, false)).toBe('swipe');
+    expect(dragIntent(0, 8, false)).toBe('swipe');
+  });
+
+  it('only moves the details of an expanded card', () => {
+    expect(dragIntent(8, 0, true)).toBe('expand');
+  });
+});
+
+describe('settlesExpanded', () => {
+  it('settles on the nearest side of a slow release', () => {
+    expect(settlesExpanded(0.6, 0)).toBe(true);
+    expect(settlesExpanded(0.4, 0)).toBe(false);
+  });
+
+  it('follows a flick whatever the position', () => {
+    expect(settlesExpanded(0.1, -900)).toBe(true);
+    expect(settlesExpanded(0.9, 900)).toBe(false);
+  });
+});
+
+describe('photoTapTarget', () => {
+  it('browses the photos from each half of the card', () => {
+    expect(photoTapTarget(0.1, 3)).toBe('previous');
+    expect(photoTapTarget(0.49, 3)).toBe('previous');
+    expect(photoTapTarget(0.5, 3)).toBe('next');
+    expect(photoTapTarget(0.9, 3)).toBe('next');
   });
 
   it('does nothing when the place has a single photo', () => {
     expect(photoTapTarget(0.9, 1)).toBeNull();
+    expect(photoTapTarget(0.1, 0)).toBeNull();
   });
 });

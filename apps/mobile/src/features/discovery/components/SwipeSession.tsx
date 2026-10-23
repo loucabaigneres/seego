@@ -36,6 +36,7 @@ export function SwipeSession({ places }: { places: DiscoveryPlace[] }) {
       <SwipeActions
         onSkip={deck.skip}
         onLike={deck.like}
+        onDetails={deck.toggleDetails}
         disabled={deck.isFinished || deck.isLeaving}
         dragX={deck.dragX}
       />

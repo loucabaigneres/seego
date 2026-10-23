@@ -18,3 +18,9 @@ export function placeSubcategories(place: Tagged): string[] {
   if (!Array.isArray(subcategories)) return [];
   return subcategories.filter((value): value is string => typeof value === 'string' && !!value);
 }
+
+/** `tags.price` ("€€", "à partir de 80 €"…), or null when missing. */
+export function placePrice(place: Tagged): string | null {
+  const price = place.tags?.price;
+  return typeof price === 'string' && price.trim() ? price.trim() : null;
+}

@@ -72,3 +72,14 @@ export function placePhotos(place: {
   const urls = [place.mainMediaUrl, ...(place.carousselUrls ?? [])];
   return [...new Set(urls.filter((url): url is string => !!url))];
 }
+
+/** Host shown under an offer link ("booking.com"), or null when the URL is missing or invalid. */
+export function offerHost(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    // React Native's URL returns an empty hostname, rather than throwing, on an invalid URL.
+    return new URL(url).hostname.replace(/^www\./, '') || null;
+  } catch {
+    return null;
+  }
+}

@@ -8,7 +8,7 @@ import Animated, {
 
 import { colors } from '@/theme/tokens';
 import { cn } from '@/ui';
-import { HeartIcon, XIcon } from '@/ui/icons';
+import { HeartIcon, InfoIcon, XIcon } from '@/ui/icons';
 
 import { SWIPE_THRESHOLD } from '../lib/swipe-gesture';
 
@@ -29,12 +29,19 @@ function growthScale(distance: number): number {
 export interface SwipeActionsProps {
   onSkip?: () => void;
   onLike?: () => void;
+  onDetails?: () => void;
   disabled?: boolean;
   /** Horizontal drag of the top card. */
   dragX?: SharedValue<number>;
 }
 
-export function SwipeActions({ onSkip, onLike, disabled = false, dragX }: SwipeActionsProps) {
+export function SwipeActions({
+  onSkip,
+  onLike,
+  onDetails,
+  disabled = false,
+  dragX,
+}: SwipeActionsProps) {
   const skipStyle = useAnimatedStyle(() => ({
     transform: [{ scale: growthScale(-(dragX?.get() ?? 0)) }],
   }));
@@ -59,6 +66,20 @@ export function SwipeActions({ onSkip, onLike, disabled = false, dragX }: SwipeA
           <XIcon size={28} color={colors.brand} />
         </Pressable>
       </Animated.View>
+
+      <Pressable
+        role="button"
+        aria-label="Voir les détails"
+        aria-disabled={disabled}
+        disabled={disabled}
+        onPress={onDetails}
+        className={cn(
+          'size-12 items-center justify-center rounded-full border border-brand active:opacity-80',
+          disabled && 'opacity-50',
+        )}
+      >
+        <InfoIcon size={24} color={colors.brand} />
+      </Pressable>
 
       <Animated.View style={likeStyle}>
         <Pressable

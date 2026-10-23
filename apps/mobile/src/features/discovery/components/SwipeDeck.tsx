@@ -16,7 +16,8 @@ export interface SwipeDeckProps {
 
 export function SwipeDeck({ cards, topCardRef, dragX, isLeaving, onDecide }: SwipeDeckProps) {
   return (
-    <View className="flex-1">
+    // Room for the two cards peeking out underneath (STACK_PEEK each).
+    <View className="mb-5 flex-1">
       {cards
         .map((place, position) => (
           <SwipeCard

@@ -1,4 +1,17 @@
-import { categoryMeta, cleanDescription, parseWktPoint, placePhotos } from './place';
+import { categoryMeta, cleanDescription, offerHost, parseWktPoint, placePhotos } from './place';
+
+describe('offerHost', () => {
+  it('returns the host without www', () => {
+    expect(offerHost('https://www.booking.com/hotel/fr/x.html?a=1')).toBe('booking.com');
+    expect(offerHost('https://getyourguide.fr/tour')).toBe('getyourguide.fr');
+  });
+
+  it('returns null for missing or invalid URLs', () => {
+    expect(offerHost(null)).toBeNull();
+    expect(offerHost('')).toBeNull();
+    expect(offerHost('pas une url')).toBeNull();
+  });
+});
 
 describe('categoryMeta', () => {
   it('returns the meta of a known category', () => {
