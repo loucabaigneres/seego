@@ -55,6 +55,8 @@ const EXPANDED_PHOTO_RATIO = 0.42;
 const SETTLE_TIMING = { duration: 320, easing: Easing.out(Easing.cubic) };
 /** The title and tags printed on the photo are gone by this point of the opening. */
 const OVERLAY_FADE_END = 0.4;
+/** While the details are dragged, the card grows by this much to stand out, then settles back. */
+const LIFT_SCALE = 0.04;
 
 const ACCESSIBILITY_ACTIONS = [
   { name: 'like', label: 'J’adore' },
@@ -88,6 +90,8 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
   /** 0 = photo only, 1 = photo on top and details under it. Follows the finger. */
   const expansion = useSharedValue(0);
   const expansionAtStart = useSharedValue(0);
+  /** 1 while a details drag is held, 0 otherwise. */
+  const lift = useSharedValue(0);
   /** Decided on the first move of each drag. */
   const intent = useSharedValue<'pending' | 'swipe' | 'expand'>('pending');
 
@@ -150,6 +154,7 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
         if (intent.get() === 'pending') {
           if (event.translationX === 0 && event.translationY === 0) return;
           intent.set(dragIntent(event.translationX, event.translationY, isExpanded));
+          if (intent.get() === 'expand') lift.set(withSpring(1));
         }
         if (intent.get() === 'expand') {
           // The edge between photo and details stays under the finger.
@@ -167,6 +172,7 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
         if (intent.get() === 'expand') {
           const expanded = settlesExpanded(expansion.get(), event.velocityY);
           expansion.set(withTiming(expanded ? 1 : 0, SETTLE_TIMING));
+          lift.set(withSpring(0));
           scheduleOnRN(setIsExpanded, expanded);
           return;
         }
@@ -211,7 +217,7 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
             translateY.get() * VERTICAL_FOLLOW,
         },
         { rotate: `${tilt}deg` },
-        { scale: 1 - stack * STACK_SCALE_STEP },
+        { scale: (1 - stack * STACK_SCALE_STEP) * (1 + lift.get() * LIFT_SCALE) },
       ],
     };
   });
