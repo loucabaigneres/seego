@@ -2,6 +2,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useCallback, useEffect, useState } from 'react'
+import { z } from 'zod'
 import { GroupTripInviteCard } from '../components/GroupTripInviteCard'
 import { ReplacePlaceModal } from '../components/ReplacePlaceModal'
 import { TripMap } from '../components/TripMap'
@@ -16,10 +17,19 @@ import { authClient } from '../lib/auth-client'
 import { moveToDay, moveWithinDay, removeFromDay } from '../lib/draftPlanning'
 import { trpc } from '../lib/trpc.js'
 
-export const Route = createFileRoute('/trip/$tripId')({ component: TripPage })
+const tripSearchSchema = z.object({
+  // Set when "Sauvegarder" sent a guest to the login page: the save is replayed once back here
+  save: z.boolean().optional().catch(undefined),
+})
+
+export const Route = createFileRoute('/trip/$tripId')({
+  validateSearch: (search) => tripSearchSchema.parse(search),
+  component: TripPage,
+})
 
 function TripPage() {
   const { tripId } = Route.useParams()
+  const { save: pendingSave } = Route.useSearch()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: session } = authClient.useSession()
@@ -67,16 +77,13 @@ function TripPage() {
     }),
   )
 
+  // Guest trips are moved to the account on login (useClaimGuestTrips); only an explicit
+  // "Sauvegarder" made before logging in also finalizes the trip.
   useEffect(() => {
-    if (
-      session?.user &&
-      tripQuery.data?.trip &&
-      tripQuery.data.trip.userId !== session.user.id &&
-      !isSavingTrip
-    ) {
-      saveToProfile({ tripId })
-    }
-  }, [session?.user, tripQuery.data?.trip, tripId, saveToProfile, isSavingTrip])
+    if (!pendingSave || !session?.user || !tripQuery.data?.trip) return
+    navigate({ to: '/trip/$tripId', params: { tripId }, search: {}, replace: true })
+    if (tripQuery.data.trip.status !== 'finalized') saveToProfile({ tripId })
+  }, [pendingSave, session?.user, tripQuery.data?.trip, tripId, navigate, saveToProfile])
 
   if (tripQuery.isPending) {
     return (
@@ -114,7 +121,7 @@ function TripPage() {
     if (!session?.user) {
       navigate({
         to: '/login',
-        search: { redirect: `/trip/${tripId}` },
+        search: { redirect: `/trip/${tripId}?save=true` },
       })
       return
     }
