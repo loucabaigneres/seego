@@ -67,6 +67,16 @@ function TripPage() {
     }),
   )
 
+  const renameMutation = useMutation(
+    trpc.user.renameTrip.mutationOptions({
+      // Awaited so the editor closes on the new title, not the stale one.
+      onSuccess: async () => {
+        queryClient.invalidateQueries(trpc.user.getTrips.queryFilter())
+        await tripQuery.refetch()
+      },
+    }),
+  )
+
   useEffect(() => {
     if (
       session?.user &&
@@ -156,7 +166,19 @@ function TripPage() {
   return (
     <div className="min-h-screen bg-[#F2EDE8] text-[#1a1a1a]">
       <div className="mx-auto w-full max-w-130 px-4 pb-12 pt-3 md:pt-5">
-        <TripHero trip={trip} heroImage={heroImage} plannedCount={plannedCount} />
+        <TripHero
+          trip={trip}
+          heroImage={heroImage}
+          plannedCount={plannedCount}
+          rename={
+            isOwner
+              ? {
+                  isPending: renameMutation.isPending,
+                  onSubmit: (title) => renameMutation.mutateAsync({ tripId, title }),
+                }
+              : undefined
+          }
+        />
 
         <SaveTripSection
           tripId={tripId}

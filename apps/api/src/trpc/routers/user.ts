@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import { count, desc, eq } from 'drizzle-orm';
+import { and, count, desc, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
@@ -68,6 +68,34 @@ export const userRouter = createTRPCRouter({
         .where(eq(user.id, ctx.user.id));
 
       return { success: true };
+    }),
+
+  renameTrip: protectedProcedure
+    .input(
+      z.object({
+        tripId: z.string().uuid(),
+        title: z
+          .string()
+          .trim()
+          .min(1, 'Le titre ne peut pas être vide.')
+          .max(80, 'Le titre doit comporter au plus 80 caractères.'),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [updatedTrip] = await ctx.db
+        .update(trip)
+        .set({ title: input.title, updatedAt: new Date() })
+        .where(and(eq(trip.id, input.tripId), eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))
+        .returning({ id: trip.id, title: trip.title });
+
+      if (!updatedTrip) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "Ce voyage n'existe pas ou vous n'avez pas l'autorisation de le modifier.",
+        });
+      }
+
+      return { success: true, trip: updatedTrip };
     }),
 
   saveTripToAccount: protectedProcedure
