@@ -50,7 +50,7 @@ export function SaveTripSection({
             Pas encore de compte ?{' '}
             <Link
               to="/register"
-              search={{ redirect: `/trip/${tripId}` }}
+              search={{ redirect: `/trip/${tripId}?save=true` }}
               className="font-bold text-[#FF4D4D] hover:underline"
             >
               Créer un compte
