@@ -34,6 +34,11 @@ src/
 
 ## Rules
 
+0. Code flows one way: **shared → features → app**, enforced by ESLint (`no-restricted-imports`).
+   Shared folders (`domain`, `hooks`, `lib`, `theme`, `ui`) never import from `features` or `app`;
+   a feature never imports another feature nor `app` (code needed by several features moves to
+   the shared folders; a screen in `src/app` composes features); outside its own folder a feature
+   reaches code through the `@/` alias, never `../../`.
 1. No business logic in `app/` screens or in components: put it in `features/*/lib`, with a test.
 2. No hard-coded colours: use token classes (`bg-primary`, `text-ink-muted`, `rounded-card`) or `theme/tokens`.
 3. API types come from `RouterOutputs` / `RouterInputs` (`@/lib/trpc`), never from relative imports into `apps/api`.

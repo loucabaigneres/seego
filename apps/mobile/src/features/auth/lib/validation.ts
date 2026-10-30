@@ -1,8 +1,9 @@
 import * as z from 'zod';
 
+import { nameSchema } from '@/domain/name';
+
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
-export const NAME_MIN_LENGTH = 2;
 
 const email = z.string().trim().toLowerCase().pipe(z.email('Cet email ne semble pas valide.'));
 
@@ -10,11 +11,6 @@ export const signInSchema = z.object({
   email,
   password: z.string().min(1, 'Entre ton mot de passe.'),
 });
-
-export const nameSchema = z
-  .string()
-  .trim()
-  .min(NAME_MIN_LENGTH, `Ton prénom doit faire au moins ${NAME_MIN_LENGTH} caractères.`);
 
 export const signUpSchema = z.object({
   name: nameSchema,
