@@ -12,16 +12,16 @@ export default function DiscoveryScreen() {
   // Same guard as the web's `beforeLoad`: the deck always belongs to a trip.
   // The deck is a child so its feed query only starts once the guard has passed.
   if (!tripId) return <Redirect href="/onboarding" />;
-  return <DiscoveryDeck />;
+  return <DiscoveryDeck tripId={tripId} />;
 }
 
-function DiscoveryDeck() {
+function DiscoveryDeck({ tripId }: { tripId: string }) {
   const feed = useDiscoveryFeed();
 
   return (
     <Screen contentClassName="gap-5 pt-3 pb-4">
       {feed.places ? (
-        <SwipeSession places={feed.places} />
+        <SwipeSession tripId={tripId} places={feed.places} />
       ) : (
         <>
           <DeckHeader likeCount={0} />

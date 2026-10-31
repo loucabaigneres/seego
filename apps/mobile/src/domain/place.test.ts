@@ -1,4 +1,24 @@
-import { categoryMeta, cleanDescription, parseWktPoint, placePhotos } from './place';
+import {
+  categoryMeta,
+  cleanDescription,
+  countryFlag,
+  offerHost,
+  parseWktPoint,
+  placePhotos,
+} from './place';
+
+describe('offerHost', () => {
+  it('returns the host without www', () => {
+    expect(offerHost('https://www.booking.com/hotel/fr/x.html?a=1')).toBe('booking.com');
+    expect(offerHost('https://getyourguide.fr/tour')).toBe('getyourguide.fr');
+  });
+
+  it('returns null for missing or invalid URLs', () => {
+    expect(offerHost(null)).toBeNull();
+    expect(offerHost('')).toBeNull();
+    expect(offerHost('pas une url')).toBeNull();
+  });
+});
 
 describe('categoryMeta', () => {
   it('returns the meta of a known category', () => {
@@ -54,5 +74,16 @@ describe('placePhotos', () => {
 
   it('handles a place without photos', () => {
     expect(placePhotos({ mainMediaUrl: null, carousselUrls: null })).toEqual([]);
+  });
+});
+
+describe('countryFlag', () => {
+  it('returns the flag of a known country', () => {
+    expect(countryFlag('Italie')).toBe('🇮🇹');
+  });
+
+  it('returns an empty string for unknown or missing countries', () => {
+    expect(countryFlag('Atlantide')).toBe('');
+    expect(countryFlag(null)).toBe('');
   });
 });

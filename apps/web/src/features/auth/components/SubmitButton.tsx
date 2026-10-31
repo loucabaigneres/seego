@@ -1,4 +1,12 @@
-export function SubmitButton({ loading, label, loadingLabel }: { loading: boolean; label: string; loadingLabel: string }) {
+export function SubmitButton({
+  loading,
+  label,
+  loadingLabel,
+}: {
+  loading: boolean;
+  label: string;
+  loadingLabel: string;
+}) {
   return (
     <button
       type="submit"
@@ -7,5 +15,5 @@ export function SubmitButton({ loading, label, loadingLabel }: { loading: boolea
     >
       {loading ? loadingLabel : label}
     </button>
-  )
+  );
 }

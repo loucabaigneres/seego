@@ -1,5 +1,6 @@
 import { waitlistLeads } from '@seego/database';
 import { z } from 'zod';
+import { sendWaitlistConfirmation } from '../../lib/email.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';
 
 // Marketing attribution captured from the landing page. Everything but the
@@ -23,7 +24,7 @@ export const waitlistRouter = createTRPCRouter({
   join: publicProcedure.input(joinInput).mutation(async ({ ctx, input }) => {
     const email = input.email.trim().toLowerCase();
 
-    await ctx.db
+    const inserted = await ctx.db
       .insert(waitlistLeads)
       .values({
         email,
@@ -35,8 +36,12 @@ export const waitlistRouter = createTRPCRouter({
         referrer: input.referrer,
         landingPageUrl: input.landingPageUrl,
       })
-      // Same address twice -> keep the first lead, report success anyway.
-      .onConflictDoNothing({ target: waitlistLeads.email });
+      .onConflictDoNothing({ target: waitlistLeads.email })
+      .returning({ id: waitlistLeads.id });
+
+    if (inserted.length > 0) {
+      void sendWaitlistConfirmation(email);
+    }
 
     return { success: true };
   }),
