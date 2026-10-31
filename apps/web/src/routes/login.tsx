@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import React, { useState } from 'react'
 import { z } from 'zod'
+import { PasswordInput } from '../components/password-input'
+import { VerifyEmailModal } from '../components/verify-email-modal'
 import { authClient } from '../lib/auth-client'
 
 const loginSearchSchema = z.object({
@@ -26,6 +28,15 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showVerify, setShowVerify] = useState(false)
+
+  const goNext = () => {
+    if (redirect) {
+      window.location.href = redirect
+    } else {
+      navigate({ to: '/' })
+    }
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,19 +47,31 @@ function LoginPage() {
       email,
       password,
       fetchOptions: {
-        onSuccess: () => {
-          if (redirect) {
-            window.location.href = redirect
+        onSuccess: () => goNext(),
+        onError: async (ctx) => {
+          if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
+            await authClient.emailOtp.sendVerificationOtp({
+              email,
+              type: 'email-verification',
+            })
+            setShowVerify(true)
           } else {
-            navigate({ to: '/' })
+            setError(ctx.error.message)
           }
-        },
-        onError: (ctx) => {
-          setError(ctx.error.message)
           setLoading(false)
         },
       },
     })
+  }
+
+  const handleVerified = async () => {
+    const { error } = await authClient.signIn.email({ email, password })
+    if (error) {
+      setShowVerify(false)
+      setError(error.message ?? 'Email confirmé, mais connexion impossible. Réessaie.')
+      return
+    }
+    goNext()
   }
 
   return (
@@ -77,13 +100,19 @@ function LoginPage() {
 
           <div>
             <label className="block text-xs font-semibold uppercase text-[#888] mb-1">Mot de passe</label>
-            <input
-              type="password"
+            <PasswordInput
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-[#ddd] p-3 rounded-xl bg-white focus:border-[#FF4D4D] focus:ring-2 focus:ring-[#FF4D4D]/20 outline-none transition text-[#1a1a1a]"
             />
+            <div className="mt-2 text-right">
+              <Link
+                to="/forgot-password"
+                className="text-xs font-semibold text-[#FF4D4D] hover:underline"
+              >
+                Mot de passe oublié ?
+              </Link>
+            </div>
           </div>
 
           <button
@@ -106,6 +135,14 @@ function LoginPage() {
           </Link>
         </p>
       </div>
+
+      {showVerify && (
+        <VerifyEmailModal
+          email={email}
+          onVerified={handleVerified}
+          onClose={() => setShowVerify(false)}
+        />
+      )}
     </div>
   )
 }

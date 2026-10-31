@@ -9,17 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ImportVideoRouteImport } from './routes/importVideo'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DiscoveryRouteImport } from './routes/discovery'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TripConfigureRouteImport } from './routes/trip/configure'
 import { Route as TripTripIdRouteImport } from './routes/trip.$tripId'
 import { Route as JoinInviteCodeRouteImport } from './routes/join.$inviteCode'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -43,6 +50,11 @@ const LoginRoute = LoginRouteImport.update({
 const ImportVideoRoute = ImportVideoRouteImport.update({
   id: '/importVideo',
   path: '/importVideo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiscoveryRoute = DiscoveryRouteImport.update({
@@ -74,11 +86,13 @@ const JoinInviteCodeRoute = JoinInviteCodeRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/discovery': typeof DiscoveryRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/importVideo': typeof ImportVideoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/join/$inviteCode': typeof JoinInviteCodeRoute
   '/trip/$tripId': typeof TripTripIdRoute
   '/trip/configure': typeof TripConfigureRoute
@@ -86,11 +100,13 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/discovery': typeof DiscoveryRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/importVideo': typeof ImportVideoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/join/$inviteCode': typeof JoinInviteCodeRoute
   '/trip/$tripId': typeof TripTripIdRoute
   '/trip/configure': typeof TripConfigureRoute
@@ -99,11 +115,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/discovery': typeof DiscoveryRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/importVideo': typeof ImportVideoRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/join/$inviteCode': typeof JoinInviteCodeRoute
   '/trip/$tripId': typeof TripTripIdRoute
   '/trip/configure': typeof TripConfigureRoute
@@ -113,11 +131,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/discovery'
+    | '/forgot-password'
     | '/importVideo'
     | '/login'
     | '/onboarding'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/join/$inviteCode'
     | '/trip/$tripId'
     | '/trip/configure'
@@ -125,11 +145,13 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/discovery'
+    | '/forgot-password'
     | '/importVideo'
     | '/login'
     | '/onboarding'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/join/$inviteCode'
     | '/trip/$tripId'
     | '/trip/configure'
@@ -137,11 +159,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/discovery'
+    | '/forgot-password'
     | '/importVideo'
     | '/login'
     | '/onboarding'
     | '/profile'
     | '/register'
+    | '/reset-password'
     | '/join/$inviteCode'
     | '/trip/$tripId'
     | '/trip/configure'
@@ -150,11 +174,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiscoveryRoute: typeof DiscoveryRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   ImportVideoRoute: typeof ImportVideoRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   JoinInviteCodeRoute: typeof JoinInviteCodeRoute
   TripTripIdRoute: typeof TripTripIdRoute
   TripConfigureRoute: typeof TripConfigureRoute
@@ -162,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -195,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/importVideo'
       fullPath: '/importVideo'
       preLoaderRoute: typeof ImportVideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/discovery': {
@@ -238,11 +278,13 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiscoveryRoute: DiscoveryRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   ImportVideoRoute: ImportVideoRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   JoinInviteCodeRoute: JoinInviteCodeRoute,
   TripTripIdRoute: TripTripIdRoute,
   TripConfigureRoute: TripConfigureRoute,
