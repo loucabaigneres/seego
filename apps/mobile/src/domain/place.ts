@@ -72,3 +72,29 @@ export function placePhotos(place: {
   const urls = [place.mainMediaUrl, ...(place.carousselUrls ?? [])];
   return [...new Set(urls.filter((url): url is string => !!url))];
 }
+
+/** Host shown under an offer link ("booking.com"), or null when the URL is missing or invalid. */
+export function offerHost(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    // React Native's URL returns an empty hostname, rather than throwing, on an invalid URL.
+    return new URL(url).hostname.replace(/^www\./, '') || null;
+  } catch {
+    return null;
+  }
+}
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  France: '🇫🇷',
+  Italie: '🇮🇹',
+  Espagne: '🇪🇸',
+  Allemagne: '🇩🇪',
+  Angleterre: '🇬🇧',
+  Portugal: '🇵🇹',
+  Grèce: '🇬🇷',
+};
+
+/** Flag emoji for a catalogue country name ("Italie" → 🇮🇹), or '' when unknown. */
+export function countryFlag(country: string | null | undefined): string {
+  return (country && COUNTRY_FLAGS[country]) || '';
+}
