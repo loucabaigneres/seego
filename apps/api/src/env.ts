@@ -22,9 +22,6 @@ const envSchema = z.object({
   FRONTEND_URL: z.url().default('http://localhost:5173'),
 
   RESEND_API_KEY: z.string().startsWith('re_', 'RESEND_API_KEY must start with "re_"'),
-  RESEND_MARKETING_API_KEY: z.string().startsWith('re_').optional(),
-
-  ADMIN_EMAILS: z.string().default(''),
 });
 
 // Parse and validate environment variables
