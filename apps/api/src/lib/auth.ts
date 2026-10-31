@@ -1,12 +1,16 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
+import { emailOTP } from 'better-auth/plugins';
 import { env } from '../env.js';
 import { db } from './db.js';
-import { sendTransactional } from './email.js';
+import { sendResetPasswordEmail, sendVerificationCode } from './email.js';
 
 // Origins only reachable while developing the mobile app.
-const mobileDevOrigins = [
+const devOrigins = [
+  // Web en local, n'importe quel port
+  'http://localhost:*',
+  'http://127.0.0.1:*',
   // Expo Go
   'exp://',
   'exp://**',
@@ -20,7 +24,22 @@ export const auth = betterAuth({
     provider: 'pg',
   }),
   // Lets the mobile app send its session cookie and receive OAuth redirects on its deep link.
-  plugins: [expo()],
+  plugins: [
+    expo(),
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 600,
+      allowedAttempts: 5,
+      resendStrategy: 'reuse',
+      sendVerificationOnSignUp: true,
+      disableSignUp: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type !== 'email-verification') return;
+
+        void sendVerificationCode(email, otp);
+      },
+    }),
+  ],
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -42,30 +61,14 @@ export const auth = betterAuth({
     env.FRONTEND_URL,
     // Mobile app scheme (`scheme` in apps/mobile/app.json).
     'seego://',
-    ...(env.NODE_ENV === 'development' ? mobileDevOrigins : []),
+    ...(env.NODE_ENV === 'development' ? devOrigins : []),
   ],
 
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      void sendTransactional({
-        to: user.email,
-        subject: 'Réinitialise ton mot de passe Seego',
-        html: `<p>Bonjour,</p>
-              <p>Clique ici pour choisir un nouveau mot de passe : <a href="${url}">Réinitialiser</a></p>
-              <p>Si tu n'es pas à l'origine de cette demande, ignore cet email.</p>`,
-      });
-    },
-  },
-  emailVerification: {
-    sendOnSignUp: true,
-    sendVerificationEmail: async ({ user, url }) => {
-      void sendTransactional({
-        to: user.email,
-        subject: 'Confirme ton adresse email',
-        html: `<p>Bienvenue sur Seego !</p>
-              <p><a href="${url}">Confirmer mon adresse</a></p>`,
-      });
+      void sendResetPasswordEmail(user.email, url);
     },
   },
 });
