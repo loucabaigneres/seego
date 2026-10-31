@@ -320,6 +320,8 @@ export const discoveryRouter = {
           where: (td, { and, eq }) => and(eq(td.tripId, targetTripId!), eq(td.dayIndex, 0)),
         });
         if (existingDay0) {
+          // Its liked places first: they reference the day (foreign key).
+          await ctx.db.delete(activity).where(eq(activity.tripDayId, existingDay0.id));
           await ctx.db.delete(tripDay).where(eq(tripDay.id, existingDay0.id));
         }
       } else {

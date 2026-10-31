@@ -3,7 +3,7 @@ import { Pressable, type PressableProps } from 'react-native';
 import { colors } from '@/theme/tokens';
 
 import { cn } from './cn';
-import { CheckIcon, type AppIcon } from './icons';
+import type { AppIcon } from './icons';
 import { Text } from './Text';
 
 export interface ChipProps extends Omit<PressableProps, 'children'> {
@@ -13,9 +13,8 @@ export interface ChipProps extends Omit<PressableProps, 'children'> {
   className?: string;
 }
 
-export function Chip({ label, selected = false, icon, className, ...props }: ChipProps) {
-  const Icon = icon ?? (selected ? CheckIcon : undefined);
-
+// The filled background marks the selection: no check icon, so chips keep their width when toggled.
+export function Chip({ label, selected = false, icon: Icon, className, ...props }: ChipProps) {
   return (
     <Pressable
       role="checkbox"
