@@ -3,7 +3,7 @@ import { createTRPCClient, httpBatchLink } from '@trpc/client';
 import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
 // Type-only import: no server code ends up in the app bundle.
-import type { AppRouter } from '@voyagr/api/src/trpc/router';
+import type { AppRouter } from '@seego/api/src/trpc/router';
 import { Platform } from 'react-native';
 
 import { API_URL } from '@/env';

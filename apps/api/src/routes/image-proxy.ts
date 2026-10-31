@@ -62,7 +62,7 @@ export function registerImageProxy(server: FastifyInstance) {
       upstream = await fetch(raw, {
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
         // Some CDNs reject requests without a browser-ish UA.
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; VoyagrBot/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; SeegoBot/1.0)' },
         redirect: 'follow',
       });
     } catch {

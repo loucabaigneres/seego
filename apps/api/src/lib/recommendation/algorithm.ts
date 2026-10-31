@@ -14,7 +14,7 @@
  * 5. Cities are scored from the feature map and normalised by size.
  */
 
-import type { DiscoveryTags } from '@voyagr/database';
+import type { DiscoveryTags } from '@seego/database';
 
 export type { DiscoveryTags };
 

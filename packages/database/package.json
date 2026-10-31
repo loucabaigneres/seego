@@ -1,5 +1,5 @@
 {
-  "name": "@voyagr/database",
+  "name": "@seego/database",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "@voyagr/eslint-config": "workspace:*",
+    "@seego/eslint-config": "workspace:*",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.2.1",
     "tsx": "^4.21.0",

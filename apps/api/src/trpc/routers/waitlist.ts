@@ -1,4 +1,4 @@
-import { waitlistLeads } from '@voyagr/database';
+import { waitlistLeads } from '@seego/database';
 import { z } from 'zod';
 import { sendWaitlistConfirmation } from '../../lib/email.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';

@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Base URL of the Voyagr API (tRPC endpoint lives at `${VITE_API_URL}/trpc`). */
+  /** Base URL of the Seego API (tRPC endpoint lives at `${VITE_API_URL}/trpc`). */
   readonly VITE_API_URL?: string;
 }
 

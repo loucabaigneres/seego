@@ -1,6 +1,6 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
 // Only the AppRouter *type* is imported, so no server code is bundled into the client.
-import type { AppRouter } from '@voyagr/api/src/trpc/router';
+import type { AppRouter } from '@seego/api/src/trpc/router';
 import { env } from '../env';
 
 /**
