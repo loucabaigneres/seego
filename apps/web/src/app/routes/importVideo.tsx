@@ -8,7 +8,7 @@ import { seo } from '@/lib/seo';
 import { trpc } from '@/lib/trpc';
 
 export const Route = createFileRoute('/importVideo')({
-  head: () => seo({ title: 'Importer une vidéo', path: '/importVideo', noindex: true }),
+  head: () => seo({ title: 'Importer une vidéo', path: '/importVideo' }),
   component: ImportVideoPage,
 });
 

@@ -1,9 +1,14 @@
 /**
  * Head tags for the app (app.seego.fr).
  *
- * The marketing site (www.seego.fr) is what we want ranked: pages here are
- * either shallow entry points (home, découverte, onboarding) or private
- * screens that must stay out of the index — hence the `noindex` flag.
+ * The whole domain is kept out of search results: `vercel.json` sends
+ * `X-Robots-Tag: noindex, nofollow` on every response, and these tags mirror
+ * it — a meta that said otherwise would simply be overridden by the header,
+ * and would contradict it for anyone reading the markup. www.seego.fr is what
+ * we want ranked.
+ *
+ * What still matters here: the browser tab title, and the preview card when a
+ * link is shared (Slack, WhatsApp, iMessage) — `noindex` does not affect those.
  */
 
 export const SITE_URL = 'https://app.seego.fr';
@@ -21,8 +26,6 @@ export type SeoOptions = {
   description?: string;
   /** Canonical path, e.g. `/discovery`. */
   path: string;
-  /** Private or duplicate screens: keep them out of search results. */
-  noindex?: boolean;
   image?: string;
   /**
    * Emit the canonical link. Only leaf routes should: the router dedupes
@@ -37,7 +40,6 @@ export function seo({
   title,
   description = DEFAULT_DESCRIPTION,
   path,
-  noindex = false,
   image = DEFAULT_IMAGE,
   canonical = true,
 }: SeoOptions) {
@@ -48,12 +50,7 @@ export function seo({
     meta: [
       { title: fullTitle },
       { name: 'description', content: description },
-      {
-        name: 'robots',
-        content: noindex
-          ? 'noindex, nofollow'
-          : 'index, follow, max-image-preview:large, max-snippet:-1',
-      },
+      { name: 'robots', content: 'noindex, nofollow' },
       { property: 'og:type', content: 'website' },
       { property: 'og:site_name', content: SITE_NAME },
       { property: 'og:locale', content: 'fr_FR' },

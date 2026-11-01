@@ -4,7 +4,7 @@ import { authSearchSchema } from '@/features/auth/lib/redirect'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/login')({
-  head: () => seo({ title: 'Connexion', path: '/login', noindex: true }),
+  head: () => seo({ title: 'Connexion', path: '/login' }),
   validateSearch: (search) => authSearchSchema.parse(search),
   component: LoginPage,
 })

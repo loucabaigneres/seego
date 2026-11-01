@@ -3,7 +3,7 @@ import { JoinInvitationCard } from '@/features/group-trip/components/JoinInvitat
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/join/$inviteCode')({
-  head: () => seo({ title: 'Rejoindre un voyage', path: '/join', noindex: true }),
+  head: () => seo({ title: 'Rejoindre un voyage', path: '/join' }),
   component: JoinGroupPage,
 })
 

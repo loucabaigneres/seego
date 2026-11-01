@@ -5,7 +5,7 @@ import { useConfigureTrip } from '@/features/trip/hooks/useConfigureTrip'
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/trip/configure')({
-  head: () => seo({ title: 'Configurer mon voyage', path: '/trip/configure', noindex: true }),
+  head: () => seo({ title: 'Configurer mon voyage', path: '/trip/configure' }),
   validateSearch: z.object({
     tripId: z.uuid().optional(),
   }),

@@ -1,16 +1,10 @@
-# app.seego.fr — the product UI.
-# Public entry points stay crawlable, everything personal or ephemeral is not.
+# app.seego.fr — the product UI, deliberately kept out of search results.
+#
+# The exclusion itself comes from the `X-Robots-Tag: noindex, nofollow` header
+# set in vercel.json. Crawling is allowed on purpose: a disallowed URL is never
+# fetched, so that header would never be read — and the URL could still end up
+# indexed from an external link.
+#
+# The indexed site is https://www.seego.fr
 User-agent: *
-Allow: /$
-Allow: /discovery
-Allow: /onboarding
-Disallow: /profile
-Disallow: /trip/
-Disallow: /join/
-Disallow: /importVideo
-Disallow: /login
-Disallow: /register
-Disallow: /forgot-password
-Disallow: /reset-password
-
-Sitemap: https://app.seego.fr/sitemap.xml
+Allow: /

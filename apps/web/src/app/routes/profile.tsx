@@ -12,7 +12,7 @@ import type { ProfileTab } from '@/features/profile/types';
 import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/profile')({
-  head: () => seo({ title: 'Mon espace', path: '/profile', noindex: true }),
+  head: () => seo({ title: 'Mon espace', path: '/profile' }),
   component: ProfilePage,
 });
 

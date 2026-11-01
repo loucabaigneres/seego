@@ -14,7 +14,7 @@ import { heroImageOf, plannedCount, splitTripDays } from '@/features/trip/lib/tr
 import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/trip/$tripId')({
-  head: () => seo({ title: 'Mon itinéraire', path: '/trip', noindex: true }),
+  head: () => seo({ title: 'Mon itinéraire', path: '/trip' }),
   component: TripPage,
 })
 
