@@ -1,0 +1,16 @@
+# app.seego.fr — the product UI.
+# Public entry points stay crawlable, everything personal or ephemeral is not.
+User-agent: *
+Allow: /$
+Allow: /discovery
+Allow: /onboarding
+Disallow: /profile
+Disallow: /trip/
+Disallow: /join/
+Disallow: /importVideo
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://app.seego.fr/sitemap.xml

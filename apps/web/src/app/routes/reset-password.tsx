@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { ResetPasswordForm } from '@/features/auth/components/ResetPasswordForm';
+import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/reset-password')({
+  head: () => seo({ title: 'Nouveau mot de passe', path: '/reset-password', noindex: true }),
   validateSearch: (search: Record<string, unknown>) => ({
     token: typeof search.token === 'string' ? search.token : undefined,
     error: typeof search.error === 'string' ? search.error : undefined,

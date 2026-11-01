@@ -1,11 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <meta name="theme-color" content="#F2EDE8" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      Title, description, canonical, robots and social cards are owned by the
+      router (`src/lib/seo.ts` + the `head` option of each route), so they match
+      the page actually displayed. Nothing SEO-related is duplicated here: two
+      canonicals on one page would contradict each other.
+      The title below is only the shell shown before React boots.
+    -->
+    <title>Seego — Ton prochain voyage, trouvé en un swipe</title>
+
+    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin />
   </head>
   <body>
     <div id="root"></div>

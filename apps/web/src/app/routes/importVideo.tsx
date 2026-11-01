@@ -4,9 +4,11 @@ import { PageSpinner } from '@/components/PageSpinner';
 import { ImportInspirationForm } from '@/features/inspiration/components/ImportInspirationForm';
 import { InspirationList } from '@/features/inspiration/components/InspirationList';
 import { useRequireSession } from '@/hooks/useRequireSession';
+import { seo } from '@/lib/seo';
 import { trpc } from '@/lib/trpc';
 
 export const Route = createFileRoute('/importVideo')({
+  head: () => seo({ title: 'Importer une vidéo', path: '/importVideo', noindex: true }),
   component: ImportVideoPage,
 });
 

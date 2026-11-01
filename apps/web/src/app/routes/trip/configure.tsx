@@ -2,8 +2,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { TripForm } from '@/features/trip/components/TripForm'
 import { useConfigureTrip } from '@/features/trip/hooks/useConfigureTrip'
+import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/trip/configure')({
+  head: () => seo({ title: 'Configurer mon voyage', path: '/trip/configure', noindex: true }),
   validateSearch: z.object({
     tripId: z.uuid().optional(),
   }),
