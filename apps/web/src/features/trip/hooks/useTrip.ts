@@ -59,6 +59,16 @@ export function useTrip(tripId: string) {
     }),
   );
 
+  const renameMutation = useMutation(
+    trpc.user.renameTrip.mutationOptions({
+      // Awaited so the editor closes on the new title, not the stale one.
+      onSuccess: async () => {
+        queryClient.invalidateQueries(trpc.user.getTrips.queryFilter());
+        await query.refetch();
+      },
+    }),
+  );
+
   useEffect(() => {
     if (
       session?.user &&
@@ -116,6 +126,10 @@ export function useTrip(tripId: string) {
       isPending: isSavingTrip,
       showBanner: showSavedBanner,
       closeBanner: () => setShowSavedBanner(false),
+    },
+    rename: {
+      isPending: renameMutation.isPending,
+      run: (title: string) => renameMutation.mutateAsync({ tripId, title }),
     },
     generate: {
       run: () => generateMutation.mutate({ tripId }),

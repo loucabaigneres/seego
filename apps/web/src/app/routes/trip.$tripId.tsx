@@ -16,7 +16,7 @@ export const Route = createFileRoute('/trip/$tripId')({ component: TripPage })
 
 function TripPage() {
   const { tripId } = Route.useParams()
-  const { query, isLoggedIn, isOwner, save, generate, replace, edit } = useTrip(tripId)
+  const { query, isLoggedIn, isOwner, save, rename, generate, replace, edit } = useTrip(tripId)
 
   if (query.isPending) return <TripLoading />
   if (query.isError) return <TripNotFound />
@@ -33,6 +33,9 @@ function TripPage() {
           trip={trip}
           heroImage={heroImageOf(itineraryDays, likedDay)}
           plannedCount={plannedCount(itineraryDays)}
+          rename={
+            isOwner ? { isPending: rename.isPending, onSubmit: rename.run } : undefined
+          }
         />
 
         <SaveTripSection
