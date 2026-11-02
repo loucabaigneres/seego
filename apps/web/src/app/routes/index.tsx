@@ -2,8 +2,16 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { ChoiceCard } from '@/features/home/components/ChoiceCard';
 import { HomeHero } from '@/features/home/components/HomeHero';
 import { useStartDirectTrip } from '@/features/home/hooks/useStartDirectTrip';
+import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/')({
+  head: () =>
+    seo({
+      title: 'Seego — Ton prochain voyage, trouvé en un swipe',
+      description:
+        "Trouve ta prochaine escapade : swipe les lieux qui t'inspirent, Seego assemble l'itinéraire, les hébergements et les trajets.",
+      path: '/',
+    }),
   component: IndexPage,
 });
 

@@ -1,0 +1,10 @@
+# app.seego.fr — the product UI, deliberately kept out of search results.
+#
+# The exclusion itself comes from the `X-Robots-Tag: noindex, nofollow` header
+# set in vercel.json. Crawling is allowed on purpose: a disallowed URL is never
+# fetched, so that header would never be read — and the URL could still end up
+# indexed from an external link.
+#
+# The indexed site is https://www.seego.fr
+User-agent: *
+Allow: /

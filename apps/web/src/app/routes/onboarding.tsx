@@ -4,8 +4,16 @@ import { QuestionStep } from '@/features/onboarding/components/QuestionStep';
 import { QuizFooter } from '@/features/onboarding/components/QuizFooter';
 import { QuizHeader } from '@/features/onboarding/components/QuizHeader';
 import { useOnboardingQuiz } from '@/features/onboarding/hooks/useOnboardingQuiz';
+import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/onboarding')({
+  head: () =>
+    seo({
+      title: 'Dis-nous ce qui te fait voyager',
+      description:
+        'Quatre questions sur tes décors, tes envies, tes compagnons de route et ton climat préféré pour personnaliser tes suggestions.',
+      path: '/onboarding',
+    }),
   component: OnboardingPage,
 });
 
