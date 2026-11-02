@@ -1,257 +1,159 @@
 import { TRPCError } from '@trpc/server';
-import type { ExtractedPlace } from '@seego/database';
-import { and, desc, eq, inArray, max } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import * as z from 'zod';
+import { upsertImportedPlace } from '../../lib/importedPlaces.js';
+import { analyzeUrl } from '../../lib/inspiration/analyze.js';
+import { CAPTION_UNAVAILABLE, requireSupportedPlatform } from '../../lib/inspiration/errors.js';
+import { asPlaces, asTags, summariseLocation } from '../../lib/inspiration/places.js';
+import { addPlacesToLikedDay, type PlaceWithRef } from '../../lib/inspiration/tripPlaces.js';
 import {
-  AnalysisError,
-  analyzeInspiration,
-  type InlineImage,
-  type InspirationAnalysis,
-} from '../../lib/aiAnalysis.js';
-import { upsertImportedPlace, type ImportedPlaceRef } from '../../lib/importedPlaces.js';
-import {
-  detectPlatform,
-  downloadImageAsInline,
   extractHashtags,
   fetchCaption,
-  fetchMedia,
   normalizeContentUrl,
   stripHashtags,
 } from '../../lib/socialImport/index.js';
-import { activity, importedInspiration, trip, tripDay } from '../../lib/tables.js';
+import { importedInspiration, trip } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
-// Les lieux importés rejoignent le bucket « lieux likés » du voyage (jour 0), celui qui
-// s'affiche avant génération et qui alimente la génération de l'itinéraire.
-const LIKED_DAY_INDEX = 0;
-
-/** Adresse postale si connue, sinon « ville, pays », sinon null. */
-const placeLocation = (place: ExtractedPlace): string | null =>
-  place.address ?? ([place.city, place.country].filter(Boolean).join(', ') || null);
-
-// Code d'erreur reconnu par le front pour déplier le champ de saisie manuelle.
-export const CAPTION_UNAVAILABLE = 'CAPTION_UNAVAILABLE';
-// Code d'erreur renvoyé quand l'analyse IA n'est pas configurée côté serveur.
-export const AI_UNAVAILABLE = 'AI_UNAVAILABLE';
-
-// On ne relaie qu'un nombre borné d'images d'aperçu vers l'IA.
-const MAX_IMAGES = 4;
-
-/** Résumé court d'un lieu pour la colonne `extracted_location` (NOT NULL). */
-const summariseLocation = (places: ExtractedPlace[]): string =>
-  places
-    .slice(0, 3)
-    .map((p) => [p.name, p.city].filter(Boolean).join(', '))
-    .join(' · ');
+const importUrlInput = z.object({
+  url: z.url("L'URL n'est pas valide."),
+  // Légende collée à la main quand la récupération automatique échoue.
+  caption: z.string().max(5000).optional(),
+});
 
 export const inspirationRouter = createTRPCRouter({
-  importFromUrl: protectedProcedure
-    .input(
-      z.object({
-        url: z.url("L'URL n'est pas valide."),
-        // Légende collée à la main quand la récupération automatique échoue.
-        caption: z.string().max(5000).optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const platform = detectPlatform(input.url);
+  importFromUrl: protectedProcedure.input(importUrlInput).mutation(async ({ ctx, input }) => {
+    const platform = requireSupportedPlatform(input.url);
 
-      if (platform === 'other') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Seuls les liens TikTok et Instagram sont pris en charge pour le moment.',
-        });
+    let caption = input.caption?.trim();
+
+    if (!caption) {
+      const result = await fetchCaption(input.url);
+
+      if (!result.ok) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: CAPTION_UNAVAILABLE });
       }
 
-      let caption = input.caption?.trim();
+      caption = result.caption;
+    }
 
-      if (!caption) {
-        const result = await fetchCaption(input.url);
+    const tags = extractHashtags(caption);
 
-        if (!result.ok) {
-          throw new TRPCError({ code: 'BAD_REQUEST', message: CAPTION_UNAVAILABLE });
-        }
+    const [inspiration] = await ctx.db
+      .insert(importedInspiration)
+      .values({
+        userId: ctx.user.id,
+        platform,
+        originalUrl: input.url,
+        // Les hashtags vivent dans `extracted_tags` : on ne les garde pas dans la description.
+        description: stripHashtags(caption) || null,
+        // La localisation sera déduite plus tard (géocodage / IA) : la colonne est
+        // NOT NULL sans valeur par défaut, on laisse une chaîne vide en attendant.
+        extracted_location: '',
+        extracted_tags: tags,
+        status: tags.length > 0 ? 'analyzed' : 'failed',
+      })
+      .returning();
 
-        caption = result.caption;
-      }
-
-      const tags = extractHashtags(caption);
-
-      const [inspiration] = await ctx.db
-        .insert(importedInspiration)
-        .values({
-          userId: ctx.user.id,
-          platform,
-          originalUrl: input.url,
-          // Les hashtags vivent dans `extracted_tags` : on ne les garde pas dans la description.
-          description: stripHashtags(caption) || null,
-          // La localisation sera déduite plus tard (géocodage / IA) : la colonne est
-          // NOT NULL sans valeur par défaut, on laisse une chaîne vide en attendant.
-          extracted_location: '',
-          extracted_tags: tags,
-          status: tags.length > 0 ? 'analyzed' : 'failed',
-        })
-        .returning();
-
-      return {
-        success: true,
-        inspiration: {
-          id: inspiration.id,
-          platform: inspiration.platform,
-          originalUrl: inspiration.originalUrl,
-          description: inspiration.description,
-          tags,
-        },
-      };
-    }),
+    return {
+      success: true,
+      inspiration: {
+        id: inspiration.id,
+        platform: inspiration.platform,
+        originalUrl: inspiration.originalUrl,
+        description: inspiration.description,
+        tags,
+      },
+    };
+  }),
 
   /**
    * Analyse par IA (Google Gemini) : on récupère la légende + l'image d'aperçu de la
    * publication, on les soumet au modèle, et on stocke le compte rendu produit ainsi
    * que les lieux détectés (avec leur adresse quand elle est connue).
    */
-  analyzeFromUrl: protectedProcedure
-    .input(
-      z.object({
-        url: z.url("L'URL n'est pas valide."),
-        // Légende collée à la main quand la récupération automatique échoue.
-        caption: z.string().max(5000).optional(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const platform = detectPlatform(input.url);
+  analyzeFromUrl: protectedProcedure.input(importUrlInput).mutation(async ({ ctx, input }) => {
+    const platform = requireSupportedPlatform(input.url);
 
-      if (platform === 'other') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Seuls les liens TikTok et Instagram sont pris en charge pour le moment.',
-        });
-      }
+    // Dédup au niveau de la vidéo : si l'utilisateur a déjà analysé ce lien, on renvoie
+    // l'analyse existante sans refaire d'appel IA ni créer un doublon.
+    const normalizedUrl = normalizeContentUrl(input.url);
+    const mine = await ctx.db
+      .select({
+        id: importedInspiration.id,
+        platform: importedInspiration.platform,
+        originalUrl: importedInspiration.originalUrl,
+        description: importedInspiration.description,
+        aiReport: importedInspiration.aiReport,
+        type: importedInspiration.type,
+        city: importedInspiration.city,
+        extractedPlaces: importedInspiration.extractedPlaces,
+        tags: importedInspiration.extracted_tags,
+      })
+      .from(importedInspiration)
+      .where(eq(importedInspiration.userId, ctx.user.id));
 
-      // Dédup au niveau de la vidéo : si l'utilisateur a déjà analysé ce lien, on renvoie
-      // l'analyse existante sans refaire d'appel IA ni créer un doublon.
-      const normalizedUrl = normalizeContentUrl(input.url);
-      const mine = await ctx.db
-        .select({
-          id: importedInspiration.id,
-          platform: importedInspiration.platform,
-          originalUrl: importedInspiration.originalUrl,
-          description: importedInspiration.description,
-          aiReport: importedInspiration.aiReport,
-          type: importedInspiration.type,
-          city: importedInspiration.city,
-          extractedPlaces: importedInspiration.extractedPlaces,
-          tags: importedInspiration.extracted_tags,
-        })
-        .from(importedInspiration)
-        .where(eq(importedInspiration.userId, ctx.user.id));
-
-      const existing = mine.find((row) => normalizeContentUrl(row.originalUrl) === normalizedUrl);
-      if (existing) {
-        return {
-          success: true,
-          alreadyImported: true,
-          inspiration: {
-            id: existing.id,
-            platform: existing.platform,
-            originalUrl: existing.originalUrl,
-            description: existing.description,
-            aiReport: existing.aiReport,
-            type: existing.type,
-            city: existing.city,
-            extractedPlaces: Array.isArray(existing.extractedPlaces)
-              ? (existing.extractedPlaces as ExtractedPlace[])
-              : [],
-            tags: Array.isArray(existing.tags) ? (existing.tags as string[]) : [],
-          },
-        };
-      }
-
-      const media = await fetchMedia(input.url);
-      const caption = input.caption?.trim() || media.caption;
-
-      // Téléchargement best-effort des aperçus : on ignore silencieusement les échecs.
-      const downloaded = await Promise.all(
-        media.imageUrls.slice(0, MAX_IMAGES).map((imageUrl) => downloadImageAsInline(imageUrl)),
-      );
-      const images: InlineImage[] = downloaded.filter(
-        (image): image is InlineImage => image !== null,
-      );
-
-      let analysis: InspirationAnalysis;
-      try {
-        analysis = await analyzeInspiration({
-          caption,
-          images,
-          transcript: media.transcript,
-        });
-      } catch (error) {
-        if (error instanceof AnalysisError) {
-          if (error.reason === 'missing_key') {
-            throw new TRPCError({ code: 'PRECONDITION_FAILED', message: AI_UNAVAILABLE });
-          }
-          if (error.reason === 'empty_input') {
-            throw new TRPCError({ code: 'BAD_REQUEST', message: CAPTION_UNAVAILABLE });
-          }
-          if (error.reason === 'blocked') {
-            throw new TRPCError({
-              code: 'BAD_REQUEST',
-              message: "Cette publication a été refusée par l'analyse (contenu bloqué).",
-            });
-          }
-          throw new TRPCError({
-            code: 'BAD_GATEWAY',
-            message: "L'analyse IA a échoué, réessaie dans un instant.",
-          });
-        }
-        throw error;
-      }
-
-      // Si l'IA n'a pas renvoyé de tags, on retombe sur les hashtags de la légende.
-      const tags =
-        analysis.tags.length > 0 ? analysis.tags : caption ? extractHashtags(caption) : [];
-
-      // Chaque lieu détecté devient un « élément lieu » réutilisable (dédupliqué), que
-      // l'on pourra sélectionner plus tard dans le remplacement d'activités. Séquentiel :
-      // l'upsert géocode l'adresse (OpenStreetMap), qui tolère mal les requêtes en rafale.
-      const previewImageUrl = media.imageUrls[0] ?? null;
-      for (const place of analysis.places) {
-        await upsertImportedPlace(ctx.db, ctx.user.id, place, previewImageUrl);
-      }
-
-      const [inspiration] = await ctx.db
-        .insert(importedInspiration)
-        .values({
-          userId: ctx.user.id,
-          platform,
-          originalUrl: input.url,
-          description: caption ? stripHashtags(caption) || null : null,
-          extracted_location: summariseLocation(analysis.places),
-          extracted_tags: tags,
-          aiReport: analysis.summary || null,
-          type: analysis.type,
-          city: analysis.city,
-          extractedPlaces: analysis.places,
-          status: 'analyzed',
-        })
-        .returning();
-
+    const existing = mine.find((row) => normalizeContentUrl(row.originalUrl) === normalizedUrl);
+    if (existing) {
       return {
         success: true,
-        alreadyImported: false,
+        alreadyImported: true,
         inspiration: {
-          id: inspiration.id,
-          platform: inspiration.platform,
-          originalUrl: inspiration.originalUrl,
-          description: inspiration.description,
-          aiReport: inspiration.aiReport,
-          type: inspiration.type,
-          city: inspiration.city,
-          extractedPlaces: analysis.places,
-          tags,
+          id: existing.id,
+          platform: existing.platform,
+          originalUrl: existing.originalUrl,
+          description: existing.description,
+          aiReport: existing.aiReport,
+          type: existing.type,
+          city: existing.city,
+          extractedPlaces: asPlaces(existing.extractedPlaces),
+          tags: asTags(existing.tags),
         },
       };
-    }),
+    }
+
+    const { analysis, caption, tags, previewImageUrl } = await analyzeUrl(input.url, input.caption);
+
+    // Chaque lieu détecté devient un « élément lieu » réutilisable (dédupliqué), que
+    // l'on pourra sélectionner plus tard dans le remplacement d'activités. Séquentiel :
+    // l'upsert géocode l'adresse (OpenStreetMap), qui tolère mal les requêtes en rafale.
+    for (const place of analysis.places) {
+      await upsertImportedPlace(ctx.db, ctx.user.id, place, previewImageUrl);
+    }
+
+    const [inspiration] = await ctx.db
+      .insert(importedInspiration)
+      .values({
+        userId: ctx.user.id,
+        platform,
+        originalUrl: input.url,
+        description: caption ? stripHashtags(caption) || null : null,
+        extracted_location: summariseLocation(analysis.places),
+        extracted_tags: tags,
+        aiReport: analysis.summary || null,
+        type: analysis.type,
+        city: analysis.city,
+        extractedPlaces: analysis.places,
+        status: 'analyzed',
+      })
+      .returning();
+
+    return {
+      success: true,
+      alreadyImported: false,
+      inspiration: {
+        id: inspiration.id,
+        platform: inspiration.platform,
+        originalUrl: inspiration.originalUrl,
+        description: inspiration.description,
+        aiReport: inspiration.aiReport,
+        type: inspiration.type,
+        city: inspiration.city,
+        extractedPlaces: analysis.places,
+        tags,
+      },
+    };
+  }),
 
   /**
    * Ajoute les lieux des inspirations sélectionnées au bucket « lieux likés » (jour 0)
@@ -286,9 +188,7 @@ export const inspirationRouter = createTRPCRouter({
           ),
         );
 
-      const places = inspirations.flatMap((row) =>
-        Array.isArray(row.extractedPlaces) ? (row.extractedPlaces as ExtractedPlace[]) : [],
-      );
+      const places = inspirations.flatMap((row) => asPlaces(row.extractedPlaces));
 
       if (places.length === 0) {
         return { success: true, tripId: input.tripId, added: 0 };
@@ -297,51 +197,12 @@ export const inspirationRouter = createTRPCRouter({
       // On rattache chaque lieu à son « élément lieu » (créé/dédupliqué), pour que les
       // activités partagent la même identité (et les mêmes coordonnées) que les candidats
       // du remplacement. Séquentiel à cause du géocodage éventuel (OpenStreetMap).
-      const placesWithContent: Array<{ place: ExtractedPlace; ref: ImportedPlaceRef | null }> = [];
+      const placesWithRef: PlaceWithRef[] = [];
       for (const place of places) {
-        placesWithContent.push({
-          place,
-          ref: await upsertImportedPlace(ctx.db, ctx.user.id, place),
-        });
+        placesWithRef.push({ place, ref: await upsertImportedPlace(ctx.db, ctx.user.id, place) });
       }
 
-      const added = await ctx.db.transaction(async (tx) => {
-        // Le bucket « lieux likés » (jour 0) peut ne pas exister encore.
-        let [likedDay] = await tx
-          .select({ id: tripDay.id })
-          .from(tripDay)
-          .where(and(eq(tripDay.tripId, input.tripId), eq(tripDay.dayIndex, LIKED_DAY_INDEX)));
-
-        if (!likedDay) {
-          [likedDay] = await tx
-            .insert(tripDay)
-            .values({ tripId: input.tripId, dayIndex: LIKED_DAY_INDEX, summary: 'Lieux likés' })
-            .returning({ id: tripDay.id });
-        }
-
-        // On ajoute à la suite des activités déjà présentes dans le bucket.
-        const [{ maxOrder } = { maxOrder: null }] = await tx
-          .select({ maxOrder: max(activity.orderIndex) })
-          .from(activity)
-          .where(eq(activity.tripDayId, likedDay.id));
-
-        const startIndex = (maxOrder ?? -1) + 1;
-
-        await tx.insert(activity).values(
-          placesWithContent.map(({ place, ref }, i) => ({
-            tripDayId: likedDay.id,
-            discoveryContentId: ref?.id ?? undefined,
-            title: place.name,
-            description: place.description ?? undefined,
-            locationName: placeLocation(place) ?? undefined,
-            // Coordonnées géocodées : le lieu apparaît ainsi sur la carte du voyage.
-            coordinates: ref?.coordinates ?? undefined,
-            orderIndex: startIndex + i,
-          })),
-        );
-
-        return places.length;
-      });
+      const added = await addPlacesToLikedDay(ctx.db, input.tripId, placesWithRef);
 
       return { success: true, tripId: input.tripId, added };
     }),
@@ -366,13 +227,10 @@ export const inspirationRouter = createTRPCRouter({
       .orderBy(desc(importedInspiration.createdAt))
       .limit(100);
 
-    // `extracted_tags` / `extracted_places` sont des jsonb : on normalise à la lecture.
     return rows.map((row) => ({
       ...row,
-      tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-      extractedPlaces: Array.isArray(row.extractedPlaces)
-        ? (row.extractedPlaces as ExtractedPlace[])
-        : [],
+      tags: asTags(row.tags),
+      extractedPlaces: asPlaces(row.extractedPlaces),
     }));
   }),
 
