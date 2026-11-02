@@ -1,5 +1,5 @@
+import { discoveryContent, swipeDirectionEnum, swipes, trip } from '@seego/database';
 import { TRPCError } from '@trpc/server';
-import { discoveryContent, swipeDirectionEnum, swipes, trip } from '@voyagr/database';
 import { and, eq, notExists } from 'drizzle-orm';
 import * as z from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from './init.js';

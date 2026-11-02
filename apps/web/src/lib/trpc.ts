@@ -4,8 +4,8 @@ import type { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
 // Only import the AppRouter type from the API package, not the entire router implementation
 // So that we avoid bundling unnecessary server-side code into the client bundle.
-import type { AppRouter } from '@voyagr/api/src/trpc/router';
-import { env } from '../env';
+import type { AppRouter } from '@seego/api/src/trpc/router';
+import { env } from '@/config/env';
 
 export const queryClient = new QueryClient({
   defaultOptions: {

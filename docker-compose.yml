@@ -3,18 +3,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.db
-    container_name: voyagr_db
+    container_name: seego_db
     restart: always
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: voyagr
+      POSTGRES_DB: seego
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d voyagr"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d seego"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,14 +23,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: voyagr_api
+    container_name: seego_api
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://admin:password@db:5432/voyagr
+      - DATABASE_URL=postgres://admin:password@db:5432/seego
       - CI=true
       - BETTER_AUTH_SECRET=1234
       - BETTER_AUTH_URL=http://localhost:3000
@@ -43,7 +43,7 @@ services:
       - /app/apps/landing-page/node_modules
       - /app/packages/database/node_modules
       - /app/packages/eslint-config/node_modules
-    command: sh -c "pnpm install && pnpm turbo run dev --filter=@voyagr/api"
+    command: sh -c "pnpm install && pnpm turbo run dev --filter=@seego/api"
 
 volumes:
   postgres_data:

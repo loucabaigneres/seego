@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RefreshControl } from 'react-native';
 
+import { InspirationList } from '@/features/inspirations/components/InspirationList';
 import { GuestInvite } from '@/features/profile/components/GuestInvite';
 import { ProfileContent, type ProfileSegment } from '@/features/profile/components/ProfileContent';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
@@ -9,6 +10,7 @@ import { ProfileStats } from '@/features/profile/components/ProfileStats';
 import { SettingsLink } from '@/features/profile/components/SettingsLink';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
+import { TripList } from '@/features/trips/components/TripList';
 import { colors } from '@/theme/tokens';
 import { ErrorState, Screen } from '@/ui';
 
@@ -61,7 +63,12 @@ export default function ProfileScreen() {
     >
       <ProfileHeader user={profile.user} />
       <ProfileStats stats={profile.stats} onPressTrips={() => setSegment('trips')} />
-      <ProfileContent segment={segment} onSegmentChange={setSegment} />
+      <ProfileContent
+        segment={segment}
+        onSegmentChange={setSegment}
+        trips={<TripList />}
+        inspirations={<InspirationList />}
+      />
       <SettingsLink />
     </Screen>
   );
