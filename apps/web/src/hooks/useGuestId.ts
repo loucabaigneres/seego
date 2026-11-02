@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const GUEST_ID_KEY = 'voyagr_guest_id';
+const GUEST_ID_KEY = 'seego_guest_id';
 
 export function useGuestId() {
   // Pass function to useState to avoid generating a new UUID on every render

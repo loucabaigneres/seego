@@ -1,5 +1,5 @@
 {
-  "name": "@voyagr/eslint-config",
+  "name": "@seego/eslint-config",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

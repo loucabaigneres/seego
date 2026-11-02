@@ -12,4 +12,4 @@ RUN pnpm install
 
 EXPOSE 3000
 
-CMD ["pnpm", "turbo", "run", "dev", "--filter=@voyagr/api"]
+CMD ["pnpm", "turbo", "run", "dev", "--filter=@seego/api"]

@@ -27,7 +27,7 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Pre-build Monorepo Dependencies
-        run: pnpm run build --filter="@voyagr/database" --filter="@voyagr/api"
+        run: pnpm run build --filter="@seego/database" --filter="@seego/api"
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/landing-page
