@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { z } from 'zod'
 import { GroupTripInviteCard } from '@/features/group-trip/components/GroupTripInviteCard'
 import { DayCard } from '@/features/trip/components/DayCard'
 import { EditActionBar } from '@/features/trip/components/EditActionBar'
@@ -12,11 +13,23 @@ import { GeneratingCard, TripLoading, TripNotFound } from '@/features/trip/compo
 import { useTrip } from '@/features/trip/hooks/useTrip'
 import { heroImageOf, plannedCount, splitTripDays } from '@/features/trip/lib/tripDays'
 
-export const Route = createFileRoute('/trip/$tripId')({ component: TripPage })
+const tripSearchSchema = z.object({
+  // Set when "Sauvegarder" sent a guest to the login page: the save is replayed once back here
+  save: z.boolean().optional().catch(undefined),
+})
+
+export const Route = createFileRoute('/trip/$tripId')({
+  validateSearch: (search) => tripSearchSchema.parse(search),
+  component: TripPage,
+})
 
 function TripPage() {
   const { tripId } = Route.useParams()
-  const { query, isLoggedIn, isOwner, save, rename, generate, replace, edit } = useTrip(tripId)
+  const { save: pendingSave } = Route.useSearch()
+  const { query, isLoggedIn, isOwner, save, rename, generate, replace, edit } = useTrip(
+    tripId,
+    pendingSave,
+  )
 
   if (query.isPending) return <TripLoading />
   if (query.isError) return <TripNotFound />

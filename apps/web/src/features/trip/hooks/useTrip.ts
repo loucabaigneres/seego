@@ -9,9 +9,9 @@ import type { Activity, Day } from '../types';
 
 /**
  * Trip page state: the trip itself, itinerary generation, saving to the account
- * (automatic once signed in), replacing a place and editing the planning.
+ * (replayed once signed in when `pendingSave` is set), replacing a place and editing the planning.
  */
-export function useTrip(tripId: string) {
+export function useTrip(tripId: string, pendingSave?: boolean) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
@@ -69,16 +69,13 @@ export function useTrip(tripId: string) {
     }),
   );
 
+  // Guest trips are moved to the account on login (useClaimGuestTrips); only an explicit
+  // "Sauvegarder" made before logging in also finalizes the trip.
   useEffect(() => {
-    if (
-      session?.user &&
-      query.data?.trip &&
-      query.data.trip.userId !== session.user.id &&
-      !isSavingTrip
-    ) {
-      saveToProfile({ tripId });
-    }
-  }, [session?.user, query.data?.trip, tripId, saveToProfile, isSavingTrip]);
+    if (!pendingSave || !session?.user || !query.data?.trip) return;
+    navigate({ to: '/trip/$tripId', params: { tripId }, search: {}, replace: true });
+    if (query.data.trip.status !== 'finalized') saveToProfile({ tripId });
+  }, [pendingSave, session?.user, query.data?.trip, tripId, navigate, saveToProfile]);
 
   const trip = query.data?.trip;
   const isLoggedIn = Boolean(session?.user);
@@ -88,7 +85,7 @@ export function useTrip(tripId: string) {
     if (!session?.user) {
       navigate({
         to: '/login',
-        search: { redirect: `/trip/${tripId}` },
+        search: { redirect: `/trip/${tripId}?save=true` },
       });
       return;
     }
