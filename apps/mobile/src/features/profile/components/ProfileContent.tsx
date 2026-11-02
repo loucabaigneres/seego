@@ -1,7 +1,6 @@
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { InspirationList } from '@/features/inspirations/components/InspirationList';
-import { TripList } from '@/features/trips/components/TripList';
 import { SegmentedControl, type Segment } from '@/ui';
 
 export type ProfileSegment = 'trips' | 'inspirations';
@@ -14,14 +13,22 @@ const SEGMENTS: readonly Segment<ProfileSegment>[] = [
 export interface ProfileContentProps {
   segment: ProfileSegment;
   onSegmentChange: (segment: ProfileSegment) => void;
+  /** Lists come from other features: the profile route composes them. */
+  trips: ReactNode;
+  inspirations: ReactNode;
 }
 
 /** "Voyages | Inspirations" switch. */
-export function ProfileContent({ segment, onSegmentChange }: ProfileContentProps) {
+export function ProfileContent({
+  segment,
+  onSegmentChange,
+  trips,
+  inspirations,
+}: ProfileContentProps) {
   return (
     <View className="gap-4">
       <SegmentedControl segments={SEGMENTS} value={segment} onChange={onSegmentChange} />
-      {segment === 'trips' ? <TripList /> : <InspirationList />}
+      {segment === 'trips' ? trips : inspirations}
     </View>
   );
 }

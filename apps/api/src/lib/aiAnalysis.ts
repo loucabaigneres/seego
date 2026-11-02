@@ -1,4 +1,4 @@
-import type { PlaceCategory } from '@voyagr/database';
+import type { PlaceCategory } from '@seego/database';
 import { generateText, NoObjectGeneratedError, Output, type LanguageModel } from 'ai';
 import * as z from 'zod';
 import { getAnalysisModel } from './aiProvider.js';

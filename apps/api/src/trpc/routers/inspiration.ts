@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server';
-import type { ExtractedPlace } from '@voyagr/database';
+import type { ExtractedPlace } from '@seego/database';
 import { and, desc, eq, inArray, max } from 'drizzle-orm';
 import * as z from 'zod';
 import {

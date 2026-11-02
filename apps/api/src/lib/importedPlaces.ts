@@ -9,7 +9,7 @@
  * créer une seconde.
  */
 
-import type { ExtractedPlace, PlaceCategory } from '@voyagr/database';
+import type { ExtractedPlace, PlaceCategory } from '@seego/database';
 import { eq, sql } from 'drizzle-orm';
 import type { Context } from '../trpc/context.js';
 import { geocodeAddress, toWktPoint } from './geocoding.js';

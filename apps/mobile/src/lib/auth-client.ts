@@ -3,7 +3,7 @@ import { createAuthClient } from 'better-auth/react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
-import { env } from '@/env';
+import { API_URL } from '@/env';
 
 /**
  * Better Auth client. On native, the session cookie lives in SecureStore
@@ -11,7 +11,7 @@ import { env } from '@/env';
  * on web, the browser handles cookies as usual.
  */
 export const authClient = createAuthClient({
-  baseURL: env.EXPO_PUBLIC_API_URL,
+  baseURL: API_URL,
   plugins: [
     expoClient({
       // Must match `scheme` in app.json and `trustedOrigins` in the API.

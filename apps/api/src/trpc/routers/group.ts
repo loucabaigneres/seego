@@ -1,7 +1,7 @@
-import crypto from 'node:crypto';
+import { activity, trip, tripDay, tripMembers, user } from '@seego/database';
 import { TRPCError } from '@trpc/server';
-import { activity, trip, tripDay, tripMembers, user } from '@voyagr/database';
 import { and, desc, eq, inArray } from 'drizzle-orm';
+import crypto from 'node:crypto';
 import { z } from 'zod';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 

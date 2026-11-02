@@ -30,6 +30,8 @@ const envSchema = z.object({
     .default('google:gemini-flash-lite-latest'),
   GEMINI_API_KEY: z.string().min(1).optional(),
   // MISTRAL_API_KEY: z.string().min(1).optional(),
+
+  RESEND_API_KEY: z.string().startsWith('re_', 'RESEND_API_KEY must start with "re_"'),
 });
 
 // Parse and validate environment variables

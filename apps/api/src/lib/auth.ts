@@ -1,11 +1,16 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
+import { emailOTP } from 'better-auth/plugins';
 import { env } from '../env.js';
 import { db } from './db.js';
+import { sendResetPasswordEmail, sendVerificationCode } from './email.js';
 
 // Origins only reachable while developing the mobile app.
-const mobileDevOrigins = [
+const devOrigins = [
+  // Web en local, n'importe quel port
+  'http://localhost:*',
+  'http://127.0.0.1:*',
   // Expo Go
   'exp://',
   'exp://**',
@@ -19,10 +24,22 @@ export const auth = betterAuth({
     provider: 'pg',
   }),
   // Lets the mobile app send its session cookie and receive OAuth redirects on its deep link.
-  plugins: [expo()],
-  emailAndPassword: {
-    enabled: true,
-  },
+  plugins: [
+    expo(),
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 600,
+      allowedAttempts: 5,
+      resendStrategy: 'reuse',
+      sendVerificationOnSignUp: true,
+      disableSignUp: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        if (type !== 'email-verification') return;
+
+        void sendVerificationCode(email, otp);
+      },
+    }),
+  ],
   socialProviders: {
     google: {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -44,6 +61,14 @@ export const auth = betterAuth({
     env.FRONTEND_URL,
     // Mobile app scheme (`scheme` in apps/mobile/app.json).
     'seego://',
-    ...(env.NODE_ENV === 'development' ? mobileDevOrigins : []),
+    ...(env.NODE_ENV === 'development' ? devOrigins : []),
   ],
+
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      void sendResetPasswordEmail(user.email, url);
+    },
+  },
 });
