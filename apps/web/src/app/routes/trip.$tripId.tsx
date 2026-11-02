@@ -11,10 +11,8 @@ import { TripMap } from '@/features/trip/components/TripMap'
 import { GeneratingCard, TripLoading, TripNotFound } from '@/features/trip/components/TripStatusCard'
 import { useTrip } from '@/features/trip/hooks/useTrip'
 import { heroImageOf, plannedCount, splitTripDays } from '@/features/trip/lib/tripDays'
-import { seo } from '@/lib/seo'
 
 export const Route = createFileRoute('/trip/$tripId')({
-  head: () => seo({ title: 'Mon itinéraire', path: '/trip' }),
   component: TripPage,
 })
 
