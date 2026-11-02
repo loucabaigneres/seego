@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { count, desc, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { deleteTripCascade } from '../../lib/deleteTrip.js';
 import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
@@ -88,5 +89,35 @@ export const userRouter = createTRPCRouter({
       }
 
       return { success: true, trip: updatedTrip };
+    }),
+
+  deleteTrip: protectedProcedure
+    .input(z.object({ tripId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const [tripRow] = await ctx.db
+        .select({ userId: trip.userId })
+        .from(trip)
+        .where(eq(trip.id, input.tripId));
+
+      if (!tripRow) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Voyage introuvable.' });
+      }
+
+      // Group trips can also be deleted by their organizer, who may not be the creator.
+      const ownerMembership = await ctx.db.query.tripMembers.findFirst({
+        where: (tm, { and, eq }) =>
+          and(eq(tm.tripId, input.tripId), eq(tm.userId, ctx.user.id), eq(tm.role, 'owner')),
+      });
+
+      if (tripRow.userId !== ctx.user.id && !ownerMembership) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: "Vous n'avez pas l'autorisation de supprimer ce voyage.",
+        });
+      }
+
+      await deleteTripCascade(ctx.db, input.tripId);
+
+      return { success: true };
     }),
 });

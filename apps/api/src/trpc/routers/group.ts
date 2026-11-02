@@ -1,8 +1,9 @@
-import { activity, trip, tripDay, tripMembers, user } from '@seego/database';
+import { trip, tripMembers, user } from '@seego/database';
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import { deleteTripCascade } from '../../lib/deleteTrip.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
 function generateInvitePayload() {
@@ -285,19 +286,7 @@ export const groupRouter = createTRPCRouter({
         });
       }
 
-      const days = await ctx.db
-        .select({ id: tripDay.id })
-        .from(tripDay)
-        .where(eq(tripDay.tripId, input.tripId));
-
-      const dayIds = days.map((d) => d.id);
-      if (dayIds.length > 0) {
-        await ctx.db.delete(activity).where(inArray(activity.tripDayId, dayIds));
-        await ctx.db.delete(tripDay).where(eq(tripDay.tripId, input.tripId));
-      }
-
-      await ctx.db.delete(tripMembers).where(eq(tripMembers.tripId, input.tripId));
-      await ctx.db.delete(trip).where(eq(trip.id, input.tripId));
+      await deleteTripCascade(ctx.db, input.tripId);
 
       return { success: true };
     }),
