@@ -9,6 +9,7 @@ import {
   deckReducer,
   EXPLORATION_SIZE,
   likeCount,
+  reachedLikeGoal,
   startDeck,
   visibleCards,
   type Swipe,
@@ -16,7 +17,10 @@ import {
 import type { DiscoveryPlace } from '../lib/discovery-place';
 
 /** One swipe session over the feed: card order, decisions, and the animation that ends each one. */
-export function useSwipeDeck(places: DiscoveryPlace[]) {
+export function useSwipeDeck(
+  places: DiscoveryPlace[],
+  { onLikeGoal }: { onLikeGoal?: () => void } = {},
+) {
   const [deck, dispatch] = useReducer(deckReducer, places, startDeck);
   const queryClient = useQueryClient();
   const topCardRef = useRef<SwipeCardHandle>(null);
@@ -61,6 +65,7 @@ export function useSwipeDeck(places: DiscoveryPlace[]) {
 
       const swipes = [...deck.swipes, swipe];
       if (swipes.length >= EXPLORATION_SIZE) reorderUpcomingCards(swipes);
+      if (reachedLikeGoal(swipes)) onLikeGoal?.();
     });
   };
 
@@ -72,6 +77,7 @@ export function useSwipeDeck(places: DiscoveryPlace[]) {
 
   return {
     cards,
+    swipes: deck.swipes,
     likeCount: likeCount(deck.swipes),
     isFinished: deck.queue.length === 0,
     isLeaving,

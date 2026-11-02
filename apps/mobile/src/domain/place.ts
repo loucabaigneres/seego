@@ -83,3 +83,18 @@ export function offerHost(url: string | null | undefined): string | null {
     return null;
   }
 }
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  France: '🇫🇷',
+  Italie: '🇮🇹',
+  Espagne: '🇪🇸',
+  Allemagne: '🇩🇪',
+  Angleterre: '🇬🇧',
+  Portugal: '🇵🇹',
+  Grèce: '🇬🇷',
+};
+
+/** Flag emoji for a catalogue country name ("Italie" → 🇮🇹), or '' when unknown. */
+export function countryFlag(country: string | null | undefined): string {
+  return (country && COUNTRY_FLAGS[country]) || '';
+}

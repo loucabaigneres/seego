@@ -1,4 +1,4 @@
-import { importedInspiration, discoveryContent, swipes } from '../schemas/inspiration.js';
+import { discoveryContent, importedInspiration, swipes } from '../schemas/inspiration.js';
 
 export const FAKE_USER_ID = 'user-test-123';
 export const DISCOVERY_CONTENT_ID = '11111111-1111-1111-1111-111111111111';
@@ -24,7 +24,7 @@ export async function seedInspirations(db: ReturnType<typeof import('../index.js
       {
         id: DISCOVERY_CONTENT_ID,
         url: 'https://www.tour-eiffel.fr/',
-        mainMediaUrl: 'https://s3.voyagr.com/paris-eiffel.mp4',
+        mainMediaUrl: 'https://s3.seego.com/paris-eiffel.mp4',
         locationName: 'Tour Eiffel',
         description:
           'Le monument le plus emblématique de Paris, offrant une vue panoramique sur la capitale.',

@@ -1,4 +1,4 @@
-import { nameSchema } from '@/features/auth/lib/validation';
+import { nameSchema } from '@/domain/name';
 
 /** Letter shown in the avatar: the name's first character, else the email's, else "?". */
 export function avatarInitial(name?: string | null, email?: string | null): string {

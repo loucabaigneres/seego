@@ -97,6 +97,8 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
 
   const isTop = position === 0;
   const photos = placePhotos(place);
+  const photo = photos.at(Math.min(photoIndex, photos.length - 1));
+  const [failedPhoto, setFailedPhoto] = useState<string | null>(null);
   const category = placeCategory(place);
   const tags = placeSubcategories(place).slice(0, 3);
   const description = cleanDescription(place.description);
@@ -257,12 +259,15 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
       <View className="flex-1 overflow-hidden rounded-card border border-line bg-ink">
         <GestureDetector gesture={Gesture.Race(createPan(), tap)}>
           <Animated.View style={[styles.photo, photoStyle]}>
-            {/* Shows through when the photo is missing or fails to load. */}
-            <View className="absolute inset-0 items-center justify-center">
-              <ImageIcon size={64} color={colors.ink.muted} />
-            </View>
+            {/* Only for a missing or broken photo: kept behind every photo, it showed through the cross-fade. */}
+            {(!photo || photo === failedPhoto) && (
+              <View className="absolute inset-0 items-center justify-center">
+                <ImageIcon size={64} color={colors.ink.muted} />
+              </View>
+            )}
             <Image
-              source={photos[Math.min(photoIndex, photos.length - 1)]}
+              source={photo}
+              onError={() => setFailedPhoto(photo ?? null)}
               style={StyleSheet.absoluteFill}
               contentFit="cover"
               transition={150}

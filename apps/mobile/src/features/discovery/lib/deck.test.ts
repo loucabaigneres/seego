@@ -1,5 +1,13 @@
 import type { CityRank } from './city-ranking';
-import { deckReducer, likeCount, startDeck, visibleCards, type DeckState } from './deck';
+import {
+  deckReducer,
+  LIKE_GOAL,
+  likeCount,
+  reachedLikeGoal,
+  startDeck,
+  visibleCards,
+  type DeckState,
+} from './deck';
 import type { DiscoveryPlace } from './discovery-place';
 
 const place = (id: string, city: string): DiscoveryPlace => ({
@@ -93,5 +101,21 @@ describe('likeCount', () => {
         { id: 'c', liked: true, viewDurationMs: 10 },
       ]),
     ).toBe(2);
+  });
+});
+
+describe('reachedLikeGoal', () => {
+  const likes = (count: number) =>
+    Array.from({ length: count }, (_, i) => ({ id: `l${i}`, liked: true, viewDurationMs: 10 }));
+  const skip = { id: 's', liked: false, viewDurationMs: 10 };
+
+  it('is true on the like that reaches the goal', () => {
+    expect(reachedLikeGoal(likes(LIKE_GOAL))).toBe(true);
+  });
+
+  it('is false before the goal, on a later skip and on later likes', () => {
+    expect(reachedLikeGoal(likes(LIKE_GOAL - 1))).toBe(false);
+    expect(reachedLikeGoal([...likes(LIKE_GOAL), skip])).toBe(false);
+    expect(reachedLikeGoal(likes(LIKE_GOAL + 1))).toBe(false);
   });
 });

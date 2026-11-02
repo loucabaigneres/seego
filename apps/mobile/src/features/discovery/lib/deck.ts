@@ -62,3 +62,8 @@ export function visibleCards(state: DeckState): DiscoveryPlace[] {
 export function likeCount(swipes: readonly Swipe[]): number {
   return swipes.filter((swipe) => swipe.liked).length;
 }
+
+/** True right after the like that reaches `LIKE_GOAL`: the result opens once, not on every later like. */
+export function reachedLikeGoal(swipes: readonly Swipe[]): boolean {
+  return swipes.at(-1)?.liked === true && likeCount(swipes) === LIKE_GOAL;
+}

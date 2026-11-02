@@ -1,4 +1,11 @@
-import { categoryMeta, cleanDescription, offerHost, parseWktPoint, placePhotos } from './place';
+import {
+  categoryMeta,
+  cleanDescription,
+  countryFlag,
+  offerHost,
+  parseWktPoint,
+  placePhotos,
+} from './place';
 
 describe('offerHost', () => {
   it('returns the host without www', () => {
@@ -67,5 +74,16 @@ describe('placePhotos', () => {
 
   it('handles a place without photos', () => {
     expect(placePhotos({ mainMediaUrl: null, carousselUrls: null })).toEqual([]);
+  });
+});
+
+describe('countryFlag', () => {
+  it('returns the flag of a known country', () => {
+    expect(countryFlag('Italie')).toBe('🇮🇹');
+  });
+
+  it('returns an empty string for unknown or missing countries', () => {
+    expect(countryFlag('Atlantide')).toBe('');
+    expect(countryFlag(null)).toBe('');
   });
 });

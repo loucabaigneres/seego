@@ -2,8 +2,8 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { colors } from '@/theme/tokens';
-import { ProgressBar, Text } from '@/ui';
-import { ArrowLeftIcon } from '@/ui/icons';
+import { cn, ProgressBar, Text } from '@/ui';
+import { ArrowLeftIcon, CompassIcon } from '@/ui/icons';
 
 import { LIKE_GOAL } from '../lib/deck';
 
@@ -13,8 +13,16 @@ function leaveDeck() {
   else router.replace('/');
 }
 
-export function DeckHeader({ likeCount }: { likeCount: number }) {
+export interface DeckHeaderProps {
+  likeCount: number;
+  /** Absent while the feed loads: the button stays disabled. */
+  onShowResult?: () => void;
+}
+
+export function DeckHeader({ likeCount, onShowResult }: DeckHeaderProps) {
   const progress = Math.min(likeCount, LIKE_GOAL);
+  const goalReached = progress === LIKE_GOAL;
+  const isResultDisabled = !onShowResult || likeCount === 0;
 
   return (
     <View className="flex-row items-center gap-3">
@@ -32,7 +40,7 @@ export function DeckHeader({ likeCount }: { likeCount: number }) {
       <View className="flex-1 gap-2">
         <View className="flex-row items-baseline justify-between">
           <Text variant="label">
-            {progress === LIKE_GOAL ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
+            {goalReached ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
           </Text>
           <Text variant="caption">
             {progress}/{LIKE_GOAL}
@@ -40,6 +48,27 @@ export function DeckHeader({ likeCount }: { likeCount: number }) {
         </View>
         <ProgressBar value={progress / LIKE_GOAL} segments={LIKE_GOAL} />
       </View>
+
+      {/* Icon only: a labelled pill squeezes the progress label onto two lines. */}
+      <Pressable
+        role="button"
+        aria-label="Ma destination"
+        aria-disabled={isResultDisabled}
+        disabled={isResultDisabled}
+        onPress={onShowResult}
+        hitSlop={4}
+        className={cn(
+          'size-11 items-center justify-center rounded-full active:opacity-80',
+          goalReached ? 'bg-brand' : 'border border-brand',
+          isResultDisabled && 'opacity-40',
+        )}
+      >
+        <CompassIcon
+          size={22}
+          weight={goalReached ? 'fill' : 'regular'}
+          color={goalReached ? colors.ink.inverse : colors.brand}
+        />
+      </Pressable>
     </View>
   );
 }

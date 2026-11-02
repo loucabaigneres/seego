@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import { trpc } from '@/lib/trpc';
 
 import { nameChange } from '../lib/profile';

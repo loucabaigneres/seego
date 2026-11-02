@@ -1,3 +1,5 @@
+import { Analytics } from '@vercel/analytics/react';
+import { ConsentBanner } from './components/ConsentBanner';
 import { CtaBand } from './components/CtaBand';
 import { Faq } from './components/Faq';
 import { Features } from './components/Features';
@@ -21,6 +23,8 @@ export default function App() {
       </main>
       <Footer />
       <ScrollToTop />
+      <ConsentBanner />
+      <Analytics />
     </div>
   );
 }

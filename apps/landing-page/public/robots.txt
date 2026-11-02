@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://seego.fr/sitemap.xml
+Sitemap: https://www.seego.fr/sitemap.xml

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { useAuthSession } from '@/features/auth/hooks/useAuthSession';
+import { useAuthSession } from '@/hooks/useAuthSession';
 import { trpc } from '@/lib/trpc';
 
 export function useProfile() {

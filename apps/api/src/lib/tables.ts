@@ -1,4 +1,4 @@
-import { schema } from '@voyagr/database';
+import { schema } from '@seego/database';
 
 export const {
   discoveryContent,
