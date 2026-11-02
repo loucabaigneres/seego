@@ -101,6 +101,7 @@ export const appRouter = createTRPCRouter({
         averagePrice: input.averagePrice as typeof trip.$inferInsert.averagePrice,
         dietaryRestrictions: input.dietaryRestrictions,
         medicalConditions: input.medicalConditions,
+        // Drizzle's update skips undefined keys, so an omitted field keeps the quiz-seeded interests.
         interests: input.interests,
         intensity: input.intensity as typeof trip.$inferInsert.intensity,
       };
@@ -123,7 +124,7 @@ export const appRouter = createTRPCRouter({
 
       const [newTrip] = await ctx.db
         .insert(trip)
-        .values({ userId, ...values, status: 'draft' })
+        .values({ userId, ...values, interests: input.interests ?? [], status: 'draft' })
         .returning({ id: trip.id });
 
       return {

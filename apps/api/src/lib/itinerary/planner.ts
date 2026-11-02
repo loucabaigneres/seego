@@ -158,10 +158,41 @@ export function pricePenalty(price: string | null, targetRank: number): number {
 
 // ─── Interest matching ────────────────────────────────────────────────────────
 
+const GASTRONOMY_KEYWORDS = [
+  'gastronomi',
+  'marche',
+  'bistro',
+  'tapas',
+  'degustation',
+  'cave',
+  'vin',
+  'culinaire',
+];
+const NATURE_KEYWORDS = [
+  'parc',
+  'jardin',
+  'plage',
+  'nature',
+  'lac',
+  'randonnee',
+  'botanique',
+  'foret',
+];
+const ADVENTURE_KEYWORDS = [
+  'aventure',
+  'sport',
+  'kayak',
+  'velo',
+  'escalade',
+  'plongee',
+  'excursion',
+  'surf',
+];
+
 /**
  * The catalog's subcategories describe amenities (`spa`, `rooftop`, `plage`, ...)
- * and do not line up with the five interests offered by the trip form, so
- * interests are matched by keyword over the item's text instead.
+ * and do not line up with the interests offered by the trip form and the
+ * onboarding quiz, so interests are matched by keyword over the item's text instead.
  */
 const INTEREST_KEYWORDS: Record<string, string[]> = {
   culture: [
@@ -176,19 +207,14 @@ const INTEREST_KEYWORDS: Record<string, string[]> = {
     'exposition',
     'patrimoine',
   ],
-  gastronomy: [
-    'gastronomi',
-    'marche',
-    'bistro',
-    'tapas',
-    'degustation',
-    'cave',
-    'vin',
-    'culinaire',
-  ],
-  nature: ['parc', 'jardin', 'plage', 'nature', 'lac', 'randonnee', 'botanique', 'foret'],
-  adventure: ['aventure', 'sport', 'kayak', 'velo', 'escalade', 'plongee', 'excursion', 'surf'],
+  gastronomy: GASTRONOMY_KEYWORDS,
+  nature: NATURE_KEYWORDS,
+  adventure: ADVENTURE_KEYWORDS,
   nightlife: ['bar', 'rooftop', 'club', 'cocktail', 'discotheque', 'nuit', 'nocturne'],
+  // Onboarding quiz vibes, seeded into `trip.interests` by `onboarding.submit`.
+  food: GASTRONOMY_KEYWORDS,
+  outdoor: [...NATURE_KEYWORDS, ...ADVENTURE_KEYWORDS],
+  relax: ['spa', 'bien-etre', 'detente', 'massage', 'hammam', 'thermes', 'plage', 'croisiere'],
 };
 
 /** Lowercase and strip diacritics so "musée" and "musee" match the same keyword. */
