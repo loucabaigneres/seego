@@ -1,4 +1,15 @@
-import { formatDate, parseIsoDate, pluralize, toIsoDate } from './date';
+import { formatDate, formatDayMonth, parseIsoDate, pluralize, toIsoDate } from './date';
+
+describe('formatDayMonth', () => {
+  it('drops the year', () => {
+    expect(formatDayMonth('2026-11-27T10:00:00Z')).toBe('27 nov.');
+  });
+
+  it('returns an empty string for missing or invalid dates', () => {
+    expect(formatDayMonth(null)).toBe('');
+    expect(formatDayMonth('not a date')).toBe('');
+  });
+});
 
 describe('formatDate', () => {
   it('formats an ISO date in French', () => {
