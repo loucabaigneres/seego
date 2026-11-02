@@ -17,7 +17,7 @@ import {
   fetchMedia,
   normalizeContentUrl,
   stripHashtags,
-} from '../../lib/socialImport.js';
+} from '../../lib/socialImport/index.js';
 import { activity, importedInspiration, trip, tripDay } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
