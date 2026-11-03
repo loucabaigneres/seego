@@ -2,10 +2,11 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { plannedCount, tripCoverImage } from '@/domain/trip';
-import { DayPicker } from '@/features/trip/components/DayPicker';
 import { DayTimeline } from '@/features/trip/components/DayTimeline';
 import { GenerateItineraryCard } from '@/features/trip/components/GenerateItineraryCard';
+import { ItineraryToolbar } from '@/features/trip/components/ItineraryToolbar';
 import { TripHero } from '@/features/trip/components/TripHero';
+import { TripMap } from '@/features/trip/components/TripMap';
 import { useTrip } from '@/features/trip/hooks/useTrip';
 import { EmptyState, ErrorState, LoadingState, Screen } from '@/ui';
 import { SuitcaseRollingIcon } from '@/ui/icons';
@@ -17,8 +18,19 @@ export default function TripScreen() {
 }
 
 function TripPage({ tripId }: { tripId: string }) {
-  const { isLoading, notFound, loadFailed, retry, trip, days, selection, isGenerated, generate } =
-    useTrip(tripId);
+  const {
+    isLoading,
+    notFound,
+    loadFailed,
+    retry,
+    trip,
+    days,
+    selection,
+    itineraryView,
+    isGenerated,
+    generate,
+  } = useTrip(tripId);
+  const showMap = isGenerated && itineraryView.view === 'map';
 
   if (!trip) {
     return (
@@ -43,10 +55,12 @@ function TripPage({ tripId }: { tripId: string }) {
     <Screen
       scroll
       contentClassName="gap-4"
-      // Child 1 is the day picker: it stays reachable on long days.
+      // Child 1 is the toolbar: the day picker stays reachable on long days.
       stickyHeaderIndices={isGenerated ? [1] : undefined}
       scrollRef={selection.scrollRef}
       onScroll={selection.onScroll}
+      // The map takes the drags; switching back to the itinerary gives them to the page again.
+      scrollEnabled={!showMap}
     >
       <TripHero
         trip={trip}
@@ -56,13 +70,18 @@ function TripPage({ tripId }: { tripId: string }) {
       />
 
       {isGenerated && (
-        <DayPicker
+        <ItineraryToolbar
           days={days.itinerary}
           selectedId={selection.selectedId}
           onSelect={selection.select}
+          view={itineraryView.view}
+          onViewChange={itineraryView.setView}
+          onLayout={itineraryView.onToolbarLayout}
         />
       )}
-      {isGenerated ? (
+      {showMap ? (
+        <TripMap days={selection.shownDays} height={itineraryView.mapHeight} />
+      ) : isGenerated ? (
         // No slide on first display: only a pick in the day picker animates.
         <LayoutAnimationConfig skipEntering>
           <Animated.View

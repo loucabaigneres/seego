@@ -17,6 +17,8 @@ export interface ScreenProps {
   scrollRef?: Ref<ScrollView>;
   /** Only with `scroll`. */
   onScroll?: ScrollViewProps['onScroll'];
+  /** Only with `scroll`: false hands vertical drags to the content (a map, say). */
+  scrollEnabled?: boolean;
 }
 
 export function Screen({
@@ -28,6 +30,7 @@ export function Screen({
   stickyHeaderIndices,
   scrollRef,
   onScroll,
+  scrollEnabled,
 }: ScreenProps) {
   const contentClasses = cn('px-6 py-6', contentClassName);
 
@@ -43,6 +46,7 @@ export function Screen({
           ref={scrollRef}
           onScroll={onScroll}
           scrollEventThrottle={onScroll ? 16 : undefined}
+          scrollEnabled={scrollEnabled}
         >
           {children}
         </ScrollView>
