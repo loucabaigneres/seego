@@ -1,16 +1,33 @@
 import { Heart, MapPin, Star, X } from 'lucide-react';
+import { useTilt } from '../lib/motion';
+
+// Free photos under the Unsplash License, served by the Unsplash CDN (resized on the fly).
+const unsplash = (id: string, width: number) =>
+  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&h=${Math.round(width * 1.6)}&q=75`;
+
+const PHOTOS = {
+  // Lisbon, Bica funicular. Photo: Henry Ren
+  front: 'photo-1697748525265-7431cba075b6',
+  // Kyoto, Yasaka pagoda. Photo: Roméo A.
+  back: 'photo-1624253321171-1be53e12f5f4',
+};
 
 export function PhoneMockup() {
+  const tilt = useTilt<HTMLDivElement>(12);
+
   return (
-    <div className="relative mx-auto w-full max-w-[290px] select-none">
+    <div
+      ref={tilt}
+      className="relative mx-auto w-full max-w-[290px] select-none transition-transform duration-300 ease-out transform-3d"
+    >
       {/* Soft glow behind the device */}
       <div
-        className="absolute -inset-8 -z-10 rounded-full bg-accent/15 blur-3xl"
+        className="absolute -inset-8 -z-10 -translate-z-[80px] rounded-full bg-accent/15 blur-3xl"
         aria-hidden="true"
       />
 
       {/* Floating chip — top left */}
-      <div className="absolute -left-4 top-24 z-20 animate-float rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-left-10">
+      <div className="absolute -left-4 top-24 z-20 translate-z-[70px] animate-float rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-left-10">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-soft text-accent">
             <Heart className="h-3.5 w-3.5 fill-current" />
@@ -23,7 +40,7 @@ export function PhoneMockup() {
       </div>
 
       {/* Floating chip — bottom right */}
-      <div className="absolute -right-3 bottom-28 z-20 animate-float-slow rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-right-8">
+      <div className="absolute -right-3 bottom-28 z-20 translate-z-[50px] animate-float-slow rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-right-8">
         <p className="text-[0.6rem] font-semibold uppercase tracking-wide text-muted">Itinéraire</p>
         <p className="text-[0.8rem] font-extrabold text-ink">Jour 2 · 4 étapes</p>
       </div>
@@ -31,6 +48,12 @@ export function PhoneMockup() {
       {/* Device */}
       <div className="relative rotate-2 rounded-[3rem] border border-black/10 bg-ink p-3 shadow-2xl shadow-black/20">
         <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.4rem] bg-sand">
+          {/* Glare that follows the 3D tilt */}
+          <div
+            className="pointer-events-none absolute inset-0 z-30 bg-[radial-gradient(circle_at_calc(50%+var(--tilt-x,0)*45%)_calc(30%+var(--tilt-y,0)*45%),rgb(255_255_255/0.28),transparent_55%)]"
+            aria-hidden="true"
+          />
+
           {/* Dynamic Island */}
           <div className="absolute left-1/2 top-3 z-20 h-6 w-24 -translate-x-1/2 rounded-full bg-ink" />
 
@@ -48,23 +71,27 @@ export function PhoneMockup() {
           {/* Swipe deck — fills the tall screen */}
           <div className="relative mx-3 flex-1">
             {/* Peeking card behind */}
-            <div className="absolute inset-x-2 top-2 bottom-0 -rotate-3 rounded-3xl bg-gradient-to-br from-[#bcd3c9] to-[#8fae9f] opacity-60" />
+            <div className="absolute inset-x-2 top-2 bottom-0 -rotate-[5deg] overflow-hidden rounded-3xl bg-[#8fae9f] shadow-md">
+              <img
+                src={unsplash(PHOTOS.back, 480)}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+                draggable={false}
+              />
+            </div>
 
             {/* Front card */}
-            <div className="absolute inset-0 overflow-hidden rounded-3xl bg-gradient-to-br from-[#ffb36b] via-[#ff7a59] to-[#ff4d6d] shadow-xl">
-              {/* Scenery silhouette */}
-              <svg
-                className="absolute bottom-0 left-0 w-full text-black/15"
-                viewBox="0 0 320 120"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M0 120V70l24-10 20 14 26-26 22 18 24-30 26 26 22-16 28 20 26-24 24 18 26-12v44z"
-                  fill="currentColor"
-                />
-              </svg>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+            <div className="absolute inset-0 overflow-hidden rounded-3xl bg-[#d9b98f] shadow-xl">
+              <img
+                src={unsplash(PHOTOS.front, 480)}
+                srcSet={`${unsplash(PHOTOS.front, 480)} 1x, ${unsplash(PHOTOS.front, 900)} 2x`}
+                alt="Deux tramways jaunes dans une rue en pente de Lisbonne"
+                className="absolute inset-0 h-full w-full object-cover"
+                fetchPriority="high"
+                draggable={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-black/20" />
 
               {/* Rating chip */}
               <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-black/35 px-2.5 py-1 backdrop-blur-sm">

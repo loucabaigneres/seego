@@ -116,17 +116,6 @@ export function WaitlistForm({
           )}
         </button>
       </div>
-
-      <p className={`mt-2.5 flex items-center gap-1.5 text-xs ${helperColor}`} aria-live="polite">
-        {error ? (
-          <span className="font-semibold text-accent">{error}</span>
-        ) : (
-          <>
-            <Check className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
-            Pas de spam. Juste un e-mail le jour du lancement.
-          </>
-        )}
-      </p>
     </form>
   );
 }
