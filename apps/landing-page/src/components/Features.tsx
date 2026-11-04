@@ -23,7 +23,7 @@ const FEATURES: Feature[] = [
   {
     icon: Map,
     stepLabel: 'Escale',
-    title: 'Itinéraire auto-magique',
+    title: 'Itinéraire personnalisé',
     description:
       'À partir de tes coups de cœur, Seego assemble un itinéraire jour par jour, optimisé et prêt à partir.',
   },
