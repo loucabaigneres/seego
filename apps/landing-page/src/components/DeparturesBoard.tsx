@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PlaneTakeoff } from 'lucide-react';
-import { useInView, usePrefersReducedMotion, useTilt } from '../lib/motion';
+import { useInView, useReducedMotion } from 'motion/react';
 import { Reveal } from './Reveal';
 
 type Departure = {
@@ -38,7 +38,7 @@ const FLIP_MS = 70;
 
 /** Split-flap style text: letters shuffle before settling once `run` is true. */
 function FlapText({ text, run, delay = 0 }: { text: string; run: boolean; delay?: number }) {
-  const reduced = usePrefersReducedMotion();
+  const reduced = useReducedMotion();
   const [shown, setShown] = useState(text.replace(/\S/g, ' '));
 
   useEffect(() => {
@@ -87,8 +87,8 @@ function FlapText({ text, run, delay = 0 }: { text: string; run: boolean; delay?
 }
 
 export function DeparturesBoard() {
-  const [boardRef, inView] = useInView<HTMLDivElement>({ rootMargin: '0px 0px -20% 0px' });
-  const tilt = useTilt<HTMLDivElement>(3);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(boardRef, { once: true, margin: '0px 0px -20% 0px' });
 
   return (
     <section id="departs" className="relative border-t border-line/60">
@@ -107,47 +107,45 @@ export function DeparturesBoard() {
         </Reveal>
 
         <Reveal from="scale" className="mt-10">
-          <div ref={tilt} className="transition-transform duration-300 ease-out">
-            <div
-              ref={boardRef}
-              className="overflow-hidden rounded-3xl bg-ink p-2 shadow-2xl shadow-black/20 sm:p-3"
-            >
-              <div className="grid grid-cols-[4.5rem_1fr_auto] gap-x-3 px-3 pb-2 pt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40 sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4">
-                <span>Vol</span>
-                <span>Destination</span>
-                <span className="hidden sm:block">Heure</span>
-                <span className="text-right sm:text-left">Statut</span>
-              </div>
-
-              <ul className="space-y-1.5">
-                {DEPARTURES.map((d, row) => (
-                  <li
-                    key={d.flight}
-                    className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-3 rounded-xl bg-white/[0.04] px-3 py-3 font-mono text-sm font-bold tracking-wider text-white sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4 sm:text-base"
-                  >
-                    <span className="text-white/60">
-                      <FlapText text={d.flight} run={inView} delay={row * 140} />
-                    </span>
-                    <span className="min-w-0 truncate">
-                      <FlapText text={d.city} run={inView} delay={row * 140 + 80} />
-                      <span className="ml-2 hidden font-sans text-xs font-medium tracking-normal text-white/40 md:inline">
-                        {d.country}
-                      </span>
-                    </span>
-                    <span className="hidden text-amber-300 sm:block">
-                      <FlapText text={d.time} run={inView} delay={row * 140 + 160} />
-                    </span>
-                    <span
-                      className={`text-right text-[0.65rem] sm:text-left sm:text-xs ${
-                        d.live ? 'animate-blink text-accent' : 'text-[#9fc3b2]'
-                      }`}
-                    >
-                      <FlapText text={d.status} run={inView} delay={row * 140 + 240} />
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          <div
+            ref={boardRef}
+            className="overflow-hidden rounded-3xl bg-ink p-2 shadow-2xl shadow-black/20 sm:p-3"
+          >
+            <div className="grid grid-cols-[4.5rem_1fr_auto] gap-x-3 px-3 pb-2 pt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40 sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4">
+              <span>Vol</span>
+              <span>Destination</span>
+              <span className="hidden sm:block">Heure</span>
+              <span className="text-right sm:text-left">Statut</span>
             </div>
+
+            <ul className="space-y-1.5">
+              {DEPARTURES.map((d, row) => (
+                <li
+                  key={d.flight}
+                  className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-3 rounded-xl bg-white/[0.04] px-3 py-3 font-mono text-sm font-bold tracking-wider text-white sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4 sm:text-base"
+                >
+                  <span className="text-white/60">
+                    <FlapText text={d.flight} run={inView} delay={row * 140} />
+                  </span>
+                  <span className="min-w-0 truncate">
+                    <FlapText text={d.city} run={inView} delay={row * 140 + 80} />
+                    <span className="ml-2 hidden font-sans text-xs font-medium tracking-normal text-white/40 md:inline">
+                      {d.country}
+                    </span>
+                  </span>
+                  <span className="hidden text-amber-300 sm:block">
+                    <FlapText text={d.time} run={inView} delay={row * 140 + 160} />
+                  </span>
+                  <span
+                    className={`text-right text-[0.65rem] sm:text-left sm:text-xs ${
+                      d.live ? 'animate-blink text-accent' : 'text-[#9fc3b2]'
+                    }`}
+                  >
+                    <FlapText text={d.status} run={inView} delay={row * 140 + 240} />
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </Reveal>
       </div>

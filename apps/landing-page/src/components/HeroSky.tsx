@@ -1,4 +1,5 @@
-import { useParallax, usePrefersReducedMotion } from '../lib/motion';
+import { motion, useReducedMotion } from 'motion/react';
+import { useParallax } from '../lib/useParallax';
 
 const FLIGHT_PATH = 'M-60 560 C 250 380, 420 660, 660 430 S 1000 120, 1280 150';
 
@@ -21,25 +22,25 @@ function Cloud({ className = '' }: { className?: string }) {
 
 /** Decorative sky behind the hero: drifting clouds with parallax and a plane on a dashed route. */
 export function HeroSky() {
-  const reduced = usePrefersReducedMotion();
-  const far = useParallax<HTMLDivElement>(0.12);
-  const near = useParallax<HTMLDivElement>(-0.18);
-  const route = useParallax<HTMLDivElement>(0.22);
+  const reduced = useReducedMotion();
+  const far = useParallax(0.12);
+  const near = useParallax(-0.18);
+  const route = useParallax(0.22);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
       {/* Far clouds */}
-      <div ref={far} className="absolute inset-0 will-change-transform">
+      <motion.div style={{ y: far }} className="absolute inset-0">
         <div className="animate-drift-slow absolute left-[6%] top-[12%] w-32 text-white/80 sm:w-44">
           <Cloud />
         </div>
         <div className="animate-drift absolute right-[30%] top-[4%] hidden w-28 text-white/70 lg:block">
           <Cloud />
         </div>
-      </div>
+      </motion.div>
 
       {/* Flight route */}
-      <div ref={route} className="absolute inset-0 will-change-transform">
+      <motion.div style={{ y: route }} className="absolute inset-0">
         <svg
           className="h-full w-full"
           viewBox="0 0 1200 700"
@@ -62,17 +63,17 @@ export function HeroSky() {
             </g>
           )}
         </svg>
-      </div>
+      </motion.div>
 
       {/* Near clouds */}
-      <div ref={near} className="absolute inset-0 will-change-transform">
+      <motion.div style={{ y: near }} className="absolute inset-0">
         <div className="animate-drift absolute -right-6 top-[58%] w-40 text-white sm:w-56">
           <Cloud />
         </div>
         <div className="animate-drift-slow absolute bottom-[6%] left-[38%] hidden w-36 text-white/90 lg:block">
           <Cloud />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

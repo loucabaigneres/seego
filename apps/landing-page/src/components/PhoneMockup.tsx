@@ -1,5 +1,4 @@
 import { Heart, MapPin, Star, X } from 'lucide-react';
-import { useTilt } from '../lib/motion';
 
 // Free photos under the Unsplash License, served by the Unsplash CDN (resized on the fly).
 const unsplash = (id: string, width: number) =>
@@ -13,21 +12,16 @@ const PHOTOS = {
 };
 
 export function PhoneMockup() {
-  const tilt = useTilt<HTMLDivElement>(12);
-
   return (
-    <div
-      ref={tilt}
-      className="relative mx-auto w-full max-w-[290px] select-none transition-transform duration-300 ease-out transform-3d"
-    >
+    <div className="relative mx-auto w-full max-w-[290px] select-none">
       {/* Soft glow behind the device */}
       <div
-        className="absolute -inset-8 -z-10 -translate-z-[80px] rounded-full bg-accent/15 blur-3xl"
+        className="absolute -inset-8 -z-10 rounded-full bg-accent/15 blur-3xl"
         aria-hidden="true"
       />
 
       {/* Floating chip — top left */}
-      <div className="absolute -left-4 top-24 z-20 translate-z-[70px] animate-float rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-left-10">
+      <div className="absolute -left-4 top-24 z-20 animate-float rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-left-10">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent-soft text-accent">
             <Heart className="h-3.5 w-3.5 fill-current" />
@@ -40,7 +34,7 @@ export function PhoneMockup() {
       </div>
 
       {/* Floating chip — bottom right */}
-      <div className="absolute -right-3 bottom-28 z-20 translate-z-[50px] animate-float-slow rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-right-8">
+      <div className="absolute -right-3 bottom-28 z-20 animate-float-slow rounded-2xl border border-line bg-white/90 px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-sm sm:-right-8">
         <p className="text-[0.6rem] font-semibold uppercase tracking-wide text-muted">Itinéraire</p>
         <p className="text-[0.8rem] font-extrabold text-ink">Jour 2 · 4 étapes</p>
       </div>
@@ -48,12 +42,6 @@ export function PhoneMockup() {
       {/* Device */}
       <div className="relative rotate-2 rounded-[3rem] border border-black/10 bg-ink p-3 shadow-2xl shadow-black/20">
         <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.4rem] bg-sand">
-          {/* Glare that follows the 3D tilt */}
-          <div
-            className="pointer-events-none absolute inset-0 z-30 bg-[radial-gradient(circle_at_calc(50%+var(--tilt-x,0)*45%)_calc(30%+var(--tilt-y,0)*45%),rgb(255_255_255/0.28),transparent_55%)]"
-            aria-hidden="true"
-          />
-
           {/* Dynamic Island */}
           <div className="absolute left-1/2 top-3 z-20 h-6 w-24 -translate-x-1/2 rounded-full bg-ink" />
 

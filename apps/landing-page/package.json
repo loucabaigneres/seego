@@ -17,6 +17,7 @@
     "@vercel/analytics": "^2.0.1",
     "d3-geo": "3.1.1",
     "lucide-react": "^0.577.0",
+    "motion": "^12.42.2",
     "posthog-js": "^1.438.13",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

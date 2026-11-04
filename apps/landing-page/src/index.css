@@ -96,29 +96,41 @@
   }
 }
 
-/* ── Scroll reveal ── */
-.reveal {
+/* ── Boarding pass: soft red glows + silver foil on hover (no filters, so nothing leaks past the rounded corners) ── */
+.boarding-pass {
+  background-image:
+    radial-gradient(circle at 100% 0%, rgb(255 77 77 / 0.28), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgb(255 77 77 / 0.14), transparent 45%);
+}
+.boarding-pass .foil {
   opacity: 0;
-  transition:
-    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  transition-delay: var(--reveal-delay, 0ms);
+  transition: opacity 0.4s ease;
+  mix-blend-mode: screen;
+  background-image:
+    radial-gradient(
+      circle at var(--foil-x, 50%) var(--foil-y, 50%),
+      rgb(255 255 255 / 0.12),
+      transparent 35%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 30%,
+      rgb(255 255 255 / 0.06) 40%,
+      hsl(320 60% 80% / 0.09) 45%,
+      hsl(200 60% 80% / 0.1) 50%,
+      hsl(60 60% 82% / 0.08) 55%,
+      rgb(255 255 255 / 0.06) 60%,
+      transparent 70%
+    );
+  background-size:
+    100% 100%,
+    300% 300%;
+  background-position:
+    0 0,
+    var(--foil-x, 50%) var(--foil-y, 50%);
 }
-.reveal[data-from='up'] {
-  transform: translateY(28px);
-}
-.reveal[data-from='left'] {
-  transform: translateX(-36px);
-}
-.reveal[data-from='right'] {
-  transform: translateX(36px);
-}
-.reveal[data-from='scale'] {
-  transform: scale(0.94);
-}
-.reveal.is-visible {
+.boarding-pass:hover .foil {
   opacity: 1;
-  transform: none;
 }
 
 .animate-drift {
@@ -170,9 +182,5 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-  .reveal {
-    opacity: 1;
-    transform: none !important;
   }
 }

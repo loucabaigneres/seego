@@ -1,5 +1,6 @@
 import { Apple, Smartphone, Sparkles } from 'lucide-react';
-import { useParallax } from '../lib/motion';
+import { motion } from 'motion/react';
+import { useParallax } from '../lib/useParallax';
 import { HeroSky } from './HeroSky';
 import { PhoneMockup } from './PhoneMockup';
 import { SocialProof } from './SocialProof';
@@ -11,7 +12,7 @@ type HeroProps = {
 };
 
 export function Hero({ joinedEmail, onJoined }: HeroProps) {
-  const phone = useParallax<HTMLDivElement>(-0.08);
+  const phone = useParallax(-0.08);
 
   return (
     <section id="top" className="relative overflow-hidden">
@@ -72,9 +73,9 @@ export function Hero({ joinedEmail, onJoined }: HeroProps) {
 
         {/* Visual */}
         <div className="animate-rise [animation-delay:120ms]">
-          <div ref={phone} className="will-change-transform">
+          <motion.div style={{ y: phone }}>
             <PhoneMockup />
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

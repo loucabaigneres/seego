@@ -1,6 +1,6 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { Hand, MapPin } from 'lucide-react';
-import { useInView } from '../../lib/motion';
+import { useInView } from 'motion/react';
 import { Reveal } from '../Reveal';
 import { DESTINATIONS, ORIGIN } from './destinations';
 
@@ -14,7 +14,8 @@ function GlobePlaceholder() {
 }
 
 export function GlobeSection() {
-  const [stageRef, near] = useInView<HTMLDivElement>({ rootMargin: '400px 0px' });
+  const stageRef = useRef<HTMLDivElement>(null);
+  const near = useInView(stageRef, { once: true, margin: '400px 0px' });
   const [failed, setFailed] = useState(false);
 
   return (

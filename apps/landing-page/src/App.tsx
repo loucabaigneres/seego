@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/react';
+import { MotionConfig } from 'motion/react';
+import { BoardingPass } from './components/BoardingPass';
 import { ConsentBanner } from './components/ConsentBanner';
-import { CtaBand } from './components/CtaBand';
 import { DeparturesBoard } from './components/DeparturesBoard';
 import { Faq } from './components/Faq';
 import { Features } from './components/Features';
@@ -16,21 +17,24 @@ export default function App() {
   const { joinedEmail, markJoined } = useWaitlistStatus();
 
   return (
-    <div className="min-h-screen overflow-x-clip bg-cream">
-      <Header />
-      <main>
-        <Hero joinedEmail={joinedEmail} onJoined={markJoined} />
-        <DeparturesBoard />
-        <GlobeSection />
-        <Features />
-        <Faq />
-        <CtaBand joinedEmail={joinedEmail} onJoined={markJoined} />
-      </main>
-      <Footer />
-      <SectionNav />
-      <ScrollToTop />
-      <ConsentBanner />
-      <Analytics />
-    </div>
+    // reducedMotion="user": scroll reveals drop their movement when the OS asks for less motion.
+    <MotionConfig reducedMotion="user">
+      <div className="min-h-screen overflow-x-clip bg-cream">
+        <Header />
+        <main>
+          <Hero joinedEmail={joinedEmail} onJoined={markJoined} />
+          <DeparturesBoard />
+          <GlobeSection />
+          <Features />
+          <Faq />
+          <BoardingPass joinedEmail={joinedEmail} onJoined={markJoined} />
+        </main>
+        <Footer />
+        <SectionNav />
+        <ScrollToTop />
+        <ConsentBanner />
+        <Analytics />
+      </div>
+    </MotionConfig>
   );
 }

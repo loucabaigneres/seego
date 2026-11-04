@@ -1,5 +1,3 @@
-import { FlightProgress } from './FlightProgress';
-
 export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/70 bg-cream/80 backdrop-blur-md">
@@ -9,7 +7,6 @@ export function Header() {
           <span className="h-2 w-2 rounded-full bg-accent transition group-hover:scale-125" />
         </a>
       </div>
-      <FlightProgress />
     </header>
   );
 }

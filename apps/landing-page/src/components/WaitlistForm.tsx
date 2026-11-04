@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { ArrowRight, Check, Loader2, Mail, PartyPopper } from 'lucide-react';
+import { ArrowRight, Loader2, Mail, PartyPopper } from 'lucide-react';
 import { isValidEmail, submitWaitlist } from '../lib/waitlist';
 
 type Status = 'idle' | 'loading' | 'error';
@@ -10,8 +10,6 @@ type WaitlistFormProps = {
   onJoined: (email: string) => void;
   /** Which form this is ('hero' | 'footer') — recorded as utm_content for conversion stats. */
   position: string;
-  /** 'dark' tweaks the helper text for use on a dark background (CTA band). */
-  tone?: 'light' | 'dark';
   /** 'start' aligns the form left on desktop; 'center' keeps it centered. */
   align?: 'center' | 'start';
 };
@@ -20,7 +18,6 @@ export function WaitlistForm({
   joinedEmail,
   onJoined,
   position,
-  tone = 'light',
   align = 'center',
 }: WaitlistFormProps) {
   const [email, setEmail] = useState('');
@@ -70,8 +67,6 @@ export function WaitlistForm({
     }
   };
 
-  const helperColor = tone === 'dark' ? 'text-white/60' : 'text-muted';
-
   return (
     <form onSubmit={handleSubmit} noValidate className={`w-full max-w-md ${alignClass}`}>
       <div className="flex flex-col gap-2.5 sm:flex-row">
@@ -116,6 +111,12 @@ export function WaitlistForm({
           )}
         </button>
       </div>
+
+      {error && (
+        <p className="mt-2.5 text-xs font-semibold text-accent" role="alert">
+          {error}
+        </p>
+      )}
     </form>
   );
 }
