@@ -1,4 +1,7 @@
 import { Apple, Smartphone, Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
+import { useParallax } from '../lib/useParallax';
+import { HeroSky } from './HeroSky';
 import { PhoneMockup } from './PhoneMockup';
 import { SocialProof } from './SocialProof';
 import { WaitlistForm } from './WaitlistForm';
@@ -9,6 +12,8 @@ type HeroProps = {
 };
 
 export function Hero({ joinedEmail, onJoined }: HeroProps) {
+  const phone = useParallax(-0.08);
+
   return (
     <section id="top" className="relative overflow-hidden">
       {/* Decorative background blobs */}
@@ -20,6 +25,7 @@ export function Hero({ joinedEmail, onJoined }: HeroProps) {
         className="pointer-events-none absolute -left-32 top-40 h-80 w-80 rounded-full bg-[#9fc3b2]/20 blur-3xl"
         aria-hidden="true"
       />
+      <HeroSky />
 
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-20 pt-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:pb-28 lg:pt-20">
         {/* Copy */}
@@ -67,7 +73,9 @@ export function Hero({ joinedEmail, onJoined }: HeroProps) {
 
         {/* Visual */}
         <div className="animate-rise [animation-delay:120ms]">
-          <PhoneMockup />
+          <motion.div style={{ y: phone }}>
+            <PhoneMockup />
+          </motion.div>
         </div>
       </div>
     </section>

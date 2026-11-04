@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Reveal } from './Reveal';
 
 type QA = { question: string; answer: string };
 
@@ -26,7 +27,7 @@ const FAQS: QA[] = [
   {
     question: 'Que faites-vous de mon e-mail ?',
     answer:
-      'On l’utilise uniquement pour te prévenir du lancement. Pas de spam, et tu peux te désinscrire à tout moment.',
+      'On l’utilise uniquement pour te prévenir du lancement et te tenir au courant des nouveautés. Pas de spam, et tu peux te désinscrire à tout moment.',
   },
 ];
 
@@ -34,22 +35,25 @@ export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="border-t border-line/60 bg-cream">
+    <section id="faq" className="border-t border-line/60 bg-cream">
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 lg:py-24">
-        <div className="text-center">
+        <Reveal className="text-center">
           <h2 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Questions fréquentes
           </h2>
           <p className="mt-3 text-base text-muted">Tout ce qu’il faut savoir avant le lancement.</p>
-        </div>
+        </Reveal>
 
         <div className="mt-10 space-y-3">
           {FAQS.map((item, index) => {
             const open = openIndex === index;
             return (
-              <div
+              <Reveal
                 key={item.question}
-                className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm"
+                delay={index * 70}
+                className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${
+                  open ? 'border-accent/30' : 'border-line'
+                }`}
               >
                 <button
                   type="button"
@@ -74,7 +78,7 @@ export function Faq() {
                     <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{item.answer}</p>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             );
           })}
         </div>
