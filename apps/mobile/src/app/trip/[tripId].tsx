@@ -1,5 +1,5 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
-import { View } from 'react-native';
+import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { plannedCount, tripCoverImage } from '@/domain/trip';
 import { DayPicker } from '@/features/trip/components/DayPicker';
@@ -63,11 +63,18 @@ function TripPage({ tripId }: { tripId: string }) {
         />
       )}
       {isGenerated ? (
-        <View className="gap-10">
-          {selection.shownDays.map((day) => (
-            <DayTimeline key={day.id} day={day} />
-          ))}
-        </View>
+        // No slide on first display: only a pick in the day picker animates.
+        <LayoutAnimationConfig skipEntering>
+          <Animated.View
+            key={selection.selectedId}
+            entering={(selection.direction === 'forward' ? FadeInRight : FadeInLeft).duration(220)}
+            className="gap-10"
+          >
+            {selection.shownDays.map((day) => (
+              <DayTimeline key={day.id} day={day} />
+            ))}
+          </Animated.View>
+        </LayoutAnimationConfig>
       ) : (
         <GenerateItineraryCard
           likedPlaces={days.likedPlaces?.activities ?? []}

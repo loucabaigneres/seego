@@ -9,8 +9,10 @@ import { ProfileStats } from '@/features/profile/components/ProfileStats';
 import { ProfileTabs } from '@/features/profile/components/ProfileTabs';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import type { ProfileTab } from '@/features/profile/types';
+import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/profile')({
+  head: () => seo({ title: 'Mon espace', path: '/profile' }),
   component: ProfilePage,
 });
 

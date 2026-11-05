@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#F2EDE8" />
     <title>Seego — Le voyage spontané arrive sur mobile</title>
@@ -10,6 +11,8 @@
       name="description"
       content="Seego transforme la recherche de voyage en jeu : swipe les lieux que tu aimes, on construit ton itinéraire. L'application mobile arrive bientôt, rejoins la liste d'attente."
     />
+    <link rel="canonical" href="https://www.seego.fr/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -19,6 +22,54 @@
       content="Swipe les lieux que tu aimes, Seego construit ton itinéraire. L'app mobile arrive bientôt."
     />
     <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="Seego" />
+    <meta property="og:url" content="https://www.seego.fr/" />
+    <meta property="og:image" content="https://www.seego.fr/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Seego — ton prochain voyage, trouvé en un swipe" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Seego — Le voyage spontané arrive sur mobile" />
+    <meta
+      name="twitter:description"
+      content="Swipe les lieux que tu aimes, Seego construit ton itinéraire. L'app mobile arrive bientôt."
+    />
+    <meta name="twitter:image" content="https://www.seego.fr/og-image.png" />
+
+    <!-- Données structurées : identifient l'entité Seego pour les moteurs et les IA -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.seego.fr/#organization",
+            "name": "Seego",
+            "url": "https://www.seego.fr",
+            "logo": "https://www.seego.fr/icon-512.png"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.seego.fr/#website",
+            "name": "Seego",
+            "url": "https://www.seego.fr",
+            "inLanguage": "fr-FR",
+            "publisher": { "@id": "https://www.seego.fr/#organization" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Seego",
+            "applicationCategory": "TravelApplication",
+            "operatingSystem": "iOS, Android",
+            "url": "https://app.seego.fr",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+            "description": "Swipe les lieux qui te font envie : Seego compose ton itinéraire de voyage jour par jour."
+          }
+        ]
+      }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
