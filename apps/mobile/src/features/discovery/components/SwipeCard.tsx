@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useImperativeHandle, useState, type Ref } from 'react';
-import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   clamp,
@@ -19,7 +19,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { categoryMeta, cleanDescription, placePhotos } from '@/domain/place';
 import { useHardwareBack } from '@/hooks/useHardwareBack';
 import { colors } from '@/theme/tokens';
-import { Badge, cn, PhotoScrim, Tag, Text } from '@/ui';
+import { Badge, cn, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { ImageIcon, MapPinIcon, XIcon } from '@/ui/icons';
 
 import { placeCategory, placeSubcategories, type DiscoveryPlace } from '../lib/discovery-place';
@@ -351,14 +351,12 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
           style={[styles.close, closeStyle]}
           pointerEvents={isExpanded ? 'auto' : 'none'}
         >
-          <Pressable
-            role="button"
-            aria-label="Fermer les détails"
+          <IconButton
+            variant="scrim"
+            label="Fermer les détails"
+            icon={XIcon}
             onPress={() => settleDetails(false)}
-            className="size-11 items-center justify-center rounded-full bg-scrim active:opacity-80"
-          >
-            <XIcon size={20} color={colors.ink.inverse} />
-          </Pressable>
+          />
         </Animated.View>
       </View>
     </Animated.View>
