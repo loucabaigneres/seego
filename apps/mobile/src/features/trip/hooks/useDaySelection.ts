@@ -18,7 +18,7 @@ export function useDaySelection(days: TripDay[]) {
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
   const scrollRef = useRef<ScrollViewInstance>(null);
   const scrollY = useRef(0);
-  // Where the picker sits, i.e. below the hero: the picker's own onLayout reports y = 0 once
+  // Where the picker sits, below the hero and save card: its own onLayout reports y = 0 once
   // ScrollView wraps it as a sticky header.
   const pickerY = useRef(0);
 
@@ -51,6 +51,7 @@ export function useDaySelection(days: TripDay[]) {
     onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       scrollY.current = event.nativeEvent.contentOffset.y;
     },
+    /** Layout of whatever sits right above the picker. */
     onHeroLayout: (event: LayoutChangeEvent) => {
       pickerY.current = event.nativeEvent.layout.y + event.nativeEvent.layout.height;
     },
