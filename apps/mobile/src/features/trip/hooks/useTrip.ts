@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { splitTripDays } from '@/domain/trip';
+import { splitTripDays, tripCoverImage } from '@/domain/trip';
 import { trpc, type RouterOutputs } from '@/lib/trpc';
 
 import { useDaySelection } from './useDaySelection';
 import { useItineraryView } from './useItineraryView';
 import { usePlanningDraft } from './usePlanningDraft';
 import { useReplacePlace } from './useReplacePlace';
+import { useTripPdf } from './useTripPdf';
 
 export type TripDay = RouterOutputs['discovery']['getTrip']['days'][number];
 export type TripActivity = TripDay['activities'][number];
@@ -34,6 +35,14 @@ export function useTrip(tripId: string) {
   // While editing, the picker and the timeline show the draft.
   const selection = useDaySelection(edit.draft ?? days.itinerary);
   const itineraryView = useItineraryView(selection.scrollToPicker);
+  const trip = query.data?.trip ?? null;
+  const pdf = useTripPdf(
+    trip && {
+      trip,
+      itinerary: days.itinerary,
+      coverImage: tripCoverImage(days.itinerary, days.likedPlaces),
+    },
+  );
   const errorCode = query.error?.data?.code;
 
   return {
@@ -42,8 +51,9 @@ export function useTrip(tripId: string) {
     notFound: errorCode === 'NOT_FOUND' || errorCode === 'BAD_REQUEST',
     loadFailed: query.isError,
     retry: () => query.refetch(),
-    trip: query.data?.trip ?? null,
+    trip,
     days,
+    pdf,
     selection,
     itineraryView,
     edit: {
