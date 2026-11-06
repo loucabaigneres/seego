@@ -1,13 +1,14 @@
 import * as THREE from 'three';
-import type { Place } from './destinations';
 
 // Brand tokens, mirrored from index.css (WebGL can't read CSS variables).
+/** A point on the globe. */
+export type Place = { name: string; lat: number; lon: number };
+
 export const ACCENT = '#ff4d4d';
 export const INK = '#1a1a1a';
-export const MUTED = '#8a8276';
 
 export const RADIUS = 1;
-export const TUBE_SEGMENTS = 64;
+const TUBE_SEGMENTS = 64;
 export const TUBE_RADIAL = 6;
 
 export function toVector(lat: number, lon: number, radius = RADIUS) {

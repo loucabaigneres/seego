@@ -46,23 +46,51 @@ export function BoardingPass({ joinedEmail, onJoined }: BoardingPassProps) {
           {/* Silver foil, revealed on hover */}
           <div className="foil pointer-events-none absolute inset-0 z-10" aria-hidden="true" />
 
-          {/* Pass header */}
-          <div className="relative flex flex-wrap items-center justify-between gap-x-6 gap-y-3 px-6 pb-6 pt-7 text-left sm:px-10">
-            <div className="flex items-center gap-2 text-white">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent">
-                <Plane className="h-4 w-4 rotate-45 fill-current" aria-hidden="true" />
-              </span>
+          {/* Pass header: airline, route, flight details */}
+          <div className="relative px-6 pb-7 pt-7 text-left text-white sm:px-10">
+            <div className="flex items-center justify-between gap-4">
               <span className="font-mono text-xs font-bold uppercase tracking-[0.25em]">
                 Carte d’embarquement
               </span>
+              <span className="font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-white/40">
+                Seego Air
+              </span>
             </div>
-            <dl className="flex flex-wrap gap-x-6 gap-y-2">
+
+            {/* Route, the way it reads on a real pass: from code ✈ to code */}
+            <div className="mt-6 flex items-center gap-3 sm:gap-6">
+              <div>
+                <p className="text-4xl font-extrabold leading-none tracking-tight sm:text-6xl">
+                  PAR
+                </p>
+                <p className="mt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40">
+                  Paris
+                </p>
+              </div>
+              <div className="flex flex-1 items-center gap-2 text-accent" aria-hidden="true">
+                <span className="h-px flex-1 border-t-2 border-dashed border-white/20" />
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white">
+                  <Plane className="h-4 w-4 rotate-45 fill-current" />
+                </span>
+                <span className="h-px flex-1 border-t-2 border-dashed border-white/20" />
+              </div>
+              <div className="text-right">
+                <p className="text-4xl font-extrabold leading-none tracking-tight text-accent sm:text-6xl">
+                  ???
+                </p>
+                <p className="mt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40">
+                  Ton prochain swipe
+                </p>
+              </div>
+            </div>
+
+            <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
               {PASS_FIELDS.map(({ label, value }) => (
                 <div key={label}>
                   <dt className="font-mono text-[0.55rem] font-bold uppercase tracking-[0.2em] text-white/40">
                     {label}
                   </dt>
-                  <dd className="font-mono text-xs font-bold text-white">{value}</dd>
+                  <dd className="mt-0.5 font-mono text-sm font-bold text-white">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -75,7 +103,7 @@ export function BoardingPass({ joinedEmail, onJoined }: BoardingPassProps) {
             <span className="absolute inset-x-6 top-0 border-t-2 border-dashed border-white/15" />
           </div>
 
-          <div className="relative px-6 pb-12 pt-10 sm:px-10 sm:pb-16">
+          <div className="relative px-6 pb-10 pt-10 sm:px-10 sm:pb-12">
             {/* Passport stamp */}
             <div
               className={`pointer-events-none absolute right-5 top-4 hidden rounded-xl border-2 border-accent/80 px-3 py-1.5 text-accent sm:right-10 sm:block ${
@@ -99,12 +127,6 @@ export function BoardingPass({ joinedEmail, onJoined }: BoardingPassProps) {
             <div className="relative z-20 mt-7">
               <WaitlistForm joinedEmail={joinedEmail} onJoined={onJoined} position="footer" />
             </div>
-
-            {/* Barcode */}
-            <div
-              className="mx-auto mt-10 h-8 max-w-xs bg-[repeating-linear-gradient(90deg,rgb(255_255_255/0.25)_0_2px,transparent_2px_4px,rgb(255_255_255/0.25)_4px_5px,transparent_5px_9px)]"
-              aria-hidden="true"
-            />
           </div>
         </div>
       </Reveal>

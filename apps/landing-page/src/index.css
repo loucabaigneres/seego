@@ -14,7 +14,6 @@
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-float-slow: float 8s ease-in-out infinite;
-  --animate-rise: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes float {
@@ -24,32 +23,6 @@
   }
   50% {
     transform: translateY(-14px) rotate(var(--tw-rotate, 0));
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes drift {
-  from {
-    transform: translateX(-12%);
-  }
-  to {
-    transform: translateX(12%);
-  }
-}
-
-@keyframes dash-flow {
-  to {
-    stroke-dashoffset: -40;
   }
 }
 
@@ -133,15 +106,6 @@
   opacity: 1;
 }
 
-.animate-drift {
-  animation: drift 26s ease-in-out infinite alternate;
-}
-.animate-drift-slow {
-  animation: drift 38s ease-in-out infinite alternate-reverse;
-}
-.animate-dash-flow {
-  animation: dash-flow 1.6s linear infinite;
-}
 .animate-stamp {
   animation: stamp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
