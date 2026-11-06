@@ -7,6 +7,7 @@ import { EditPlanningBar } from '@/features/trip/components/EditPlanningBar';
 import { GenerateItineraryCard } from '@/features/trip/components/GenerateItineraryCard';
 import { ItineraryToolbar } from '@/features/trip/components/ItineraryToolbar';
 import { MoveToDaySheet } from '@/features/trip/components/MoveToDaySheet';
+import { PdfActionsSheet } from '@/features/trip/components/PdfActionsSheet';
 import { PlanningEditHeader } from '@/features/trip/components/PlanningEditHeader';
 import { ReplacePlaceSheet } from '@/features/trip/components/ReplacePlaceSheet';
 import { TripHero } from '@/features/trip/components/TripHero';
@@ -29,6 +30,7 @@ function TripPage({ tripId }: { tripId: string }) {
     retry,
     trip,
     days,
+    pdf,
     selection,
     itineraryView,
     edit,
@@ -98,7 +100,7 @@ function TripPage({ tripId }: { tripId: string }) {
           />
         )}
         {isGenerated && !showMap && (
-          <PlanningEditHeader isEditing={edit.isEditing} onStart={edit.start} />
+          <PlanningEditHeader isEditing={edit.isEditing} onStart={edit.start} pdf={pdf} />
         )}
         {showMap ? (
           <TripMap days={selection.shownDays} height={itineraryView.mapHeight} />
@@ -137,6 +139,7 @@ function TripPage({ tripId }: { tripId: string }) {
       </Screen>
 
       <ReplacePlaceSheet replace={replace} />
+      <PdfActionsSheet visible={pdf.isChoosing} onPick={pdf.run} onClose={pdf.dismiss} />
       <MoveToDaySheet
         targets={edit.moveTargets}
         onPick={edit.moveTo}
