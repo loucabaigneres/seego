@@ -99,7 +99,7 @@ export function TakeoffReel({ children }: TakeoffReelProps) {
       />
       <div
         ref={stageRef}
-        className="sticky top-0 flex h-svh items-center justify-center overflow-hidden bg-cream"
+        className="sticky top-0 flex h-svh items-center justify-center overflow-hidden bg-background"
       >
         {/* View through the window, with the shade inside the same clip */}
         <motion.div style={{ clipPath }} className="absolute inset-0">
@@ -113,11 +113,11 @@ export function TakeoffReel({ children }: TakeoffReelProps) {
           />
           <motion.div
             style={{ top: frameTop, left: frameLeft, width: frameWidth, height: shadeHeight }}
-            className="absolute flex items-end justify-center bg-gradient-to-b from-[#f4efe8] to-[#ddd5c8] shadow-[0_6px_14px_rgb(0_0_0/0.18)]"
+            className="absolute flex items-end justify-center bg-gradient-to-b from-background to-surface shadow-[0_6px_14px_rgb(0_0_0/0.18)]"
             aria-hidden="true"
           >
             {/* Pull handle */}
-            <span className="mb-2 h-1.5 w-12 rounded-full bg-[#b9b0a2]" />
+            <span className="mb-2 h-1.5 w-12 rounded-full bg-line-strong" />
           </motion.div>
         </motion.div>
 
@@ -131,14 +131,14 @@ export function TakeoffReel({ children }: TakeoffReelProps) {
             borderRadius: frameRadius,
             opacity: frameOpacity,
           }}
-          className="pointer-events-none absolute shadow-[0_0_0_18px_#faf8f6,0_0_0_19px_var(--color-line),0_0_0_34px_#ece6dd,0_24px_60px_14px_rgb(0_0_0/0.12),inset_0_0_0_6px_rgb(255_255_255/0.35),inset_0_10px_40px_rgb(0_0_0/0.35)]"
+          className="pointer-events-none absolute shadow-[0_0_0_18px_var(--color-background),0_0_0_19px_var(--color-line),0_0_0_34px_var(--color-surface),0_24px_60px_14px_rgb(0_0_0/0.12),inset_0_0_0_6px_rgb(255_255_255/0.35),inset_0_10px_40px_rgb(0_0_0/0.35)]"
           aria-hidden="true"
         />
 
         {/* Difference blend keeps the words readable on cream and on the photo */}
         <motion.h2
           style={{ opacity: wordsOpacity }}
-          className="pointer-events-none relative mt-[4.5rem] flex w-full justify-center gap-[3vw] text-[clamp(2.8rem,10vw,10rem)] font-extrabold leading-none tracking-tight text-white mix-blend-difference"
+          className="pointer-events-none relative mt-[4.5rem] flex w-full justify-center gap-[3vw] text-[clamp(2.8rem,10vw,10rem)] font-extrabold leading-none tracking-tight text-ink-inverse mix-blend-difference"
         >
           <motion.span style={{ x: leftX }}>Prêt</motion.span>
           <motion.span style={{ x: rightX }}>à partir ?</motion.span>

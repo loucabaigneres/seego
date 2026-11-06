@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useInView, useReducedMotion } from 'motion/react';
 
 const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789°/#*';
@@ -20,7 +20,7 @@ export function Cross({ className = '' }: { className?: string }) {
 /** Mono section label, e.g. "(01) Manifeste". */
 export function SectionLabel({ index, children }: { index: string; children: string }) {
   return (
-    <p className="font-mono text-[0.7rem] font-bold uppercase tracking-[0.25em] text-muted">
+    <p className="tabular-nums text-[0.7rem] font-bold uppercase tracking-[0.25em] text-ink-muted">
       ({index}) <span className="ml-2">{children}</span>
     </p>
   );
@@ -41,17 +41,20 @@ export function LineReveal({
   trigger = 'view',
   delay = 0,
 }: LineRevealProps) {
-  const play = trigger === 'view' ? { whileInView: { y: '0%' } } : { animate: { y: '0%' } };
+  // Observe the (unclipped) wrapper rather than the lines: each line starts translated out of its
+  // overflow-hidden mask, so an observer on the line itself can see it as fully hidden and never fire.
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: '0px 0px -10% 0px' });
+  const shown = trigger === 'mount' || inView;
 
   return (
-    <span className={`block ${className}`}>
+    <span ref={ref} className={`block ${className}`}>
       {lines.map((line, i) => (
         <span key={line} className="block overflow-hidden pb-[0.1em]">
           <motion.span
             className="block"
             initial={{ y: '110%' }}
-            {...play}
-            viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+            animate={{ y: shown ? '0%' : '110%' }}
             transition={{ duration: 1, ease: EASE_OUT, delay: delay + i * 0.09 }}
           >
             {line}

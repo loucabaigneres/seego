@@ -27,7 +27,7 @@ function Photo({ id, alt, drift }: { id: string; alt: string; drift: MotionValue
         style={{ x: drift }}
         className="absolute inset-y-0 -left-[10%] h-full w-[120%] max-w-none object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
     </div>
   );
 }
@@ -39,7 +39,7 @@ const FEATURES: Feature[] = [
     description:
       'Oublie les 30 onglets ouverts. Swipe à droite les destinations et activités qui te font envie, à gauche le reste.',
     visual: () => (
-      <div className="absolute inset-0 flex items-center justify-center bg-accent-soft">
+      <div className="absolute inset-0 flex items-center justify-center bg-accent">
         <div className="w-[48%] max-w-[200px] translate-y-[28%]">
           <PhoneMockup />
         </div>
@@ -52,7 +52,7 @@ const FEATURES: Feature[] = [
     description:
       'À partir de tes coups de cœur, Seego assemble un itinéraire jour par jour, optimisé et prêt à partir.',
     visual: (drift) => (
-      <Photo id={PHOTOS.kyoto} alt="La pagode Yasaka à Kyoto au coucher du soleil" drift={drift} />
+      <Photo id={PHOTOS.rome} alt="Le Colisée à Rome au crépuscule" drift={drift} />
     ),
   },
   {
@@ -108,10 +108,10 @@ export function FeatureRail() {
   const intro = (
     <>
       <SectionLabel index="02">L’app</SectionLabel>
-      <h2 className="mt-6 text-[clamp(2.4rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight text-ink">
+      <h2 className="mt-6 text-[clamp(2.4rem,5vw,4.5rem)] font-display font-normal leading-[0.95] tracking-tight text-ink">
         <LineReveal lines={['Trois escales,', 'un voyage.']} />
       </h2>
-      <p className="mt-5 max-w-sm text-base text-muted">
+      <p className="mt-5 max-w-sm text-base text-ink-muted">
         Ce qui t’attend sur l’app, du premier swipe jusqu’à l’arrivée.
       </p>
     </>
@@ -120,25 +120,25 @@ export function FeatureRail() {
   const cards = FEATURES.map(({ icon: Icon, title, description, visual }, i) => (
     <article
       key={title}
-      className={`relative flex shrink-0 flex-col overflow-hidden rounded-[2rem] bg-white shadow-sm ${
+      className={`relative flex shrink-0 flex-col overflow-hidden rounded-[2rem] bg-surface shadow-sm ${
         wide ? 'h-[72svh] w-[56vw] lg:w-[40vw]' : 'w-full'
       }`}
     >
       <div className={`relative overflow-hidden ${wide ? 'flex-1' : 'h-72'}`}>{visual(drift)}</div>
       <div className="relative p-6 sm:p-8">
-        <Cross className="right-6 top-6 text-muted/60" />
+        <Cross className="right-6 top-6 text-ink-muted/60" />
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-brand">
             <Icon className="h-5 w-5" aria-hidden="true" />
           </span>
-          <span className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.25em] text-muted">
+          <span className="tabular-nums text-[0.65rem] font-bold uppercase tracking-[0.25em] text-ink-muted">
             Escale {String(i + 1).padStart(2, '0')} / {String(FEATURES.length).padStart(2, '0')}
           </span>
         </div>
         <h3 className="mt-4 text-2xl font-extrabold tracking-tight text-ink sm:text-3xl">
           {title}
         </h3>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">{description}</p>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{description}</p>
       </div>
     </article>
   ));

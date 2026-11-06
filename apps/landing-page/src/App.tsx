@@ -28,10 +28,10 @@ const SECTIONS = [
 
 function Header() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 flex h-[4.5rem] items-center justify-center bg-cream/80 px-5 backdrop-blur-md sm:px-8">
+    <header className="fixed inset-x-0 top-0 z-50 flex h-18 items-center justify-center bg-background/80 px-5 backdrop-blur-md sm:px-8">
       <a href="#top" className="group flex items-center gap-1.5">
         <span className="text-xl font-extrabold tracking-tight text-ink">Seego</span>
-        <span className="h-2 w-2 rounded-full bg-accent transition group-hover:scale-125" />
+        <span className="h-2 w-2 rounded-full bg-cta transition group-hover:scale-125" />
       </a>
     </header>
   );
@@ -47,7 +47,7 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen overflow-x-clip bg-cream">
+      <div className="min-h-screen overflow-x-clip bg-background">
         <Header />
         <main>
           <JourneyHero joinedEmail={joinedEmail} onJoined={markJoined} />

@@ -59,7 +59,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
-        run: pnpx turbo run format lint build typecheck --filter=@seego/api --filter=@seego/database --filter=@seego/web
+        run: pnpx turbo run format lint build typecheck test --filter=@seego/api --filter=@seego/database --filter=@seego/web --filter=@seego/ui --filter=@seego/mobile
 
   build-and-push-docker:
     name: Build and Push Docker Image

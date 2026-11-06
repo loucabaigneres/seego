@@ -58,13 +58,13 @@ export function SectionNav({ sections }: { sections: Section[] }) {
                 className="group relative flex h-6 w-6 items-center justify-center"
               >
                 {current ? (
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-accent text-white shadow-md shadow-accent/30">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cta text-ink shadow-md shadow-cta/30">
                     <Plane className="h-3 w-3 rotate-135 fill-current" aria-hidden="true" />
                   </span>
                 ) : (
-                  <span className="h-2.5 w-2.5 rounded-full border-2 border-muted/60 bg-cream transition group-hover:scale-125 group-hover:border-accent" />
+                  <span className="h-2.5 w-2.5 rounded-full border-2 border-ink-muted/60 bg-background transition group-hover:scale-125 group-hover:border-cta" />
                 )}
-                <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[0.7rem] font-bold text-white opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[0.7rem] font-bold text-ink-inverse opacity-0 shadow-sm transition group-hover:opacity-100 group-focus-visible:opacity-100">
                   {label}
                 </span>
               </a>

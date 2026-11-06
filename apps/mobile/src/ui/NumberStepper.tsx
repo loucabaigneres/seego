@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import { MinusIcon, PlusIcon, type AppIcon } from './icons';
@@ -47,7 +47,7 @@ export function NumberStepper({
         onAccessibilityAction={(event) =>
           step(event.nativeEvent.actionName === 'increment' ? 1 : -1)
         }
-        className="min-h-14 flex-row items-center justify-between rounded-field border border-line-strong bg-surface-raised px-1"
+        className="min-h-14 flex-row items-center justify-between rounded-field border border-line-strong bg-background px-1"
       >
         <StepButton icon={MinusIcon} label="Diminuer" disabled={value <= min} onPress={() => step(-1)} />
         <Text variant="label">{display}</Text>

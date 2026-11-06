@@ -14,7 +14,7 @@ export function ItineraryHeader({ trip, days, isEditing, onStartEditing }: Itine
   return (
     <>
       <div className="mt-6 flex items-center justify-between gap-3">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-[#888]">
+        <h2 className="text-xs font-bold uppercase tracking-wider text-ink-muted">
           Jour par jour
         </h2>
         {!isEditing && (
@@ -22,7 +22,7 @@ export function ItineraryHeader({ trip, days, isEditing, onStartEditing }: Itine
             <button
               type="button"
               onClick={onStartEditing}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#ddd] bg-white px-4 py-2 text-xs font-semibold text-[#1a1a1a] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-95"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 py-2 text-xs font-semibold text-ink transition hover:border-brand hover:text-brand active:scale-95"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m15.2 5.2 3.6 3.6M4 20l4.2-.9L19.4 7.9a1.8 1.8 0 0 0 0-2.6l-.7-.7a1.8 1.8 0 0 0-2.6 0L4.9 15.8 4 20Z" />
@@ -37,7 +37,7 @@ export function ItineraryHeader({ trip, days, isEditing, onStartEditing }: Itine
                 <button
                   type="button"
                   disabled={loading}
-                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#ddd] bg-white px-4 py-2 text-xs font-semibold text-[#1a1a1a] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-95 disabled:opacity-50"
+                  className="inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 py-2 text-xs font-semibold text-ink transition hover:border-brand hover:text-brand active:scale-95 disabled:opacity-50"
                 >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14" />
@@ -51,7 +51,7 @@ export function ItineraryHeader({ trip, days, isEditing, onStartEditing }: Itine
       </div>
 
       {isEditing && (
-        <p className="mt-3 rounded-2xl border border-[rgba(255,77,77,.25)] bg-[rgba(255,77,77,.08)] px-4 py-3 text-xs leading-relaxed text-[#555]">
+        <p className="mt-3 rounded-2xl border border-[rgba(255,77,77,.25)] bg-[rgba(255,77,77,.08)] px-4 py-3 text-xs leading-relaxed text-ink-secondary">
           Réordonne, déplace ou supprime des lieux, puis enregistre. L'hébergement est commun
           à tout le séjour : utilise « Changer » hors édition pour le remplacer.
         </p>

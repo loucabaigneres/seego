@@ -54,13 +54,13 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
           </div>
 
           {/* Crop marks */}
-          <Cross className="left-5 top-5 text-muted" />
-          <Cross className="right-5 top-5 text-muted" />
-          <Cross className="bottom-5 left-5 text-muted" />
-          <Cross className="bottom-5 right-5 text-muted" />
+          <Cross className="left-5 top-5 text-ink-muted" />
+          <Cross className="right-5 top-5 text-ink-muted" />
+          <Cross className="bottom-5 left-5 text-ink-muted" />
+          <Cross className="bottom-5 right-5 text-ink-muted" />
 
           {/* HUD corners */}
-          <div className="pointer-events-none absolute inset-x-10 top-5 flex justify-between font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-muted">
+          <div className="pointer-events-none absolute inset-x-10 top-5 flex justify-between tabular-nums text-[0.6rem] font-bold uppercase tracking-[0.25em] text-ink-muted">
             <span>
               Seego<span className="hidden sm:inline"> // Carnet de vol</span>
             </span>
@@ -75,12 +75,12 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
             style={{ opacity: introOpacity, y: introY }}
             className="pointer-events-none absolute inset-x-6 bottom-16 z-10 sm:inset-x-10 sm:bottom-24 lg:bottom-auto lg:top-1/2 lg:max-w-[62%] lg:-translate-y-1/2"
           >
-            <p className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.25em] text-accent">
+            <p className="tabular-nums text-[0.65rem] font-bold uppercase tracking-[0.25em] text-brand">
               L’application mobile arrive bientôt
             </p>
-            <h1 className="mt-4 text-[clamp(2.5rem,6vw,6.5rem)] font-extrabold leading-[0.95] tracking-tight">
+            <h1 className="mt-4 text-[clamp(2.5rem,6vw,6.5rem)] font-display font-normal leading-[0.95] tracking-tight">
               <LineReveal trigger="mount" delay={0.2} lines={['Ton prochain', 'voyage, en un']} />
-              <LineReveal trigger="mount" delay={0.38} lines={['swipe.']} className="text-accent" />
+              <LineReveal trigger="mount" delay={0.38} lines={['swipe.']} className="text-brand" />
             </h1>
             {/* Same waitlist as the boarding pass; clickable only until the flight starts */}
             <motion.div
@@ -108,17 +108,17 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
                   exit={{ opacity: 0, y: -24 }}
                   transition={{ duration: 0.35, ease: EASE_OUT }}
                 >
-                  <p className="font-mono text-[0.65rem] font-bold uppercase tracking-[0.25em] text-muted">
+                  <p className="tabular-nums text-[0.65rem] font-bold uppercase tracking-[0.25em] text-ink-muted">
                     {stop.country}
                   </p>
-                  <h2 className="mt-3 text-[clamp(3rem,8vw,8rem)] font-extrabold leading-[0.9] tracking-tight">
+                  <h2 className="mt-3 text-[clamp(3rem,8vw,8rem)] font-display font-normal leading-[0.9] tracking-tight">
                     <LineReveal trigger="mount" lines={[stop.name]} />
                   </h2>
                   <motion.p
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
-                    className="mt-4 max-w-sm text-sm text-muted sm:text-base"
+                    className="mt-4 max-w-sm text-sm text-ink-muted sm:text-base"
                   >
                     {stop.tagline}
                   </motion.p>
@@ -128,7 +128,7 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.35 }}
-                      className="pointer-events-auto mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-bold text-white shadow-lg shadow-accent/30 transition hover:brightness-110"
+                      className="pointer-events-auto mt-6 inline-flex items-center gap-2 rounded-full bg-cta px-5 py-3 text-sm font-bold text-ink shadow-lg shadow-cta/30 transition hover:brightness-110"
                     >
                       Embarquer avec Seego
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -140,14 +140,14 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
           </div>
 
           {/* Bottom HUD: coordinates, journey rail, scroll hint */}
-          <div className="pointer-events-none absolute inset-x-10 bottom-5 flex items-end justify-between gap-6 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-muted">
+          <div className="pointer-events-none absolute inset-x-10 bottom-5 flex items-end justify-between gap-6 tabular-nums text-[0.6rem] font-bold uppercase tracking-[0.25em] text-ink-muted">
             <ScrambleText text={formatCoords(stop)} className="hidden sm:inline" />
             <div className="flex flex-1 items-center gap-1.5 sm:max-w-xs" aria-hidden="true">
               {STOPS.map((s, i) => (
                 <span
                   key={s.name}
                   className={`h-0.5 flex-1 rounded-full transition-colors duration-500 ${
-                    i <= current ? 'bg-accent' : 'bg-line'
+                    i <= current ? 'bg-cta' : 'bg-line'
                   }`}
                 />
               ))}

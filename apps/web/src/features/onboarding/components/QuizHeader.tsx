@@ -10,15 +10,15 @@ export function QuizHeader({ current, total, progress }: QuizHeaderProps) {
 
   return (
     <div className="mb-6">
-      <div className="flex justify-between items-center text-xs font-semibold text-[#888] uppercase tracking-wider mb-2">
+      <div className="flex justify-between items-center text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2">
         <span>
           Étape {current} sur {total}
         </span>
         <span>{percent} %</span>
       </div>
-      <div className="h-1.5 w-full bg-[#eee] rounded-full overflow-hidden">
+      <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#FF4D4D] transition-all duration-300 rounded-full"
+          className="h-full bg-cta transition-all duration-300 rounded-full"
           style={{ width: `${percent}%` }}
         />
       </div>

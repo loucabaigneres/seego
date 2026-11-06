@@ -11,7 +11,7 @@ import { SettingsLink } from '@/features/profile/components/SettingsLink';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { TripList } from '@/features/trips/components/TripList';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { ErrorState, Screen } from '@/ui';
 
 export default function ProfileScreen() {

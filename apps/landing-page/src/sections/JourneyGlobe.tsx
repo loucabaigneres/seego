@@ -130,7 +130,7 @@ export default function JourneyGlobe({ progress, onError }: JourneyGlobeProps) {
         <span className="absolute left-0 top-0 h-px w-10 origin-left -rotate-45 bg-ink" />
         <span
           ref={calloutTextRef}
-          className="absolute left-7 -top-10 whitespace-nowrap rounded-md bg-ink px-2 py-1 font-mono text-[0.6rem] font-bold tracking-[0.2em] text-white"
+          className="absolute left-7 -top-10 whitespace-nowrap rounded-md bg-ink px-2 py-1 tabular-nums text-[0.6rem] font-bold tracking-[0.2em] text-ink-inverse"
         />
       </div>
     </div>

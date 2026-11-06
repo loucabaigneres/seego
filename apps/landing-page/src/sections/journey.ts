@@ -26,11 +26,11 @@ export const STOPS: Stop[] = [
     tagline: 'Aurores boréales et lagons qui fument.',
   },
   {
-    name: 'Kyoto',
-    country: 'Japon',
-    lat: 35.01,
-    lon: 135.77,
-    tagline: 'Temples, ruelles de Gion et matcha.',
+    name: 'Rome',
+    country: 'Italie',
+    lat: 41.9,
+    lon: 12.5,
+    tagline: 'Colisée, ruelles du Trastevere et gelato.',
   },
 ];
 

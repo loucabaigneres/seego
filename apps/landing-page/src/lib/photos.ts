@@ -2,8 +2,8 @@
 export const PHOTOS = {
   // Lisbon, Bica funicular. Photo: Henry Ren
   lisbon: 'photo-1697748525265-7431cba075b6',
-  // Kyoto, Yasaka pagoda. Photo: Roméo A.
-  kyoto: 'photo-1624253321171-1be53e12f5f4',
+  // Rome, the Colosseum at dusk. Photo: David Köhler
+  rome: 'photo-1552832230-c0197dd311b5',
   // Airplane wing above the clouds. Photo: Johny Goerend
   wing: 'photo-1593182440709-4b7b56482c55',
 };

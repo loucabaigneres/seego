@@ -53,6 +53,7 @@ export function SignInForm() {
 
       <Button
         label="Se connecter"
+        variant="cta"
         loading={form.isSubmitting}
         onPress={form.submit}
         className="mt-1"

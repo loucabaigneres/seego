@@ -40,7 +40,7 @@ export function SwipeCard({ card, onSwipe, isFront }: SwipeCardProps) {
 
   return (
     <motion.div
-      className="absolute w-full h-[70vh] max-h-150 max-w-sm rounded-3xl overflow-hidden shadow-xl bg-gray-200 origin-bottom"
+      className="absolute w-full h-[70vh] max-h-150 max-w-sm rounded-card overflow-hidden shadow-xl border border-brand/15 bg-surface origin-bottom"
       // Configuration de la physique
       style={{ x, rotate }}
       drag={isFront ? "x" : false} // On ne peut glisser que la première carte
@@ -60,25 +60,25 @@ export function SwipeCard({ card, onSwipe, isFront }: SwipeCardProps) {
       />
 
       {/* Les indicateurs visuels (LIKE / NOPE) */}
-      <motion.div style={{ opacity: opacityLike }} className="absolute top-8 left-8 border-4 border-green-500 rounded-lg px-4 py-1">
-        <span className="text-3xl font-bold text-green-500 tracking-wider transform -rotate-12">LIKE</span>
+      <motion.div style={{ opacity: opacityLike }} className="absolute top-8 left-8 border-4 border-success rounded-lg px-4 py-1">
+        <span className="text-3xl font-bold text-success-text tracking-wider transform -rotate-12">LIKE</span>
       </motion.div>
-      <motion.div style={{ opacity: opacityNope }} className="absolute top-8 right-8 border-4 border-red-500 rounded-lg px-4 py-1">
-        <span className="text-3xl font-bold text-red-500 tracking-wider transform rotate-12">NOPE</span>
+      <motion.div style={{ opacity: opacityNope }} className="absolute top-8 right-8 border-4 border-brand rounded-lg px-4 py-1">
+        <span className="text-3xl font-bold text-brand tracking-wider transform rotate-12">NOPE</span>
       </motion.div>
 
       {/* Le dégradé sombre en bas pour rendre le texte lisible */}
-      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/80 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink/80 to-transparent pointer-events-none" />
 
       {/* Les informations de la destination */}
-      <div className="absolute inset-x-0 bottom-0 p-6 text-white pointer-events-none">
-        <h2 className="text-3xl font-bold mb-2 flex items-center gap-2">
+      <div className="absolute inset-x-0 bottom-0 p-6 text-ink-inverse pointer-events-none">
+        <h2 className="text-3xl font-display font-normal mb-2 flex items-center gap-2">
           {card.locationName}
         </h2>
         
         <div className="flex flex-wrap gap-2 mb-3">
           {tags?.subcategory?.map((tag: string) => (
-            <span key={tag} className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-medium">
+            <span key={tag} className="px-3 py-1 bg-background/20 backdrop-blur-md rounded-full text-xs font-medium">
               #{tag}
             </span>
           ))}
