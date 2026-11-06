@@ -11,6 +11,7 @@ export { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';
 export { ArrowSquareOutIcon } from 'phosphor-react-native/src/icons/ArrowSquareOut';
 export { BankIcon } from 'phosphor-react-native/src/icons/Bank';
 export { BarnIcon } from 'phosphor-react-native/src/icons/Barn';
+export { BedIcon } from 'phosphor-react-native/src/icons/Bed';
 export { BuildingsIcon } from 'phosphor-react-native/src/icons/Buildings';
 export { CalendarIcon } from 'phosphor-react-native/src/icons/Calendar';
 export { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';

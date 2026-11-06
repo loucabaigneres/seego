@@ -4,6 +4,7 @@ import { splitTripDays } from '@/domain/trip';
 import { trpc, type RouterOutputs } from '@/lib/trpc';
 
 import { useDaySelection } from './useDaySelection';
+import { useItineraryView } from './useItineraryView';
 
 export type TripDay = RouterOutputs['discovery']['getTrip']['days'][number];
 export type TripActivity = TripDay['activities'][number];
@@ -24,6 +25,7 @@ export function useTrip(tripId: string) {
 
   const days = splitTripDays(query.data?.days ?? []);
   const selection = useDaySelection(days.itinerary);
+  const itineraryView = useItineraryView(selection.scrollToPicker);
   const errorCode = query.error?.data?.code;
 
   return {
@@ -35,6 +37,7 @@ export function useTrip(tripId: string) {
     trip: query.data?.trip ?? null,
     days,
     selection,
+    itineraryView,
     isGenerated: query.data?.isGenerated ?? false,
     generate: {
       run: () => generation.mutate({ tripId }),
