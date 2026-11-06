@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type * as z from 'zod';
 
 import { authErrorMessage, type AuthError } from '../lib/errors';
-import { syncQueriesWithSession } from '../lib/query-cache';
 import { validate, type FieldErrors } from '../lib/validation';
 
 interface UseAuthFormOptions<S extends z.ZodObject> {
@@ -11,7 +10,10 @@ interface UseAuthFormOptions<S extends z.ZodObject> {
   /** The Better Auth call;
    *  resolves with its `error` (null on success). */
   request: (data: z.output<S>) => Promise<{ error: AuthError | null }>;
-  onSuccess: () => void;
+  /** Receives the submitted values, e.g. to sign in again once the e-mail is confirmed. */
+  onSuccess: (data: z.output<S>) => void | Promise<void>;
+  /** Resolves `true` when the form deals with this error itself (no message shown). */
+  onError?: (error: AuthError, data: z.output<S>) => boolean | Promise<boolean>;
 }
 
 export function useAuthForm<S extends z.ZodObject>({
@@ -19,6 +21,7 @@ export function useAuthForm<S extends z.ZodObject>({
   initialValues,
   request,
   onSuccess,
+  onError,
 }: UseAuthFormOptions<S>) {
   type Values = z.input<S>;
 
@@ -46,11 +49,10 @@ export function useAuthForm<S extends z.ZodObject>({
     try {
       const { error } = await request(result.data);
       if (error) {
-        setFormError(authErrorMessage(error));
+        if (!(await onError?.(error, result.data))) setFormError(authErrorMessage(error));
         return;
       }
-      await syncQueriesWithSession('signed-in');
-      onSuccess();
+      await onSuccess(result.data);
     } catch {
       setFormError(authErrorMessage(null));
     } finally {
@@ -58,5 +60,5 @@ export function useAuthForm<S extends z.ZodObject>({
     }
   };
 
-  return { values, setField, fieldErrors, formError, isSubmitting, submit };
+  return { values, setField, fieldErrors, formError, setFormError, isSubmitting, submit };
 }

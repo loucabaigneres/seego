@@ -13,6 +13,9 @@ const MESSAGES: Record<string, string> = {
     'Un compte existe déjà avec cet email. Connecte-toi plutôt.',
   PASSWORD_TOO_SHORT: 'Ton mot de passe est trop court.',
   PASSWORD_TOO_LONG: 'Ton mot de passe est trop long.',
+  INVALID_OTP: 'Code invalide ou expiré.',
+  OTP_EXPIRED: 'Code invalide ou expiré.',
+  TOO_MANY_ATTEMPTS: 'Trop de tentatives. Demande un nouveau code.',
   INVALID_ORIGIN: "L'app n'est pas autorisée par le serveur. Préviens l'équipe.",
 };
 

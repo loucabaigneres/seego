@@ -61,6 +61,7 @@ export default function RootLayout() {
           <Stack.Screen name="settings" />
           <Stack.Screen name="auth/sign-in" options={{ presentation: 'modal' }} />
           <Stack.Screen name="auth/sign-up" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="auth/forgot-password" options={{ presentation: 'modal' }} />
         </Stack>
       </QueryClientProvider>
     </GestureHandlerRootView>
