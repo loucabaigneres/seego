@@ -38,11 +38,11 @@ export function Faq() {
   return (
     <section id="faq">
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 lg:py-24">
-        <Reveal className="mx-auto w-fit rounded-3xl bg-white/70 px-8 py-6 text-center shadow-lg shadow-black/10 backdrop-blur-md">
-          <h2 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
+        <Reveal className="mx-auto w-fit rounded-3xl bg-background/70 px-8 py-6 text-center shadow-lg shadow-ink/10 backdrop-blur-md">
+          <h2 className="text-3xl font-display font-normal tracking-tight text-ink sm:text-4xl">
             Questions fréquentes
           </h2>
-          <p className="mt-3 text-base text-muted">Tout ce qu’il faut savoir avant le lancement.</p>
+          <p className="mt-3 text-base text-ink-muted">Tout ce qu’il faut savoir avant le lancement.</p>
         </Reveal>
 
         <div className="mt-10 space-y-3">
@@ -52,8 +52,8 @@ export function Faq() {
               <Reveal
                 key={item.question}
                 delay={index * 70}
-                className={`overflow-hidden rounded-2xl border bg-white/80 shadow-lg shadow-black/10 backdrop-blur-md ${
-                  open ? 'border-accent/30' : 'border-white/60'
+                className={`overflow-hidden rounded-2xl border bg-background/80 shadow-lg shadow-ink/10 backdrop-blur-md ${
+                  open ? 'border-cta/30' : 'border-background/60'
                 }`}
               >
                 <button
@@ -64,7 +64,7 @@ export function Faq() {
                 >
                   <span className="text-sm font-bold text-ink sm:text-base">{item.question}</span>
                   <ChevronDown
-                    className={`h-4 w-4 shrink-0 text-accent transition-transform duration-300 ${
+                    className={`h-4 w-4 shrink-0 text-brand transition-transform duration-300 ${
                       open ? 'rotate-180' : ''
                     }`}
                     aria-hidden="true"
@@ -76,7 +76,7 @@ export function Faq() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{item.answer}</p>
+                    <p className="px-5 pb-4 text-sm leading-relaxed text-ink-muted">{item.answer}</p>
                   </div>
                 </div>
               </Reveal>

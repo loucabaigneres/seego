@@ -44,5 +44,5 @@ src/
 3. API types come from `RouterOutputs` / `RouterInputs` (`@/lib/trpc`), never from relative imports into `apps/api`.
 4. Every query renders its loading, error (with retry) and empty states using `@/ui`.
 5. UI copy is French and uses "tu".
-6. Follow the charte (DA V1, Sept. 2026): one corallo (`primary`) button per screen, no shadows,
+6. Follow the charte (DA V1, Sept. 2026): vino for actions, albicocca (`cta`) as the sparse secondary accent, no shadows,
    no emojis in the UI, icons from `@/ui/icons` (Phosphor), serif for titles, sans for actions.

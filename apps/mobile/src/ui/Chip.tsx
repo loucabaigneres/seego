@@ -1,6 +1,6 @@
 import { Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import type { AppIcon } from './icons';
@@ -30,13 +30,13 @@ export function Chip({ label, selected = false, icon: Icon, className, ...props 
         <Icon
           size={20}
           weight={selected ? 'fill' : 'regular'}
-          color={selected ? colors.ink.inverse : colors.brand}
+          color={selected ? colors.accent : colors.brand}
         />
       )}
       <Text
         className={cn(
           'font-sans-medium text-control',
-          selected ? 'text-ink-inverse' : 'text-brand',
+          selected ? 'text-accent' : 'text-brand',
         )}
       >
         {label}

@@ -1,17 +1,8 @@
 @import 'tailwindcss';
+/* Colors, fonts, radii and type scale come from the shared charte (packages/ui). */
+@import '@seego/ui/css';
 
-/* ── Seego brand tokens (aligned with apps/web) ── */
 @theme {
-  --color-cream: #f2ede8;
-  --color-sand: #faf8f6;
-  --color-ink: #1a1a1a;
-  --color-muted: #8a8276;
-  --color-accent: #ff4d4d;
-  --color-accent-soft: #fff1f1;
-  --color-line: #e2dcce;
-
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
-
   --animate-float: float 6s ease-in-out infinite;
   --animate-float-slow: float 8s ease-in-out infinite;
 }
@@ -69,11 +60,11 @@
   }
 }
 
-/* ── Boarding pass: soft red glows + silver foil on hover (no filters, so nothing leaks past the rounded corners) ── */
+/* ── Boarding pass: soft apricot glows + silver foil on hover (no filters, so nothing leaks past the rounded corners) ── */
 .boarding-pass {
   background-image:
-    radial-gradient(circle at 100% 0%, rgb(255 77 77 / 0.28), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgb(255 77 77 / 0.14), transparent 45%);
+    radial-gradient(circle at 100% 0%, rgb(240 138 93 / 0.28), transparent 45%),
+    radial-gradient(circle at 0% 100%, rgb(240 138 93 / 0.14), transparent 45%);
 }
 .boarding-pass .foil {
   opacity: 0;
@@ -128,7 +119,7 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--color-cream);
+  background-color: var(--color-background);
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;

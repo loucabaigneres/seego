@@ -1,11 +1,13 @@
+import { colors } from '@seego/ui';
+
 import * as THREE from 'three';
 
 // Brand tokens, mirrored from index.css (WebGL can't read CSS variables).
 /** A point on the globe. */
 export type Place = { name: string; lat: number; lon: number };
 
-export const ACCENT = '#ff4d4d';
-export const INK = '#1a1a1a';
+export const ACCENT: string = colors.cta;
+export const INK: string = colors.ink.DEFAULT;
 
 export const RADIUS = 1;
 const TUBE_SEGMENTS = 64;

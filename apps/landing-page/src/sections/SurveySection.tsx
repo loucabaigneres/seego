@@ -12,10 +12,10 @@ export function SurveySection() {
         {/* Pitch + button */}
         <div>
           <SectionLabel index="03">Ton avis</SectionLabel>
-          <h2 className="mt-6 text-[clamp(2.4rem,5vw,4.5rem)] font-extrabold leading-[0.95] tracking-tight text-ink">
+          <h2 className="mt-6 text-[clamp(2.4rem,5vw,4.5rem)] font-display font-normal leading-[0.95] tracking-tight text-ink">
             <LineReveal lines={['Aide-nous à', 'tracer la route.']} />
           </h2>
-          <p className="mt-5 max-w-md text-base text-muted">
+          <p className="mt-5 max-w-md text-base text-ink-muted">
             Quelques questions sur ta façon de préparer tes voyages. Tes réponses décident de ce
             qu’on construit en premier dans l’app.
           </p>
@@ -25,7 +25,7 @@ export function SurveySection() {
               href={FORM_URL}
               target="_blank"
               rel="noreferrer"
-              className="group inline-flex items-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-accent/30 transition hover:brightness-110 active:scale-95"
+              className="group inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3.5 text-sm font-bold text-ink shadow-lg shadow-cta/30 transition hover:brightness-110 active:scale-95"
             >
               Répondre au questionnaire
               <ArrowUpRight
@@ -33,7 +33,7 @@ export function SurveySection() {
                 aria-hidden="true"
               />
             </a>
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-xs font-bold text-accent">
+            <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-brand">
               <Clock className="h-3.5 w-3.5" aria-hidden="true" />3 minutes, anonyme
             </span>
           </Reveal>
@@ -41,17 +41,17 @@ export function SurveySection() {
 
         {/* Luggage tag with the QR code (smaller on phones) */}
         <Reveal from="right" className="flex justify-center">
-          <div className="relative flex -rotate-3 items-center gap-3 rounded-2xl rounded-l-[2.5rem] bg-ink py-5 pl-11 pr-4 text-white shadow-xl shadow-black/15 sm:gap-6 sm:rounded-l-[3rem] sm:py-6 sm:pl-14 sm:pr-8">
+          <div className="relative flex -rotate-3 items-center gap-3 rounded-2xl rounded-l-[2.5rem] bg-ink py-5 pl-11 pr-4 text-ink-inverse shadow-xl shadow-ink/15 sm:gap-6 sm:rounded-l-[3rem] sm:py-6 sm:pl-14 sm:pr-8">
             {/* Eyelet and string */}
             <span
-              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-cream ring-4 ring-white/20 sm:left-5 sm:h-5 sm:w-5"
+              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-background ring-4 ring-background/20 sm:left-5 sm:h-5 sm:w-5"
               aria-hidden="true"
             />
             <span
-              className="absolute -left-20 top-1/2 hidden h-px w-24 -rotate-12 bg-muted/60 sm:block"
+              className="absolute -left-20 top-1/2 hidden h-px w-24 -rotate-12 bg-ink-muted/60 sm:block"
               aria-hidden="true"
             />
-            <div className="shrink-0 rounded-xl bg-white p-2 sm:p-3">
+            <div className="shrink-0 rounded-xl bg-surface p-2 sm:p-3">
               <img
                 src="/qr-questionnaire.svg"
                 alt="QR code vers le questionnaire Seego"
@@ -61,7 +61,7 @@ export function SurveySection() {
               />
             </div>
             <div className="max-w-[8.5rem] sm:max-w-[11rem]">
-              <p className="flex items-center gap-1.5 font-mono text-[0.6rem] font-bold uppercase tracking-[0.25em] text-white/50">
+              <p className="flex items-center gap-1.5 tabular-nums text-[0.6rem] font-bold uppercase tracking-[0.25em] text-ink-inverse/60">
                 <QrCode className="h-3.5 w-3.5" aria-hidden="true" />
                 Bagage cabine
               </p>

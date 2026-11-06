@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { colors } from '@seego/ui';
 import {
   ACCENT,
   buildAtmosphere,
@@ -24,7 +25,7 @@ export function createGlobeScene(places: Place[], legs: [Place, Place][]) {
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
   camera.position.set(0, 0, 4.2);
 
-  scene.add(new THREE.HemisphereLight('#ffffff', '#e2dcce', 2.2));
+  scene.add(new THREE.HemisphereLight('#ffffff', colors.surface, 2.2));
   const sun = new THREE.DirectionalLight('#ffffff', 1.2);
   sun.position.set(-3, 2, 4);
   scene.add(sun);

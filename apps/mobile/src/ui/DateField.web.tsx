@@ -23,12 +23,12 @@ export function DateField({ label, value, onChange, minimumDate, error, classNam
           if (event.target.value) onChange(event.target.value);
         }}
         className={cn(
-          'min-h-14 rounded-field border bg-surface-raised px-4 font-sans text-body text-ink',
-          error ? 'border-primary-text' : 'border-line-strong',
+          'min-h-14 rounded-field border bg-background px-4 font-sans text-body text-ink',
+          error ? 'border-brand' : 'border-line-strong',
         )}
       />
       {error && (
-        <Text variant="caption" tone="primary">
+        <Text variant="caption" tone="brand">
           {error}
         </Text>
       )}

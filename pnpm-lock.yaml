@@ -103,6 +103,9 @@ importers:
 
   apps/landing-page:
     dependencies:
+      '@seego/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.1.3(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
@@ -209,12 +212,12 @@ importers:
       '@better-auth/expo':
         specifier: ~1.6.23
         version: 1.6.33(ca50b9f79072ee0d0c9267de6af4a4eb)
+      '@expo-google-fonts/fraunces':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@expo-google-fonts/hanken-grotesk':
         specifier: ^0.4.3
         version: 0.4.3
-      '@expo-google-fonts/instrument-serif':
-        specifier: ^0.4.1
-        version: 0.4.1
       '@react-native-async-storage/async-storage':
         specifier: 2.2.0
         version: 2.2.0(react-native@0.86.3(@babel/core@7.29.0)(@react-native/jest-preset@0.86.3(@babel/core@7.29.0)(react@19.2.3))(@react-native/metro-config@0.86.3(@babel/core@7.29.0))(@types/react@19.2.17)(react@19.2.3))
@@ -330,6 +333,9 @@ importers:
       '@seego/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@seego/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
@@ -369,6 +375,9 @@ importers:
       '@react-pdf/renderer':
         specifier: ^4.5.1
         version: 4.5.1(react@19.2.7)
+      '@seego/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@tailwindcss/vite':
         specifier: ^4.3.0
         version: 4.3.0(vite@8.1.3(@types/node@24.13.2)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
@@ -521,6 +530,27 @@ importers:
       typescript-eslint:
         specifier: ^8.59.1
         version: 8.59.1(eslint@10.2.1(jiti@2.7.0))(typescript@6.0.3)
+
+  packages/ui:
+    devDependencies:
+      '@seego/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      eslint:
+        specifier: ^10.2.1
+        version: 10.12.0(jiti@2.7.0)
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vitest:
+        specifier: ^4.1.5
+        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.6.0)(jsdom@28.1.0(@noble/hashes@2.2.0))(vite@8.1.3(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.7.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3))
 
 packages:
 
@@ -1854,11 +1884,11 @@ packages:
       '@noble/hashes':
         optional: true
 
+  '@expo-google-fonts/fraunces@0.4.1':
+    resolution: {integrity: sha512-gYc9P92ObyWvz1rWPOeWSvVKyBFIuA8hgOdhvo4DSiPBaWLbFA6v8uLIEIBwW+0oWTlXbBzjeBReHQI2H7UNjQ==}
+
   '@expo-google-fonts/hanken-grotesk@0.4.3':
     resolution: {integrity: sha512-TZn/Ux+nCxEjG/zAenCFbEhOAPxSXN3lo2YU2jHcPsNBPFeicm8feQStL81igJuAwJLCn62VvEOdTtmVEBDl0g==}
-
-  '@expo-google-fonts/instrument-serif@0.4.1':
-    resolution: {integrity: sha512-1CgCrLbTSgE7RV8ZrTT7i06UAyNQDBrhxQuxkReNnfq5yvUhTmvpOK17grlEsXG5p04lJ1ZXGiIjPeHo6X0sXg==}
 
   '@expo-google-fonts/material-symbols@0.4.50':
     resolution: {integrity: sha512-XNSgSfd+1p6wqRAzzhrckGngHJQ1/z+oCMdI5FN+x/VnDeMMFGkXsuRNPYcZTYYff1GwVwx4u6Gqnb30aALysw==}
@@ -9018,6 +9048,11 @@ snapshots:
       eslint: 10.12.0(jiti@1.21.7)
       eslint-visitor-keys: 3.4.3
 
+  '@eslint-community/eslint-utils@4.9.1(eslint@10.12.0(jiti@2.7.0))':
+    dependencies:
+      eslint: 10.12.0(jiti@2.7.0)
+      eslint-visitor-keys: 3.4.3
+
   '@eslint-community/eslint-utils@4.9.1(eslint@10.2.1(jiti@2.7.0))':
     dependencies:
       eslint: 10.2.1(jiti@2.7.0)
@@ -9084,9 +9119,9 @@ snapshots:
       '@noble/hashes': 2.2.0
     optional: true
 
-  '@expo-google-fonts/hanken-grotesk@0.4.3': {}
+  '@expo-google-fonts/fraunces@0.4.1': {}
 
-  '@expo-google-fonts/instrument-serif@0.4.1': {}
+  '@expo-google-fonts/hanken-grotesk@0.4.3': {}
 
   '@expo-google-fonts/material-symbols@0.4.50': {}
 
@@ -12937,6 +12972,43 @@ snapshots:
       optionator: 0.9.4
     optionalDependencies:
       jiti: 1.21.7
+    transitivePeerDependencies:
+      - supports-color
+
+  eslint@10.12.0(jiti@2.7.0):
+    dependencies:
+      '@eslint-community/eslint-utils': 4.9.1(eslint@10.12.0(jiti@2.7.0))
+      '@eslint-community/regexpp': 4.12.2
+      '@eslint/config-array': 0.23.5
+      '@eslint/config-helpers': 0.7.0
+      '@eslint/core': 1.2.1
+      '@eslint/plugin-kit': 0.7.3
+      '@humanfs/node': 0.16.8
+      '@humanwhocodes/module-importer': 1.0.1
+      '@humanwhocodes/retry': 0.4.3
+      '@types/estree': 1.0.8
+      ajv: 6.15.0
+      cross-spawn: 7.0.6
+      debug: 4.4.3
+      escape-string-regexp: 4.0.0
+      eslint-scope: 9.1.2
+      eslint-visitor-keys: 5.0.1
+      espree: 11.2.0
+      esquery: 1.7.0
+      esutils: 2.0.3
+      fast-deep-equal: 3.1.3
+      file-entry-cache: 11.1.5
+      find-up: 5.0.0
+      glob-parent: 6.0.2
+      ignore: 5.3.2
+      imurmurhash: 0.1.4
+      is-glob: 4.0.3
+      json-stable-stringify-without-jsonify: 1.0.1
+      minimatch: 10.2.5
+      natural-compare: 1.4.0
+      optionator: 0.9.4
+    optionalDependencies:
+      jiti: 2.7.0
     transitivePeerDependencies:
       - supports-color
 

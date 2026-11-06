@@ -31,7 +31,7 @@ export function ScrollToTop({ onScrollTop }: ScrollToTopProps) {
         if (onScrollTop) onScrollTop();
         else window.scrollTo({ top: 0, behavior: 'smooth' });
       }}
-      className={`group fixed bottom-6 right-6 z-50 flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-ink text-white shadow-lg shadow-black/20 transition-all duration-300 hover:brightness-110 active:scale-90 ${
+      className={`group fixed bottom-6 right-6 z-50 flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full bg-ink text-ink-inverse shadow-lg shadow-ink/20 transition-all duration-300 hover:brightness-110 active:scale-90 ${
         visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
       }`}
     >

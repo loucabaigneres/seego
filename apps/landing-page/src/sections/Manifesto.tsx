@@ -86,7 +86,7 @@ export function Manifesto() {
 
   return (
     <section ref={sectionRef} id="manifeste" className="relative overflow-hidden py-32 lg:py-48">
-      {/* Flight ribbon, drawn as you scroll (Lusion's signature stroke, in Seego coral) */}
+      {/* Flight ribbon, drawn as you scroll (Lusion's signature stroke, in pesca so the notte text stays readable on top of it) */}
       <svg
         className="pointer-events-none absolute inset-0 h-full w-full"
         viewBox={`0 0 ${size.width} ${size.height}`}
@@ -100,7 +100,7 @@ export function Manifesto() {
           strokeWidth={Math.min(56, size.width * 0.1)}
           strokeLinecap="round"
           style={{ pathLength: ribbon }}
-          opacity={0.9}
+          opacity={1}
         />
       </svg>
 
@@ -110,7 +110,7 @@ export function Manifesto() {
         className="pointer-events-none absolute left-0 top-0 z-20 opacity-0 transition-opacity duration-300"
         aria-hidden="true"
       >
-        <Plane className="h-14 w-14 fill-ink text-ink drop-shadow-lg" strokeWidth={1.2} />
+        <Plane className="h-14 w-14 fill-brand text-brand drop-shadow-lg" strokeWidth={1.2} />
       </div>
 
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">

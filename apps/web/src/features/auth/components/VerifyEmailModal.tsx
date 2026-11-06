@@ -96,27 +96,27 @@ export function VerifyEmailModal({ email, onVerified, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 px-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="verify-title"
     >
-      <div className="w-full max-w-md rounded-3xl border border-[#eee] bg-white p-8 shadow-xl">
-        <h2 id="verify-title" className="text-2xl font-extrabold text-[#1a1a1a]">
+      <div className="w-full max-w-md rounded-card border border-brand/15 bg-surface p-8">
+        <h2 id="verify-title" className="text-2xl font-display font-normal text-ink">
           Vérifie ton email
         </h2>
-        <p className="mt-1 text-sm text-[#888]">
+        <p className="mt-1 text-sm text-ink-muted">
           Entre le code à 6 chiffres envoyé à{' '}
-          <span className="font-semibold text-[#1a1a1a]">{email}</span>.
+          <span className="font-semibold text-ink">{email}</span>.
         </p>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-semibold text-[#FF4D4D]">
+          <div className="mt-4 rounded-xl border border-brand/20 bg-surface p-3 text-xs font-semibold text-brand">
             {error}
           </div>
         )}
         {info && (
-          <div className="mt-4 rounded-xl border border-green-100 bg-green-50 p-3 text-xs font-semibold text-green-700">
+          <div className="mt-4 rounded-xl border border-success/30 bg-success/10 p-3 text-xs font-semibold text-success-text">
             {info}
           </div>
         )}
@@ -142,12 +142,12 @@ export function VerifyEmailModal({ email, onVerified, onClose }: Props) {
               aria-label={`Chiffre ${i + 1}`}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="h-14 w-12 rounded-xl border border-[#ddd] bg-white text-center text-xl font-bold text-[#1a1a1a] outline-none transition focus:border-[#FF4D4D] focus:ring-2 focus:ring-[#FF4D4D]/20 disabled:opacity-50"
+              className="h-14 w-12 rounded-xl border border-line-strong bg-background text-center text-xl font-bold text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-50"
             />
           ))}
         </div>
 
-        <p className="mt-4 text-xs text-[#888]">
+        <p className="mt-4 text-xs text-ink-muted">
           Pas reçu ? Regarde dans tes spams. Si tu as déjà un compte, connecte-toi.
         </p>
 
@@ -155,7 +155,7 @@ export function VerifyEmailModal({ email, onVerified, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="text-xs font-semibold text-[#888] hover:underline cursor-pointer"
+            className="text-xs font-semibold text-ink-muted hover:underline cursor-pointer"
           >
             Retour
           </button>
@@ -163,7 +163,7 @@ export function VerifyEmailModal({ email, onVerified, onClose }: Props) {
             type="button"
             onClick={handleResend}
             disabled={cooldown > 0 || loading}
-            className="text-xs font-bold text-[#FF4D4D] hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer"
+            className="text-xs font-bold text-brand hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer"
           >
             {cooldown > 0 ? `Renvoyer le code (${cooldown}s)` : 'Renvoyer le code'}
           </button>

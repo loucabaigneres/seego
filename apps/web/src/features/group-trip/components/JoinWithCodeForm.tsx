@@ -1,4 +1,5 @@
 import type { FormEvent } from 'react'
+import { FIELD_CLASS } from '@/components/formStyles';
 
 /** Input + submit used to join a group trip with an 8-character invite code. */
 export function JoinWithCodeForm({
@@ -20,9 +21,9 @@ export function JoinWithCodeForm({
   const isFull = variant === 'full'
 
   return (
-    <form onSubmit={onSubmit} className="border-t border-[#eee] pt-3">
+    <form onSubmit={onSubmit} className="border-t border-line pt-3">
       {isFull && (
-        <label className="block text-[11px] font-semibold text-[#888] mb-1">
+        <label className="mb-1 block text-xs font-medium text-ink">
           Rejoindre avec un code (8 caractères)
         </label>
       )}
@@ -33,17 +34,17 @@ export function JoinWithCodeForm({
           placeholder={isFull ? 'Ex: aB3_9-Q1' : 'Code à 8 caractères…'}
           value={value}
           onChange={(e) => onChange(e.target.value.trim())}
-          className={`flex-1 rounded-xl border border-[#ddd] bg-[#F2EDE8] px-3 ${isFull ? 'py-2' : 'py-1.5'} text-xs font-mono text-[#1A1A1A] outline-none focus:border-[#FF4D4D]`}
+          className={`${FIELD_CLASS} flex-1 px-3 ${isFull ? 'py-2' : 'py-1.5'} tabular-nums text-xs`}
         />
         <button
           type="submit"
           disabled={isJoining}
-          className={`cursor-pointer rounded-xl bg-[#1A1A1A] ${isFull ? 'px-3.5 py-2' : 'px-3 py-1.5'} text-xs font-bold text-white transition hover:bg-black disabled:opacity-50`}
+          className={`cursor-pointer rounded-xl bg-brand ${isFull ? 'px-3.5 py-2' : 'px-3 py-1.5'} text-xs font-bold text-accent transition hover:bg-ink disabled:opacity-50`}
         >
           {isJoining ? '…' : isFull ? 'Rejoindre' : 'OK'}
         </button>
       </div>
-      {error && <p className="mt-1 text-[11px] text-[#FF4D4D]">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-brand">{error}</p>}
     </form>
   )
 }

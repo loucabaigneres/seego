@@ -51,7 +51,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
             <Link
               to="/register"
               search={{ redirect }}
-              className="font-bold text-[#FF4D4D] hover:underline"
+              className="font-bold text-brand hover:underline"
             >
               Créer un compte
             </Link>
@@ -69,7 +69,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
               <div className="mt-2 text-right">
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-semibold text-[#FF4D4D] hover:underline"
+                  className="text-xs font-semibold text-brand hover:underline"
                 >
                   Mot de passe oublié ?
                 </Link>
