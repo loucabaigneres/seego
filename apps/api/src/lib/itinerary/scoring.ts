@@ -29,6 +29,7 @@ function normalize(text: string): string {
   return text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
 }
 
+/** Texte normalisé (titre, lieu, description, sous-catégories) où l'on cherche les mots-clés d'intérêt. */
 function haystack(item: ItinItem): string {
   return normalize(
     [item.title, item.locationName, item.description, ...(item.subcategory ?? [])]
