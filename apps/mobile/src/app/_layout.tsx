@@ -1,12 +1,11 @@
 import '../global.css';
 
-// One import per weight: the package barrel would bundle all 18 Hanken weights.
-import { Fraunces_400Regular } from '@expo-google-fonts/fraunces/400Regular';
-import { Fraunces_400Regular_Italic } from '@expo-google-fonts/fraunces/400Regular_Italic';
-import { HankenGrotesk_400Regular } from '@expo-google-fonts/hanken-grotesk/400Regular';
-import { HankenGrotesk_500Medium } from '@expo-google-fonts/hanken-grotesk/500Medium';
-import { HankenGrotesk_600SemiBold } from '@expo-google-fonts/hanken-grotesk/600SemiBold';
-import { HankenGrotesk_700Bold } from '@expo-google-fonts/hanken-grotesk/700Bold';
+import Fraunces_400Regular from '@seego/ui/fonts/native/Fraunces-Regular.ttf';
+import Fraunces_400Regular_Italic from '@seego/ui/fonts/native/Fraunces-Italic.ttf';
+import HankenGrotesk_400Regular from '@seego/ui/fonts/native/HankenGrotesk-Regular.ttf';
+import HankenGrotesk_500Medium from '@seego/ui/fonts/native/HankenGrotesk-Medium.ttf';
+import HankenGrotesk_600SemiBold from '@seego/ui/fonts/native/HankenGrotesk-SemiBold.ttf';
+import HankenGrotesk_700Bold from '@seego/ui/fonts/native/HankenGrotesk-Bold.ttf';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';

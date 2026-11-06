@@ -1,9 +1,17 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { buildThemeCss } from './css';
-import { colors, GOOGLE_FONTS_HREF, palette, radii, SCREEN_MARGIN, typeScale } from './index';
+import {
+  colors,
+  NATIVE_FONT_FILES,
+  palette,
+  radii,
+  SCREEN_MARGIN,
+  typeScale,
+  webFonts,
+} from './index';
 import { tailwindTheme } from './tailwind';
 
 describe('tokens', () => {
@@ -59,12 +67,26 @@ describe('tailwind v4 @theme css', () => {
   });
 });
 
-describe('web fonts', () => {
-  it.each(['web', 'landing-page'])('%s loads exactly the shared Google Fonts stylesheet', (app) => {
-    const html = readFileSync(
-      fileURLToPath(new URL(`../../../apps/${app}/index.html`, import.meta.url)),
-      'utf8',
-    );
-    expect(html.replaceAll('&amp;', '&')).toContain(`href="${GOOGLE_FONTS_HREF}"`);
+describe('self-hosted fonts', () => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const css = readFileSync(`${root}src/fonts.css`, 'utf8');
+
+  it('ships every file declared in fonts.css', () => {
+    const urls = [...css.matchAll(/url\('\.\.\/(fonts\/web\/[^']+)'\)/g)].map((m) => m[1]);
+    expect(urls.length).toBeGreaterThan(0);
+    for (const url of urls) expect(existsSync(`${root}${url}`), url).toBe(true);
+  });
+
+  it('declares the families of the typography tokens', () => {
+    for (const family of ['Fraunces', 'Hanken Grotesk'])
+      expect(css).toContain(`font-family: '${family}'`);
+    expect(webFonts.display).toContain("'Fraunces'");
+    expect(webFonts.sans).toContain("'Hanken Grotesk'");
+  });
+
+  it('ships the static files the mobile app loads', () => {
+    for (const file of Object.values(NATIVE_FONT_FILES)) {
+      expect(existsSync(`${root}fonts/native/${file}`), file).toBe(true);
+    }
   });
 });

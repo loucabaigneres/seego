@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 /* Colors, fonts, radii and type scale come from the shared charte (packages/ui). */
 @import '@seego/ui/css';
+@import '@seego/ui/fonts.css';
 
 @theme {
   --animate-float: float 6s ease-in-out infinite;

@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@seego/ui/css';
+@import '@seego/ui/fonts.css';
 
 /* ── TripMap markers ── */
 

@@ -9,7 +9,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./tailwind": "./src/tailwind.ts",
-    "./css": "./src/theme.css"
+    "./css": "./src/theme.css",
+    "./fonts.css": "./src/fonts.css",
+    "./fonts/*": "./fonts/*"
   },
   "scripts": {
     "generate:css": "tsx scripts/generate-css.ts",
