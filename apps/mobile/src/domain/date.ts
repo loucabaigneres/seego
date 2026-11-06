@@ -11,6 +11,13 @@ export function formatDate(
   return date.toLocaleDateString(LOCALE, { day: 'numeric', month, year: 'numeric' });
 }
 
+/** "12 janv." — for compact labels where the year is obvious. */
+export function formatDayMonth(value: string | null | undefined): string {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
+}
+
 /** `YYYY-MM-DD` in local time: `toISOString()` is UTC and can shift the day near midnight. */
 export function toIsoDate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
