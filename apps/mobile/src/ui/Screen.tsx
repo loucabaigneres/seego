@@ -19,6 +19,8 @@ export interface ScreenProps {
   onScroll?: ScrollViewProps['onScroll'];
   /** Only with `scroll`: false hands vertical drags to the content (a map, say). */
   scrollEnabled?: boolean;
+  /** Pinned under the content (an action bar), outside the scroll. */
+  footer?: ReactNode;
 }
 
 export function Screen({
@@ -31,6 +33,7 @@ export function Screen({
   scrollRef,
   onScroll,
   scrollEnabled,
+  footer,
 }: ScreenProps) {
   const contentClasses = cn('px-6 py-6', contentClassName);
 
@@ -53,6 +56,7 @@ export function Screen({
       ) : (
         <View className={cn('flex-1', contentClasses)}>{children}</View>
       )}
+      {footer}
     </SafeAreaView>
   );
 }
