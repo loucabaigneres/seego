@@ -14,9 +14,9 @@ With `pip install fonttools brotli`:
 
 - `web/Fraunces*.woff2`: `fontTools.varLib.instancer` with `SOFT=0, WONK=0, wght=400:700` (the `opsz` axis is kept, browsers apply it automatically), then `pyftsubset`-style Latin subset (U+0000-00FF, œ, €, typographic punctuation, arrows) and woff2.
 - `web/HankenGrotesk-Variable.woff2`: `wght=400:900`, same subset.
-- `native/Fraunces-{Regular,Italic}.ttf`: instance at `opsz=36, wght=400, SOFT=0, WONK=0` (React Native cannot use variable fonts).
+- `native/Fraunces-{Regular,Italic}.ttf`: instance at `opsz=36, wght=400, SOFT=0, WONK=0` (React Native cannot use variable fonts). The `name` table is rewritten so the PostScript name matches the file name (`Fraunces-Regular`, `Fraunces-Italic`), as Expo recommends.
 - `native/HankenGrotesk-*.ttf`: static files from the Google Fonts download, unchanged.
 
 ## Changing a font
 
-Replace the files, keep their names (or update `src/fonts.css` and the `useFonts` call in `apps/mobile/src/app/_layout.tsx`), and keep the family names in `src/typography.ts` in sync.
+Replace the files, keep their names (or update `src/fonts.css` and the `fonts` list of the `expo-font` plugin in `apps/mobile/app.json`), and keep the family names in `src/typography.ts` in sync.

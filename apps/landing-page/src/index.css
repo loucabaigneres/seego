@@ -64,8 +64,8 @@
 /* ── Boarding pass: soft apricot glows + silver foil on hover (no filters, so nothing leaks past the rounded corners) ── */
 .boarding-pass {
   background-image:
-    radial-gradient(circle at 100% 0%, rgb(240 138 93 / 0.28), transparent 45%),
-    radial-gradient(circle at 0% 100%, rgb(240 138 93 / 0.14), transparent 45%);
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-cta) 28%, transparent), transparent 45%),
+    radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--color-cta) 14%, transparent), transparent 45%);
 }
 .boarding-pass .foil {
   opacity: 0;

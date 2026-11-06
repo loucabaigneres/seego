@@ -3,15 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 import { buildThemeCss } from './css';
-import {
-  colors,
-  NATIVE_FONT_FILES,
-  palette,
-  radii,
-  SCREEN_MARGIN,
-  typeScale,
-  webFonts,
-} from './index';
+import { colors, fonts, palette, radii, SCREEN_MARGIN, typeScale, webFonts } from './index';
 import { tailwindTheme } from './tailwind';
 
 describe('tokens', () => {
@@ -84,9 +76,9 @@ describe('self-hosted fonts', () => {
     expect(webFonts.sans).toContain("'Hanken Grotesk'");
   });
 
-  it('ships the static files the mobile app loads', () => {
-    for (const file of Object.values(NATIVE_FONT_FILES)) {
-      expect(existsSync(`${root}fonts/native/${file}`), file).toBe(true);
+  it('ships a static file for every React Native family name', () => {
+    for (const family of Object.values(fonts)) {
+      expect(existsSync(`${root}fonts/native/${family}.ttf`), family).toBe(true);
     }
   });
 });
