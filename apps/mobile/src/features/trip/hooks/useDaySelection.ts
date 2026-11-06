@@ -25,6 +25,11 @@ export function useDaySelection(days: TripDay[]) {
   const showAll = selectedId === ALL_DAYS;
   const selectedDay = days.find((day) => day.id === selectedId) ?? days[0];
 
+  /** Scrolls the hero away, leaving the picker at the top of the screen. */
+  const scrollToPicker = (animated = false) => {
+    scrollRef.current?.scrollTo({ y: pickerY.current, animated });
+  };
+
   /** A day id, or `ALL_DAYS`. */
   const select = (id: string) => {
     if (id === selectedId) return;
@@ -33,9 +38,7 @@ export function useDaySelection(days: TripDay[]) {
     setDirection(position(id) >= position(selectedId) ? 'forward' : 'backward');
     setSelectedId(id);
     // Picker stuck at the top: show the new day from its first step, not from the old scroll depth.
-    if (scrollY.current > pickerY.current) {
-      scrollRef.current?.scrollTo({ y: pickerY.current, animated: false });
-    }
+    if (scrollY.current > pickerY.current) scrollToPicker();
   };
 
   return {
@@ -43,6 +46,7 @@ export function useDaySelection(days: TripDay[]) {
     shownDays: showAll ? days : selectedDay ? [selectedDay] : [],
     direction,
     select,
+    scrollToPicker,
     scrollRef,
     onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       scrollY.current = event.nativeEvent.contentOffset.y;

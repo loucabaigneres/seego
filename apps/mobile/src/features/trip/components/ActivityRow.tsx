@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
+import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { categoryMeta, cleanDescription } from '@/domain/place';
@@ -9,13 +10,25 @@ import { ArrowSquareOutIcon, MapPinIcon } from '@/ui/icons';
 
 import type { TripActivity } from '../hooks/useTrip';
 
-export function ActivityRow({ activity }: { activity: TripActivity }) {
+export interface ActivityRowProps {
+  activity: TripActivity;
+  /** Controls under the text: "Changer", or the edit buttons. */
+  action?: ReactNode;
+  onLongPress?: () => void;
+}
+
+export function ActivityRow({ activity, action, onLongPress }: ActivityRowProps) {
   const meta = categoryMeta(activity.category);
   const description = cleanDescription(activity.description);
   const { sourceUrl } = activity;
 
   return (
-    <View className="flex-row gap-3 rounded-field bg-surface p-3">
+    <Pressable
+      onLongPress={onLongPress}
+      disabled={!onLongPress}
+      accessibilityHint={onLongPress ? 'Appui long pour remplacer ce lieu' : undefined}
+      className="flex-row gap-3 rounded-field bg-surface p-3"
+    >
       <View
         className="size-[76px] items-center justify-center overflow-hidden rounded-xl"
         style={{ backgroundColor: meta.colors.fill }}
@@ -70,7 +83,9 @@ export function ActivityRow({ activity }: { activity: TripActivity }) {
             <ArrowSquareOutIcon size={14} color={colors.brand} />
           </Pressable>
         )}
+
+        {action && <View className="mt-1">{action}</View>}
       </View>
-    </View>
+    </Pressable>
   );
 }
