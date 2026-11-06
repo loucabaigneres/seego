@@ -1,35 +1,41 @@
 import { useEffect, useState } from 'react';
 import { Plane } from 'lucide-react';
 
-const SECTIONS = [
-  { id: 'top', label: 'Accueil' },
-  { id: 'departs', label: 'Départs' },
-  { id: 'globe', label: 'Globe' },
-  { id: 'itineraire', label: 'Itinéraire' },
-  { id: 'faq', label: 'FAQ' },
-  { id: 'embarquement', label: 'Embarquement' },
-];
+type Section = { id: string; label: string };
 
 /** Side navigation drawn as a route: one stop per section, the plane marks where you are. */
-export function SectionNav() {
-  const [active, setActive] = useState('top');
+export function SectionNav({ sections }: { sections: Section[] }) {
+  const [active, setActive] = useState(sections[0].id);
+  const ids = sections.map((s) => s.id).join(',');
 
   useEffect(() => {
-    // A section is "current" when it crosses the middle of the viewport.
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: '-50% 0px -50% 0px' },
-    );
-    SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
+    // The current section is the last one (in page order) whose top has passed the middle of
+    // the screen. Reading positions on scroll never skips a section, even a short one crossed
+    // in a single frame, and nested blocks (the FAQ inside the take-off section) work too.
+    const order = ids.split(',');
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const middle = window.innerHeight / 2;
+      let current = order[0];
+      for (const id of order) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= middle) current = id;
+      }
+      setActive(current);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [ids]);
 
   return (
     <nav
@@ -41,7 +47,7 @@ export function SectionNav() {
         aria-hidden="true"
       />
       <ul className="relative flex flex-col items-center gap-5">
-        {SECTIONS.map(({ id, label }) => {
+        {sections.map(({ id, label }) => {
           const current = id === active;
           return (
             <li key={id}>

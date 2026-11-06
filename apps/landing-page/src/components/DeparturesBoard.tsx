@@ -1,6 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { PlaneTakeoff } from 'lucide-react';
-import { useInView, useReducedMotion } from 'motion/react';
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from 'motion/react';
+import { useScrub } from '../lib/useScrub';
 import { Reveal } from './Reveal';
 
 type Departure = {
@@ -86,12 +94,101 @@ function FlapText({ text, run, delay = 0 }: { text: string; run: boolean; delay?
   );
 }
 
+const ROW_CLASS =
+  'grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-3 rounded-xl bg-white/[0.04] px-3 py-3 font-mono text-sm font-bold tracking-wider text-white sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4 sm:text-base';
+
+/** A board row that slides in from alternating sides as the board scrolls into place. */
+function ScrollRow({
+  progress,
+  index,
+  children,
+}: {
+  progress: MotionValue<number>;
+  index: number;
+  children: ReactNode;
+}) {
+  const start = 0.3 + index * 0.08;
+  const x = useScrub(progress, [start, start + 0.3], [index % 2 ? 80 : -80, 0]);
+  const opacity = useScrub(progress, [start, start + 0.25], [0, 1]);
+  return (
+    <motion.li style={{ x, opacity }} className={ROW_CLASS}>
+      {children}
+    </motion.li>
+  );
+}
+
+/** Departures board whose entrance follows the scroll: a plane takes off, the board tilts up, rows slide in. */
 export function DeparturesBoard() {
+  const sectionRef = useRef<HTMLElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(boardRef, { once: true, margin: '0px 0px -20% 0px' });
 
+  // 0 when the section top enters the screen, 1 when the board sits in the middle.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'center center'],
+  });
+  const boardRotateX = useScrub(scrollYProgress, [0.2, 0.9], [32, 0]);
+  const boardScale = useScrub(scrollYProgress, [0.2, 0.9], [0.86, 1]);
+  const boardY = useScrub(scrollYProgress, [0.2, 0.9], [120, 0]);
+  // Take-off: rolls along the runway, then climbs out of the frame.
+  const planeLeft = useScrub(scrollYProgress, [0, 0.8], ['0%', '100%']);
+  const planeY = useTransform(scrollYProgress, (p) => -(Math.max(0, (p - 0.35) / 0.45) ** 2) * 70);
+  // Nose lifts as it leaves the runway, then the plane fades out before reaching the title.
+  const planeRotate = useTransform(
+    scrollYProgress,
+    (p) => -18 * Math.min(1, Math.max(0, (p - 0.35) / 0.12)),
+  );
+  const planeOpacity = useScrub(scrollYProgress, [0.72, 0.85], [1, 0]);
+
+  const rows = DEPARTURES.map((d, row) => (
+    <>
+      <span className="text-white/60">
+        <FlapText text={d.flight} run={inView} delay={row * 140} />
+      </span>
+      <span className="min-w-0 truncate">
+        <FlapText text={d.city} run={inView} delay={row * 140 + 80} />
+        <span className="ml-2 hidden font-sans text-xs font-medium tracking-normal text-white/40 md:inline">
+          {d.country}
+        </span>
+      </span>
+      <span className="hidden text-amber-300 sm:block">
+        <FlapText text={d.time} run={inView} delay={row * 140 + 160} />
+      </span>
+      <span
+        className={`text-right text-[0.65rem] sm:text-left sm:text-xs ${
+          d.live ? 'animate-blink text-accent' : 'text-[#9fc3b2]'
+        }`}
+      >
+        <FlapText text={d.status} run={inView} delay={row * 140 + 240} />
+      </span>
+    </>
+  ));
+
+  const board = (
+    <div
+      ref={boardRef}
+      className="overflow-hidden rounded-3xl bg-ink p-2 shadow-2xl shadow-black/20 sm:p-3"
+    >
+      <div className="grid grid-cols-[4.5rem_1fr_auto] gap-x-3 px-3 pb-2 pt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40 sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4">
+        <span>Vol</span>
+        <span>Destination</span>
+        <span className="hidden sm:block">Heure</span>
+        <span className="text-right sm:text-left">Statut</span>
+      </div>
+
+      <ul className="space-y-1.5">
+        {DEPARTURES.map((d, row) => (
+          <ScrollRow key={d.flight} progress={scrollYProgress} index={row}>
+            {rows[row]}
+          </ScrollRow>
+        ))}
+      </ul>
+    </div>
+  );
+
   return (
-    <section id="departs" className="relative border-t border-line/60">
+    <section ref={sectionRef} id="departs" className="relative border-t border-line/60">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-6 lg:py-24">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1 text-xs font-bold text-muted">
@@ -106,48 +203,24 @@ export function DeparturesBoard() {
           </p>
         </Reveal>
 
-        <Reveal from="scale" className="mt-10">
-          <div
-            ref={boardRef}
-            className="overflow-hidden rounded-3xl bg-ink p-2 shadow-2xl shadow-black/20 sm:p-3"
+        {/* Runway with a plane taking off as you scroll */}
+        <div className="relative mx-auto mt-10 h-10 max-w-2xl" aria-hidden="true">
+          <span className="absolute inset-x-0 bottom-2 border-t-2 border-dashed border-line" />
+          <motion.span
+            style={{ left: planeLeft, y: planeY, rotate: planeRotate, opacity: planeOpacity }}
+            className="absolute bottom-0 -translate-x-1/2 text-accent"
           >
-            <div className="grid grid-cols-[4.5rem_1fr_auto] gap-x-3 px-3 pb-2 pt-1 font-mono text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40 sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4">
-              <span>Vol</span>
-              <span>Destination</span>
-              <span className="hidden sm:block">Heure</span>
-              <span className="text-right sm:text-left">Statut</span>
-            </div>
-
-            <ul className="space-y-1.5">
-              {DEPARTURES.map((d, row) => (
-                <li
-                  key={d.flight}
-                  className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-x-3 rounded-xl bg-white/[0.04] px-3 py-3 font-mono text-sm font-bold tracking-wider text-white sm:grid-cols-[6rem_1fr_5rem_9rem] sm:px-4 sm:text-base"
-                >
-                  <span className="text-white/60">
-                    <FlapText text={d.flight} run={inView} delay={row * 140} />
-                  </span>
-                  <span className="min-w-0 truncate">
-                    <FlapText text={d.city} run={inView} delay={row * 140 + 80} />
-                    <span className="ml-2 hidden font-sans text-xs font-medium tracking-normal text-white/40 md:inline">
-                      {d.country}
-                    </span>
-                  </span>
-                  <span className="hidden text-amber-300 sm:block">
-                    <FlapText text={d.time} run={inView} delay={row * 140 + 160} />
-                  </span>
-                  <span
-                    className={`text-right text-[0.65rem] sm:text-left sm:text-xs ${
-                      d.live ? 'animate-blink text-accent' : 'text-[#9fc3b2]'
-                    }`}
-                  >
-                    <FlapText text={d.status} run={inView} delay={row * 140 + 240} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Reveal>
+            <PlaneTakeoff className="h-7 w-7" />
+          </motion.span>
+        </div>
+        <div className="mt-6 [perspective:1200px]">
+          <motion.div
+            style={{ rotateX: boardRotateX, scale: boardScale, y: boardY }}
+            className="origin-bottom"
+          >
+            {board}
+          </motion.div>
+        </div>
       </div>
     </section>
   );

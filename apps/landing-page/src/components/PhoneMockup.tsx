@@ -1,15 +1,5 @@
 import { Heart, MapPin, Star, X } from 'lucide-react';
-
-// Free photos under the Unsplash License, served by the Unsplash CDN (resized on the fly).
-const unsplash = (id: string, width: number) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&h=${Math.round(width * 1.6)}&q=75`;
-
-const PHOTOS = {
-  // Lisbon, Bica funicular. Photo: Henry Ren
-  front: 'photo-1697748525265-7431cba075b6',
-  // Kyoto, Yasaka pagoda. Photo: Roméo A.
-  back: 'photo-1624253321171-1be53e12f5f4',
-};
+import { PHOTOS, unsplash } from '../lib/photos';
 
 export function PhoneMockup() {
   return (
@@ -61,7 +51,7 @@ export function PhoneMockup() {
             {/* Peeking card behind */}
             <div className="absolute inset-x-2 top-2 bottom-0 -rotate-[5deg] overflow-hidden rounded-3xl bg-[#8fae9f] shadow-md">
               <img
-                src={unsplash(PHOTOS.back, 480)}
+                src={unsplash(PHOTOS.kyoto, 480)}
                 alt=""
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -72,8 +62,8 @@ export function PhoneMockup() {
             {/* Front card */}
             <div className="absolute inset-0 overflow-hidden rounded-3xl bg-[#d9b98f] shadow-xl">
               <img
-                src={unsplash(PHOTOS.front, 480)}
-                srcSet={`${unsplash(PHOTOS.front, 480)} 1x, ${unsplash(PHOTOS.front, 900)} 2x`}
+                src={unsplash(PHOTOS.lisbon, 480)}
+                srcSet={`${unsplash(PHOTOS.lisbon, 480)} 1x, ${unsplash(PHOTOS.lisbon, 900)} 2x`}
                 alt="Deux tramways jaunes dans une rue en pente de Lisbonne"
                 className="absolute inset-0 h-full w-full object-cover"
                 fetchPriority="high"

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { geoEquirectangular, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import land110m from 'world-atlas/land-110m.json';
-import { MUTED, RADIUS, toVector } from './geometry';
+import { INK, RADIUS, toVector } from './geometry';
 
 const DOT_COUNT = 14000;
 
@@ -62,7 +62,8 @@ export function buildLandDots() {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   const material = new THREE.PointsMaterial({
-    color: MUTED,
+    // Ink continents stay readable on the white sphere against the cream page.
+    color: INK,
     size: 0.024,
     map: dotTexture,
     transparent: true,

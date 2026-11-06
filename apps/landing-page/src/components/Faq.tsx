@@ -31,13 +31,14 @@ const FAQS: QA[] = [
   },
 ];
 
+/** FAQ with frosted cards, made to scroll over the sky photo of the take-off section. */
 export function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="border-t border-line/60 bg-cream">
+    <section id="faq">
       <div className="mx-auto max-w-3xl px-5 py-20 sm:px-6 lg:py-24">
-        <Reveal className="text-center">
+        <Reveal className="mx-auto w-fit rounded-3xl bg-white/70 px-8 py-6 text-center shadow-lg shadow-black/10 backdrop-blur-md">
           <h2 className="text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
             Questions fréquentes
           </h2>
@@ -51,8 +52,8 @@ export function Faq() {
               <Reveal
                 key={item.question}
                 delay={index * 70}
-                className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${
-                  open ? 'border-accent/30' : 'border-line'
+                className={`overflow-hidden rounded-2xl border bg-white/80 shadow-lg shadow-black/10 backdrop-blur-md ${
+                  open ? 'border-accent/30' : 'border-white/60'
                 }`}
               >
                 <button

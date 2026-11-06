@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { DESTINATIONS, ORIGIN, type Place } from './destinations';
 import {
   ACCENT,
   buildAtmosphere,
@@ -9,17 +8,18 @@ import {
   RADIUS,
   TUBE_RADIAL,
   type Marker,
+  type Place,
   type Route,
 } from './geometry';
 import { buildLandDots } from './landDots';
 
-export const ARC_CYCLE = 5; // seconds per route animation loop
-export const BASE_PITCH = THREE.MathUtils.degToRad(32);
-// Face Europe first.
-export const BASE_YAW = THREE.MathUtils.degToRad(-90 - 8);
+const BASE_PITCH = THREE.MathUtils.degToRad(32);
 
-/** Builds the whole globe. `tilt` handles pitch, `spin` (inside it) handles yaw. */
-export function createGlobeScene(places: Place[]) {
+/**
+ * Builds the whole globe. `tilt` handles pitch, `spin` (inside it) handles yaw.
+ * `legs` are the routes drawn between places.
+ */
+export function createGlobeScene(places: Place[], legs: [Place, Place][]) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
   camera.position.set(0, 0, 4.2);
@@ -43,7 +43,7 @@ export function createGlobeScene(places: Place[]) {
     buildLandDots(),
   );
 
-  const routes = DESTINATIONS.map((d) => buildRoute(ORIGIN, d));
+  const routes = legs.map(([from, to]) => buildRoute(from, to));
   routes.forEach(({ tube, traveller }) => spin.add(tube, traveller));
 
   const markers = places.map((p, i) => buildMarker(p, i === 0 ? INK : ACCENT));
@@ -52,20 +52,18 @@ export function createGlobeScene(places: Place[]) {
   return { scene, camera, tilt, spin, routes, markers };
 }
 
-/** Each route grows from Paris, holds, then retracts towards its destination. */
-export function animateRoutes(routes: Route[], time: number) {
+/**
+ * Draws the part of a route between `shrink` and `grow` (both 0..1, from its start).
+ * The traveller dot rides the tip while the route is growing.
+ */
+export function setRouteProgress({ curve, tube, traveller }: Route, grow: number, shrink = 0) {
   const triangle = TUBE_RADIAL * 6;
-  routes.forEach(({ curve, tube, traveller }, i) => {
-    const phase = ((((time + i * 0.9) % ARC_CYCLE) + ARC_CYCLE) % ARC_CYCLE) / ARC_CYCLE;
-    const total = tube.geometry.index?.count ?? 0;
-    const grow = THREE.MathUtils.clamp(phase / 0.45, 0, 1);
-    const shrink = THREE.MathUtils.clamp((phase - 0.8) / 0.2, 0, 1);
-    const startIndex = Math.floor((total * shrink) / triangle) * triangle;
-    const endIndex = Math.floor((total * grow) / triangle) * triangle;
-    tube.geometry.setDrawRange(startIndex, Math.max(0, endIndex - startIndex));
-    traveller.visible = grow > 0 && grow < 1;
-    if (traveller.visible) traveller.position.copy(curve.getPointAt(grow));
-  });
+  const total = tube.geometry.index?.count ?? 0;
+  const startIndex = Math.floor((total * shrink) / triangle) * triangle;
+  const endIndex = Math.floor((total * grow) / triangle) * triangle;
+  tube.geometry.setDrawRange(startIndex, Math.max(0, endIndex - startIndex));
+  traveller.visible = grow > 0 && grow < 1;
+  if (traveller.visible) traveller.position.copy(curve.getPointAt(grow));
 }
 
 export function animateMarkers(markers: Marker[], time: number, reduced: boolean) {
