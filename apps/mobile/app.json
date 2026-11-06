@@ -28,6 +28,10 @@
       ],
       "expo-font",
       "expo-secure-store",
+      "expo-image",
+      "expo-sharing",
+      "expo-status-bar",
+      "expo-web-browser",
       "@react-native-community/datetimepicker"
     ],
     "experiments": {
