@@ -54,6 +54,19 @@ export const auth = betterAuth({
     //     }
     //   : {}),
   },
+  // Le front (app.seego.fr / *.vercel.app) et l'API sont sur des sites différents :
+  // le cookie de session doit être SameSite=None; Secure pour être renvoyé en cross-site.
+  // En dev (localhost, HTTP) on garde les valeurs par défaut.
+  ...(env.NODE_ENV === 'development'
+    ? {}
+    : {
+        advanced: {
+          defaultCookieAttributes: {
+            sameSite: 'none' as const,
+            secure: true,
+          },
+        },
+      }),
   trustedOrigins: [
     'https://app.seego.fr',
     'https://seego-app.vercel.app',
