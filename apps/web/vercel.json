@@ -1,12 +1,9 @@
 {
   "rewrites": [
     {
-      "source": "/api/auth/:path*",
-      "destination": "https://voyagr-api-stg.onrender.com/api/auth/:path*"
-    },
-    { "source": "/trpc/:path*", "destination": "https://voyagr-api-stg.onrender.com/trpc/:path*" },
-    { "source": "/image-proxy", "destination": "https://voyagr-api-stg.onrender.com/image-proxy" },
-    { "source": "/(.*)", "destination": "/index.html" }
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {
