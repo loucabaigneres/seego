@@ -16,6 +16,7 @@ jobs:
       docker_tag: ${{ steps.set-env.outputs.docker_tag }}
       vercel_args: ${{ steps.set-env.outputs.vercel_args }}
       vercel_env: ${{ steps.set-env.outputs.vercel_env }}
+      api_url: ${{ steps.set-env.outputs.api_url }}
     steps:
       - id: set-env
         run: |
@@ -24,11 +25,13 @@ jobs:
             echo "docker_tag=latest" >> $GITHUB_OUTPUT
             echo "vercel_args=--prod" >> $GITHUB_OUTPUT
             echo "vercel_env=production" >> $GITHUB_OUTPUT
+            echo "api_url=https://voyagr-api.onrender.com" >> $GITHUB_OUTPUT
           else
             echo "env_name=staging" >> $GITHUB_OUTPUT
             echo "docker_tag=staging" >> $GITHUB_OUTPUT
             echo "vercel_args=" >> $GITHUB_OUTPUT
             echo "vercel_env=preview" >> $GITHUB_OUTPUT
+            echo "api_url=https://voyagr-api-stg.onrender.com" >> $GITHUB_OUTPUT
           fi
 
   quality-check:
@@ -159,6 +162,9 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Point the API proxy (vercel.json rewrites) at this environment's API
+        run: node apps/web/scripts/set-api-proxy.mjs ${{ needs.setup-environment.outputs.api_url }}
 
       - name: Build Project Artifacts (Vercel)
         run: vercel build ${{ needs.setup-environment.outputs.vercel_args }} --token=${{ secrets.VERCEL_TOKEN }} --cwd=apps/web

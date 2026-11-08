@@ -1,6 +1,6 @@
 import { categoryColors, colors } from '@seego/ui'
 import { Document, Image, Link, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
-import { env } from '@/config/env'
+import { apiUrl } from '@/config/env'
 
 // ─── Types (mirrors getTrip output) ──────────────────────────────────────────
 
@@ -63,7 +63,7 @@ function cleanDesc(desc: string): string {
  * relays them instead.
  */
 function proxiedImage(url: string): string {
-  return `${env.VITE_API_URL}/image-proxy?url=${encodeURIComponent(url)}`
+  return `${apiUrl}/image-proxy?url=${encodeURIComponent(url)}`
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string; tint: string; text: string }> = {
