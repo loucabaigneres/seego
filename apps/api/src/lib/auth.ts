@@ -19,7 +19,7 @@ const devOrigins = [
   'http://localhost:8081',
 ];
 
-const isApiOverHttps = env.BETTER_AUTH_URL.startsWith('https://');
+export const isApiOverHttps = env.BETTER_AUTH_URL.startsWith('https://');
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
