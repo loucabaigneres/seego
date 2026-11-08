@@ -3,6 +3,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": ["VITE_*"],
       "outputs": ["dist/**", "build/**"]
     },
     "start": {
@@ -28,6 +29,9 @@
     },
     "format": {
       "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^typecheck"]
     }
   }
 }

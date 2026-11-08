@@ -1,7 +1,7 @@
+import { trip, userOnboarding } from '@seego/database';
+import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../init.js';
 import { submitOnboardingSchema } from '../schemas/onboarding.js';
-import { trip, userOnboarding } from '@voyagr/database';
-import { z } from 'zod';
 
 export const onboardingRouter = createTRPCRouter({
   startDirectTrip: publicProcedure

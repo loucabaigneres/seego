@@ -19,9 +19,8 @@ const TONES = {
   secondary: 'text-ink-secondary',
   muted: 'text-ink-muted',
   brand: 'text-brand',
-  primary: 'text-primary-text',
   accent: 'text-accent',
-  success: 'text-success',
+  success: 'text-success-text',
   inverse: 'text-ink-inverse',
 } as const;
 
@@ -50,9 +49,4 @@ export function Text({ variant = 'body', tone, className, ...props }: TextProps)
       {...props}
     />
   );
-}
-
-/** Italic serif for the words that carry emotion, nested in a title: `ta prochaine <Em>escapade</Em>`. */
-export function Em({ className, ...props }: RNTextProps & { className?: string }) {
-  return <RNText className={cn('font-display-italic', className)} {...props} />;
 }

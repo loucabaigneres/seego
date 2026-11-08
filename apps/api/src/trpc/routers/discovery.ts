@@ -1,13 +1,12 @@
-// import type { VoyagrDb } from '#/db/voyagr';
-import type { Context } from '../context.js';
+import type { DiscoveryContentData } from '@seego/database';
 import type { TRPCRouterRecord } from '@trpc/server';
 import { TRPCError } from '@trpc/server';
-import type { DiscoveryContentData } from '@voyagr/database';
 import { eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { DiscoveryItem, SwipeRecord } from '../../lib/recommendation/algorithm.js';
 import { rankDestinations, recommend } from '../../lib/recommendation/algorithm.js';
 import { activity, discoveryContent, swipes, trip, tripDay } from '../../lib/tables.js';
+import type { Context } from '../context.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';
 
 // ─── Catalog ────────────────────────────────────────────────────────────────────
@@ -217,7 +216,12 @@ export const discoveryRouter = {
    * places in that city saved as activities. Requires a running, seeded DB.
    */
   saveTrip: publicProcedure
-    .input(z.object({ swipes: z.array(swipeInput) }))
+    .input(
+      z.object({
+        tripId: z.string().nullish(),
+        swipes: z.array(swipeInput),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const catalog = await getCatalog(ctx.db);
       const history = buildSwipeHistory(input.swipes, catalog);
@@ -228,7 +232,7 @@ export const discoveryRouter = {
       if (!top) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
-          message: 'Aucune destination déterminée — pas assez de swipes.',
+          message: 'Aucune destination déterminée / pas assez de swipes.',
         });
       }
 
@@ -271,59 +275,119 @@ export const discoveryRouter = {
         .filter((s) => s.liked && s.item.city === top.city)
         .map((s) => s.item);
 
-      const [createdTrip] = await ctx.db
-        .insert(trip)
-        .values({
-          userId,
-          title: `Voyage à ${top.city}`,
-          destination: top.city,
-          status: 'draft',
-        })
-        .returning({ id: trip.id });
+      let targetTripId = input.tripId ?? undefined;
 
-      // 3. A single day to hold the liked places.
-      const [day] = await ctx.db
-        .insert(tripDay)
-        .values({
-          tripId: createdTrip.id,
-          dayIndex: 0,
-          summary: `Lieux likés à ${top.city}`,
-        })
-        .returning({ id: tripDay.id });
+      if (userId !== 'guest') {
+        const pendingGroupTrip = await ctx.db.query.trip.findFirst({
+          where: (t, { and, eq, or, isNull }) =>
+            and(
+              eq(t.userId, userId),
+              eq(t.isGroup, true),
+              or(
+                isNull(t.destination),
+                eq(t.destination, 'Destination à définir'),
+                eq(t.destination, 'Nouvelle aventure'),
+              ),
+            ),
+          orderBy: (t, { desc }) => [desc(t.createdAt)],
+        });
 
-      // 4. One activity per liked place that exists in the database.
-      const activityValues = likedInCity.flatMap((item, index) => {
-        const row = rowByUrl.get(item.url);
-        if (!row) return [];
-        return [
-          {
-            tripDayId: day.id,
-            discoveryContentId: row.id,
-            title: row.locationName ?? item.locationName ?? 'Lieu',
-            locationName: row.locationName,
-            coordinates: row.coordinates,
-            orderIndex: index,
-          },
-        ];
-      });
-      if (activityValues.length > 0) {
-        await ctx.db.insert(activity).values(activityValues);
+        if (pendingGroupTrip) {
+          if (targetTripId && targetTripId !== pendingGroupTrip.id) {
+            await ctx.db
+              .delete(trip)
+              .where(eq(trip.id, targetTripId))
+              .catch(() => {});
+          }
+          targetTripId = pendingGroupTrip.id;
+        }
       }
 
+      // Steps 2 to 4 run in one transaction: a crash midway must not leave the
+      // trip without its liked places (old day 0 deleted, new one not created).
+      const { tripId, activityCount } = await ctx.db.transaction(async (tx) => {
+        let tripId = targetTripId;
+
+        if (tripId) {
+          // Mise à jour du voyage (conserve isGroup et inviteCode existants)
+          await tx
+            .update(trip)
+            .set({
+              title: `Voyage à ${top.city}`,
+              destination: top.city,
+              status: 'draft',
+              updatedAt: new Date(),
+            })
+            .where(eq(trip.id, tripId));
+
+          // Nettoyage de l'ancien jour 0 pour éviter les doublons
+          const existingDay0 = await tx.query.tripDay.findFirst({
+            where: (td, { and, eq }) => and(eq(td.tripId, tripId!), eq(td.dayIndex, 0)),
+          });
+          if (existingDay0) {
+            // Its liked places first: they reference the day (foreign key).
+            await tx.delete(activity).where(eq(activity.tripDayId, existingDay0.id));
+            await tx.delete(tripDay).where(eq(tripDay.id, existingDay0.id));
+          }
+        } else {
+          const [createdTrip] = await tx
+            .insert(trip)
+            .values({
+              userId,
+              title: `Voyage à ${top.city}`,
+              destination: top.city,
+              status: 'draft',
+            })
+            .returning({ id: trip.id });
+          tripId = createdTrip.id;
+        }
+
+        // 3. A single day to hold the liked places.
+        const [day] = await tx
+          .insert(tripDay)
+          .values({
+            tripId,
+            dayIndex: 0,
+            summary: `Lieux likés à ${top.city}`,
+          })
+          .returning({ id: tripDay.id });
+
+        // 4. One activity per liked place that exists in the database.
+        const activityValues = likedInCity.flatMap((item, index) => {
+          const row = rowByUrl.get(item.url);
+          if (!row) return [];
+          return [
+            {
+              tripDayId: day.id,
+              discoveryContentId: row.id,
+              title: row.locationName ?? item.locationName ?? 'Lieu',
+              locationName: row.locationName,
+              coordinates: row.coordinates,
+              orderIndex: index,
+            },
+          ];
+        });
+        if (activityValues.length > 0) {
+          await tx.insert(activity).values(activityValues);
+        }
+
+        return { tripId, activityCount: activityValues.length };
+      });
+
       return {
-        tripId: createdTrip.id,
+        tripId,
         destination: top.city,
         country: top.country,
-        activityCount: activityValues.length,
+        activityCount,
         swipesRecorded: swipeValues.length,
-        unresolved: likedInCity.length - activityValues.length,
+        unresolved: likedInCity.length - activityCount,
       };
     }),
 
   // ─── Admin ─────────────────────────────────────────────────────────────────────
 
   /** Throws FORBIDDEN if the calling user is not an admin. */
-  // async function requireAdmin(ctx: { db: VoyagrDb; userId: string }) {
+  // async function requireAdmin(ctx: { db: SeegoDb; userId: string }) {
   //   if (ctx.userId === 'guest') {
   //     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Non authentifié.' });
   //   }

@@ -1,6 +1,6 @@
-# 🗺️ Voyagr Project
+# 🗺️ Seego Project
 
-Welcome to the main repository for the Voyagr project! This repository uses a **Monorepo** architecture powered by [Turborepo](https://turborepo.dev/) and [pnpm](https://pnpm.io/).
+Welcome to the main repository for the Seego project! This repository uses a **Monorepo** architecture powered by [Turborepo](https://turborepo.dev/) and [pnpm](https://pnpm.io/).
 
 ## 🛠️ Tech Stack
 
@@ -20,7 +20,7 @@ Welcome to the main repository for the Voyagr project! This repository uses a **
 The codebase is divided into executable applications and shared packages.
 
 ```bash
-voyagr/
+seego/
 ├── apps/
 │   ├── api/              # The backend server (Fastify + tRPC + Better Auth)
 │   ├── mobile/           # The mobile application (React Native + Expo)
@@ -60,7 +60,7 @@ The project uses Zod for strict environment validation. You need to create three
 Create `apps/api/.env`:
 
 ```env
-DATABASE_URL=postgres://admin:password@db:5432/voyagr
+DATABASE_URL=postgres://admin:password@db:5432/seego
 PORT=3000
 NODE_ENV=development
 BETTER_AUTH_SECRET=generate_a_random_string_here
@@ -68,6 +68,10 @@ BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=found_in_your_google_cloud_console
 GOOGLE_CLIENT_SECRET=found_in_your_google_cloud_console
 FRONTEND_URL=http://localhost:5173
+
+# AI Analysis Configuration (optional to start the server, required to analyze posts)
+AI_MODEL=google:gemini-flash-lite-latest
+GEMINI_API_KEY=your_google_ai_studio_api_key
 ```
 
 Create `apps/web/.env`:
@@ -84,10 +88,21 @@ EXPO_PUBLIC_API_URL=http://localhost:3000
 
 > ⚠️ **Note for Mobile testing:** _If you are testing the mobile app on a physical device using Expo Go, `localhost` will not work. You must replace it with your computer's local IP address (e.g., `EXPO_PUBLIC_API_URL=http://192.168.1.X:3000`)._
 
+#### Mobile authentication (Better Auth)
+
+The mobile app signs in through the API's Better Auth, with the `@better-auth/expo` plugin: the session lives in SecureStore, and everything runs in Expo Go (no development build).
+
+- **Email / password** works on every target, including a LAN IP.
+- **Google** uses the browser redirect flow, so Google must reach the API's callback (`<BETTER_AUTH_URL>/api/auth/callback/google`, listed in the Google Cloud Console). Google refuses private IPs, so:
+  - **iOS simulator**: `http://localhost:3000` works as is.
+  - **Android emulator or USB device**: run `adb reverse tcp:3000 tcp:3000`, then use `EXPO_PUBLIC_API_URL=http://localhost:3000`.
+  - **Physical iPhone**: expose the API through an HTTPS tunnel (e.g. `ngrok http 3000`), set the tunnel URL as `BETTER_AUTH_URL` (API) and `EXPO_PUBLIC_API_URL` (mobile), and add `<tunnel>/api/auth/callback/google` to the Google console.
+- The API trusts the app scheme `seego://` and, in development, Expo Go (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
+
 Create `packages/database/.env`:
 
 ```env
-DATABASE_URL=postgres://admin:password@localhost:5432/voyagr
+DATABASE_URL=postgres://admin:password@localhost:5432/seego
 ```
 
 ### 4. Start the Backend Infrastructure (Docker)
@@ -105,9 +120,9 @@ docker-compose up -d
 We use strict migration flows. First, generate the SQL migration files, apply them to the database, and finally inject the test data:
 
 ```bash
-pnpm --filter @voyagr/database db:generate
-pnpm --filter @voyagr/database db:migrate
-pnpm --filter @voyagr/database db:seed
+pnpm --filter @seego/database db:generate
+pnpm --filter @seego/database db:migrate
+pnpm --filter @seego/database db:seed
 ```
 
 > ℹ️ Note on `data.json`: The discovery content seed (`discovery.seed.ts`) imports extra locations from `packages/database/data.json` if the file is present. This file is gitignored (large scraped dataset) — without it, the seed simply skips this step and only inserts the test data.
@@ -119,7 +134,7 @@ Since the backend is already running via Docker, you only need to start the fron
 #### Run the Web App:
 
 ```bash
-pnpm turbo run dev --filter=@voyagr/web
+pnpm turbo run dev --filter=@seego/web
 ```
 
 ✅ The Web App will be accessible at `http://localhost:5173`
@@ -127,13 +142,13 @@ pnpm turbo run dev --filter=@voyagr/web
 #### Run the Mobile App:
 
 ```bash
-pnpm turbo run dev --filter=@voyagr/mobile
+pnpm turbo run dev --filter=@seego/mobile
 ```
 
 Or
 
 ```bash
-pnpm turbo run dev --filter=@voyagr/mobile --ui=tui
+pnpm turbo run dev --filter=@seego/mobile --ui=tui
 ```
 
 ✅ Scan the QR code in your terminal with the Expo Go app on your phone, or press `i` to open the iOS simulator / `a` for the Android emulator.
@@ -176,14 +191,14 @@ _Example:_ `git commit -m "feat: add user authentication via BetterAuth"`
 
 Thanks to Turborepo, you can run commands from the root to target specific projects.
 
-| Action                        | Command                                      |
-| ----------------------------- | -------------------------------------------- |
-| **Start the API**             | `pnpm turbo run dev --filter=@voyagr/api`    |
-| **Start the Web App**         | `pnpm turbo run dev --filter=@voyagr/web`    |
-| **Start the Mobile App**      | `pnpm turbo run dev --filter=@voyagr/mobile` |
-| **Format the entire project** | `pnpm run format`                            |
-| **Lint the entire project**   | `pnpm run lint`                              |
-| **Generate DB migration**     | `pnpm --filter @voyagr/database db:generate` |
-| **Apply DB migration**        | `pnpm --filter @voyagr/database db:migrate`  |
-| **Start Docker (DB + API)**   | `docker-compose up -d`                       |
-| **Stop Docker**               | `docker-compose down`                        |
+| Action                        | Command                                     |
+| ----------------------------- | ------------------------------------------- |
+| **Start the API**             | `pnpm turbo run dev --filter=@seego/api`    |
+| **Start the Web App**         | `pnpm turbo run dev --filter=@seego/web`    |
+| **Start the Mobile App**      | `pnpm turbo run dev --filter=@seego/mobile` |
+| **Format the entire project** | `pnpm run format`                           |
+| **Lint the entire project**   | `pnpm run lint`                             |
+| **Generate DB migration**     | `pnpm --filter @seego/database db:generate` |
+| **Apply DB migration**        | `pnpm --filter @seego/database db:migrate`  |
+| **Start Docker (DB + API)**   | `docker-compose up -d`                      |
+| **Stop Docker**               | `docker-compose down`                       |

@@ -1,5 +1,5 @@
 {
-  "name": "voyagr",
+  "name": "seego",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "typecheck": "turbo run typecheck",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "turbo run test"
   },
   "keywords": [],
   "author": "",
@@ -17,21 +18,12 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
-    "@voyagr/eslint-config": "workspace:*",
+    "@seego/eslint-config": "workspace:*",
     "eslint": "^10.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "turbo": "^2.9.6"
-  },
-  "lint-staged": {
-    "*.{js,ts}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
   },
   "dependencies": {
     "jose": "^6.2.3"

@@ -2,7 +2,6 @@ import { Text } from 'react-native';
 
 import { cn } from './cn';
 
-/** "Seego" in the display serif, with the corallo point — the setting sun of the charte. */
 export function Wordmark({
   inverse = false,
   className,
@@ -20,8 +19,8 @@ export function Wordmark({
         className,
       )}
     >
-      Seeg<Text className="font-display-italic">o</Text>
-      <Text className="text-primary">.</Text>
+      See<Text className="font-display-italic">go</Text>
+      <Text className="text-cta">.</Text>
     </Text>
   );
 }

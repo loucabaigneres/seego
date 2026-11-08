@@ -5,7 +5,7 @@ WORKDIR /app
 
 FROM base AS pruner
 COPY . .
-RUN turbo prune @voyagr/api --docker
+RUN turbo prune @seego/api --docker
 
 FROM base AS builder
 COPY --from=pruner /app/out/json/ .
@@ -14,9 +14,11 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
 COPY turbo.json turbo.json
-RUN pnpm turbo run build --filter=@voyagr/api...
+RUN pnpm turbo run build --filter=@seego/api...
 
 FROM base AS runner
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
 ENV NODE_ENV=production
 WORKDIR /app
 
