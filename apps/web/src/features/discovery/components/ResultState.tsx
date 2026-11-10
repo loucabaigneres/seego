@@ -11,10 +11,10 @@ export function ResultState({ titleId, title, subtitle, action, children }: Resu
   return (
     <div className="flex flex-col items-center gap-3 px-8 pb-12 pt-16 text-center">
       {children}
-      <h2 id={titleId} className="mt-1 text-lg font-bold text-[#1a1a1a]">
+      <h2 id={titleId} className="mt-1 text-lg font-display font-normal text-ink">
         {title}
       </h2>
-      <p className="max-w-xs text-sm text-[#888]">{subtitle}</p>
+      <p className="max-w-xs text-sm text-ink-muted">{subtitle}</p>
       {action && <div className="mt-3">{action}</div>}
     </div>
   )

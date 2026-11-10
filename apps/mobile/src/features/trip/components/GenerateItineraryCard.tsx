@@ -32,7 +32,7 @@ export function GenerateItineraryCard({
           <Text variant="overline">{pluralize(likedPlaces.length, 'lieu liké', 'lieux likés')}</Text>
           <View className="flex-row flex-wrap gap-2">
             {likedPlaces.map((place) => (
-              <Tag key={place.id} label={place.title} capitalize={false} className="bg-surface-raised" />
+              <Tag key={place.id} label={place.title} capitalize={false} className="bg-background" />
             ))}
           </View>
         </View>

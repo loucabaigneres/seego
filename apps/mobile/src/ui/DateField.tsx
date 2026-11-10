@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Platform, Pressable, View } from 'react-native';
 
 import { formatDate, parseIsoDate, toIsoDate } from '@/domain/date';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { Button } from './Button';
 import { cn } from './cn';
@@ -60,8 +60,8 @@ export function DateField({
         aria-invalid={!!error}
         onPress={open}
         className={cn(
-          'min-h-14 flex-row items-center gap-3 rounded-field border bg-surface-raised px-4 active:opacity-80',
-          error ? 'border-primary-text' : 'border-line-strong',
+          'min-h-14 flex-row items-center gap-3 rounded-field border bg-background px-4 active:opacity-80',
+          error ? 'border-brand' : 'border-line-strong',
         )}
       >
         <CalendarIcon size={20} color={colors.brand} />
@@ -70,7 +70,7 @@ export function DateField({
         </Text>
       </Pressable>
       {error && (
-        <Text variant="caption" tone="primary">
+        <Text variant="caption" tone="brand">
           {error}
         </Text>
       )}

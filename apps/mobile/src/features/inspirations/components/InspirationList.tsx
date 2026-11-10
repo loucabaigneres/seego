@@ -33,7 +33,7 @@ export function InspirationList() {
   if (inspirations.length === 0) {
     return (
       <EmptyState
-        className="flex-none rounded-card bg-surface py-10"
+        className="flex-none rounded-card border border-brand/15 bg-surface py-10"
         icon={SparkleIcon}
         title="Pas encore d’inspiration"
         description="Les vidéos TikTok ou Instagram que tu importes depuis le site apparaîtront ici. L’import arrive bientôt sur mobile."

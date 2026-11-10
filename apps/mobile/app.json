@@ -26,7 +26,19 @@
           "imageWidth": 200
         }
       ],
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "@seego/ui/fonts/native/Fraunces-Regular.ttf",
+            "@seego/ui/fonts/native/Fraunces-Italic.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Regular.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Medium.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-SemiBold.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Bold.ttf"
+          ]
+        }
+      ],
       "expo-secure-store",
       "@react-native-community/datetimepicker"
     ],

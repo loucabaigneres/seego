@@ -9,7 +9,7 @@ export type DayEditControls = {
 }
 
 const iconButton =
-  'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-[#ddd] bg-white text-[#555] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-90 disabled:cursor-default disabled:opacity-35 disabled:hover:border-[#ddd] disabled:hover:text-[#555]'
+  'flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-line-strong bg-surface text-ink-secondary transition hover:border-brand hover:text-brand active:scale-90 disabled:cursor-default disabled:opacity-35 disabled:hover:border-line-strong disabled:hover:text-ink-secondary'
 
 export function EditControls({
   activity,
@@ -54,7 +54,7 @@ export function EditControls({
       </button>
 
       {locked ? (
-        <span className="text-[11px] font-medium text-[#aaa]">Commun à tout le séjour</span>
+        <span className="text-[11px] font-medium text-ink-muted">Commun à tout le séjour</span>
       ) : (
         <>
           {days.length > 1 && (
@@ -67,7 +67,7 @@ export function EditControls({
             type="button"
             onClick={() => controls.onRemove(activity.id)}
             aria-label="Supprimer"
-            className={`${iconButton} hover:bg-[#FF4D4D] hover:text-white`}
+            className={`${iconButton} hover:bg-ink hover:text-ink-inverse`}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.2} viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M10 11v6m4-6v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3" />

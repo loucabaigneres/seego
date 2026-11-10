@@ -3,7 +3,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { Pressable, View } from 'react-native';
 
 import { categoryMeta, cleanDescription } from '@/domain/place';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Text } from '@/ui';
 import { ArrowSquareOutIcon, MapPinIcon } from '@/ui/icons';
 
@@ -44,7 +44,7 @@ export function ActivityRow({ activity }: { activity: TripActivity }) {
 
         {activity.locationName && activity.locationName !== activity.title && (
           <View className="flex-row items-center gap-1">
-            <MapPinIcon size={14} color={colors.primary.text} />
+            <MapPinIcon size={14} color={colors.brand} />
             <Text variant="caption" numberOfLines={1} className="flex-1">
               {activity.locationName}
             </Text>

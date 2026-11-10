@@ -7,5 +7,5 @@ export interface CardProps extends ViewProps {
 }
 
 export function Card({ className, ...props }: CardProps) {
-  return <View className={cn('rounded-card bg-surface p-5', className)} {...props} />;
+  return <View className={cn('rounded-card border border-brand/15 bg-surface p-5', className)} {...props} />;
 }

@@ -25,12 +25,12 @@ function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-[#F2EDE8] px-4 py-8 flex flex-col items-center justify-center">
-      <div className="w-full max-w-xl rounded-3xl bg-white p-6 sm:p-8 shadow-sm border border-[#eee]">
+    <div className="min-h-[calc(100vh-65px)] bg-background px-4 py-8 flex flex-col items-center justify-center">
+      <div className="w-full max-w-xl rounded-card bg-surface p-6 sm:p-8 border border-brand/15">
         <QuizHeader current={quiz.step.current} total={quiz.step.total} progress={quiz.step.progress} />
 
         {quiz.errorMessage && (
-          <div className="mb-4 rounded-xl bg-red-50 p-3 text-xs font-semibold text-[#FF4D4D] border border-red-100">
+          <div className="mb-4 rounded-xl bg-surface p-3 text-xs font-semibold text-brand border border-brand/20">
             {quiz.errorMessage}
           </div>
         )}

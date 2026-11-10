@@ -20,7 +20,7 @@ function IndexPage() {
   const directTrip = useStartDirectTrip();
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center bg-[#F2EDE8] px-4 py-12">
+    <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-2xl text-center">
         <HomeHero />
 

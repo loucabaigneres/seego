@@ -27,7 +27,7 @@ function Stat({ value, label, onPress }: StatProps) {
       role="button"
       aria-label={`${value} ${text}`}
       onPress={onPress}
-      className="flex-1 gap-1 rounded-card bg-surface p-5 active:opacity-80"
+      className="flex-1 gap-1 rounded-card border border-brand/15 bg-surface p-5 active:opacity-80"
     >
       {content}
     </Pressable>

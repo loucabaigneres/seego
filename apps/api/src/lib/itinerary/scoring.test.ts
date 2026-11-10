@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { interestBonus } from './planner.js';
-import type { ItinItem } from './planner.js';
+import { interestBonus } from './scoring.js';
+import type { ItinItem } from './types.js';
 
 function makeItem(title: string, subcategory: string[] = []): ItinItem {
   return {

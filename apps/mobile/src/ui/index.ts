@@ -1,6 +1,6 @@
 /**
  * Seego design system (charte DA V1), written in-house: no third-party UI kit.
- * Built on NativeWind classes mapped to `theme/tokens`, `cn()` (clsx + tailwind-merge)
+ * Built on NativeWind classes mapped to the `@seego/ui` tokens, `cn()` (clsx + tailwind-merge)
  * and Phosphor icons.
  */
 export { Badge } from './Badge';
@@ -11,6 +11,7 @@ export { cn } from './cn';
 export { ComingSoonScreen } from './ComingSoonScreen';
 export { DateField } from './DateField';
 export { GoogleLogo } from './GoogleLogo';
+export { IconButton } from './IconButton';
 export { Notice } from './Notice';
 export { NumberStepper } from './NumberStepper';
 export { PhotoScrim } from './PhotoScrim';
