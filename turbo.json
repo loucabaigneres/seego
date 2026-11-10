@@ -29,6 +29,9 @@
     },
     "format": {
       "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^typecheck"]
     }
   }
 }

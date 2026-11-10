@@ -1,38 +1,11 @@
 import 'leaflet/dist/leaflet.css';
 
+import { colors } from '@seego/ui';
 import L from 'leaflet';
 import { useEffect, useRef, useState } from 'react';
+import { CAT_EMOJI, CAT_LABEL, catStyle } from '../lib/categories';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-/**
- * Mirrors `CATEGORY_META` on the planning page: a pale `tint` behind `#555`
- * text for badges, the saturated `fill` reserved for the selected state. `ink`
- * is the same hue pushed dark enough to stay legible on a white pin.
- */
-const CAT_STYLE: Record<string, { fill: string; ink: string; tint: string }> = {
-  hotel:      { fill: '#FF4D4D', ink: '#E03E3E', tint: 'rgba(255,77,77,.12)' },
-  'activité': { fill: '#2ecc71', ink: '#27ae60', tint: 'rgba(46,204,113,.12)' },
-  restaurant: { fill: '#FFA03C', ink: '#D9822B', tint: 'rgba(255,160,60,.14)' },
-}
-
-const DEFAULT_STYLE = { fill: '#888', ink: '#777', tint: 'rgba(0,0,0,.05)' }
-
-function catStyle(category: string | null) {
-  return CAT_STYLE[category ?? ''] ?? DEFAULT_STYLE
-}
-
-const CAT_LABEL: Record<string, string> = {
-  hotel:      'Hébergement',
-  'activité': 'Activité',
-  restaurant: 'Restaurant',
-}
-
-const CAT_EMOJI: Record<string, string> = {
-  hotel:      '🏨',
-  'activité': '🗺️',
-  restaurant: '🍽️',
-}
 
 /** White pictogram drawn inside each pin, authored on a 24×24 grid. */
 const CAT_GLYPH: Record<string, string> = {
@@ -61,9 +34,9 @@ function makeIcon(category: string | null, active = false) {
   // Resting discs carry the category colour with a white glyph; the selected
   // one inverts to a white disc. `ink` is the darker hue, used whenever the
   // colour sits on white and needs the extra contrast.
-  const body   = active ? '#fff' : fill
-  const ring   = active ? ink    : '#fff'
-  const glyphC = active ? ink    : '#fff'
+  const body   = active ? colors.background : fill
+  const ring   = active ? ink    : colors.background
+  const glyphC = active ? ink    : colors.background
 
   // Filter ids must differ per appearance: duplicate ids across markers would
   // all resolve to the first one in the DOM.
@@ -123,29 +96,6 @@ type MarkerMeta = { marker: L.Marker; dayIndex: number; category: string | null 
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function FilterChip({
-  label,
-  active,
-  activeStyle,
-  onClick,
-}: {
-  label:       string
-  active:      boolean
-  activeStyle: React.CSSProperties
-  onClick:     () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold transition active:scale-95"
-      style={active ? activeStyle : { background: 'white', borderColor: '#ddd', color: '#555' }}
-    >
-      {label}
-    </button>
-  )
-}
-
 function PinIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -158,23 +108,19 @@ function PinIcon({ className }: { className?: string }) {
 
 interface TripMapProps {
   days: Day[]
+  /** Day / category filters, owned by the page so the day list stays in sync with the map. */
+  selectedDay: number | null
+  selectedCategory: string | null
+  /** Tailwind classes sizing the map canvas. */
+  heightClass?: string
 }
 
-export function TripMap({ days }: TripMapProps) {
+export function TripMap({ days, selectedDay, selectedCategory, heightClass = 'h-100' }: TripMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef       = useRef<L.Map | null>(null)
   const markersRef   = useRef<Map<string, MarkerMeta>>(new Map())
 
   const [activePin,         setActivePin]         = useState<ActivePin | null>(null)
-  const [selectedDay,       setSelectedDay]       = useState<number | null>(null)
-  const [selectedCategory,  setSelectedCategory]  = useState<string | null>(null)
-
-  const allDayIndexes = [...new Set(days.map((d) => d.dayIndex))].sort((a, b) => a - b)
-  const allCategories = [
-    ...new Set(
-      days.flatMap((d) => d.activities.map((a) => a.category)).filter(Boolean) as string[],
-    ),
-  ]
 
   // ── Init map ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -274,53 +220,13 @@ export function TripMap({ days }: TripMapProps) {
   return (
     <div className="w-full">
 
-      {/* ── Filters ── */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        {/* Day group */}
-        <FilterChip
-          label="Tous les jours"
-          active={selectedDay === null}
-          activeStyle={{ background: '#1a1a1a', borderColor: '#1a1a1a', color: 'white' }}
-          onClick={() => setSelectedDay(null)}
-        />
-        {allDayIndexes.map((idx) => (
-          <FilterChip
-            key={idx}
-            label={`Jour ${idx}`}
-            active={selectedDay === idx}
-            activeStyle={{ background: '#FF4D4D', borderColor: '#FF4D4D', color: 'white' }}
-            onClick={() => setSelectedDay(selectedDay === idx ? null : idx)}
-          />
-        ))}
-
-        {/* Divider */}
-        {allCategories.length > 0 && (
-          <span className="h-5 w-px shrink-0 bg-[#e5ded6]" />
-        )}
-
-        {/* Category group */}
-        {allCategories.map((c) => (
-          <FilterChip
-            key={c}
-            label={`${CAT_EMOJI[c] ?? ''} ${CAT_LABEL[c] ?? c}`}
-            active={selectedCategory === c}
-            activeStyle={{
-              background:  catStyle(c).tint,
-              borderColor: catStyle(c).ink,
-              color:       catStyle(c).ink,
-            }}
-            onClick={() => setSelectedCategory(selectedCategory === c ? null : c)}
-          />
-        ))}
-      </div>
-
       {/* ── Map card ── */}
-      <div className="relative overflow-hidden z-0 rounded-[28px] border border-[#eee] bg-white shadow-sm">
-        <div ref={containerRef} style={{ height: 400 }} className="w-full" />
+      <div className="relative overflow-hidden z-0 rounded-card border border-brand/15 bg-surface">
+        <div ref={containerRef} className={`w-full ${heightClass}`} />
 
         {/* ── Detail panel ── */}
         {activePin && (
-          <div className="absolute inset-x-3 bottom-3 z-1000 overflow-hidden rounded-[20px] border border-[#eee] bg-white shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
+          <div className="absolute inset-x-3 bottom-3 z-1000 overflow-hidden rounded-card border border-brand/15 bg-surface shadow-[0_8px_32px_rgba(0,0,0,0.14)]">
             {/* Image */}
             {activePin.activity.mainMediaUrl && (
               <div className="relative h-36 w-full overflow-hidden">
@@ -329,18 +235,18 @@ export function TripMap({ days }: TripMapProps) {
                   alt={activePin.activity.title}
                   className="h-full w-full object-cover"
                 />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/30 to-transparent" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink/30 to-transparent" />
               </div>
             )}
 
             <div className="p-3.5">
               {/* Badges + close */}
               <div className="mb-2.5 flex items-center gap-2">
-                <span className="inline-flex h-6 items-center rounded-full bg-[#FF4D4D] px-3 text-xs font-bold text-white">
+                <span className="inline-flex h-6 items-center rounded-full bg-brand px-3 text-xs font-bold text-accent">
                   Jour {activePin.dayIndex}
                 </span>
                 <span
-                  className="inline-flex h-6 items-center rounded-full px-3 text-xs font-semibold text-[#555]"
+                  className="inline-flex h-6 items-center rounded-full px-3 text-xs font-semibold text-ink-secondary"
                   style={{ background: catTint }}
                 >
                   {emoji} {categoryLabel}
@@ -348,7 +254,7 @@ export function TripMap({ days }: TripMapProps) {
                 <button
                   type="button"
                   onClick={() => setActivePin(null)}
-                  className="ml-auto flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-[#eee] bg-[#FBF8F5] text-[11px] text-[#888] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D]"
+                  className="ml-auto flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-[11px] text-ink-muted transition hover:border-brand hover:text-brand"
                   aria-label="Fermer"
                 >
                   ✕
@@ -356,22 +262,22 @@ export function TripMap({ days }: TripMapProps) {
               </div>
 
               {/* Title */}
-              <p className="text-[16px] font-bold leading-snug text-[#1a1a1a]">
+              <p className="text-[16px] font-bold leading-snug text-ink">
                 {activePin.activity.locationName ?? activePin.activity.title}
               </p>
 
               {/* Location sub-label */}
               {activePin.activity.locationName &&
                 activePin.activity.locationName !== activePin.activity.title && (
-                  <p className="mt-1 flex items-center gap-1 text-xs text-[#888]">
-                    <PinIcon className="h-3.5 w-3.5 shrink-0 text-[#FF4D4D]" />
+                  <p className="mt-1 flex items-center gap-1 text-xs text-ink-muted">
+                    <PinIcon className="h-3.5 w-3.5 shrink-0 text-brand" />
                     <span className="truncate">{activePin.activity.title}</span>
                   </p>
                 )}
 
               {/* Description */}
               {desc && (
-                <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-[#999]">{desc}</p>
+                <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-ink-muted">{desc}</p>
               )}
 
               {/* CTA */}
@@ -380,7 +286,7 @@ export function TripMap({ days }: TripMapProps) {
                   href={activePin.activity.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-[#FF4D4D] hover:underline"
+                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline"
                 >
                   Voir l'offre
                   <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>

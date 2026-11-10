@@ -5,7 +5,7 @@ import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { formatDate, pluralize } from '@/domain/date';
 import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
 import type { RouterOutputs } from '@/lib/trpc';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { ArrowLeftIcon, HouseIcon, MapPinIcon, MapTrifoldIcon } from '@/ui/icons';
 

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { cn, IconButton, ProgressBar, Text } from '@/ui';
 import { ArrowLeftIcon, CompassIcon } from '@/ui/icons';
 

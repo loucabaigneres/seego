@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { formatDate } from '@/domain/date';
 import type { RouterOutputs } from '@/lib/trpc';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, Text } from '@/ui';
 import { CaretRightIcon } from '@/ui/icons';
 
@@ -21,7 +21,7 @@ export function TripCard({ trip }: { trip: TripListItem }) {
       role="link"
       aria-label={`${title}, ${status.label}`}
       onPress={() => router.push({ pathname: '/trip/[tripId]', params: { tripId: trip.id } })}
-      className="flex-row items-center gap-3 rounded-card bg-surface p-5 active:opacity-80"
+      className="flex-row items-center gap-3 rounded-card border border-brand/15 bg-surface p-5 active:opacity-80"
     >
       <View className="flex-1 gap-2">
         <Text variant="label" numberOfLines={2}>

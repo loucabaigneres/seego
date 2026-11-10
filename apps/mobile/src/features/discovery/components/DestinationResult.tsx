@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { pluralize } from '@/domain/date';
 import { countryFlag } from '@/domain/place';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, Card, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { CalendarIcon, XIcon } from '@/ui/icons';
 

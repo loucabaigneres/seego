@@ -27,7 +27,7 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
 
       {deck.isFinished ? (
         <EmptyState
-          className="rounded-card bg-surface"
+          className="rounded-card border border-brand/15 bg-surface"
           icon={MapTrifoldIcon}
           title="Tu as parcouru tous les lieux !"
           description="Découvre la destination qui te correspond, ou recommence pour affiner tes goûts."

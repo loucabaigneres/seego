@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Button, Screen, Text } from '@/ui';
 import { XIcon } from '@/ui/icons';
 

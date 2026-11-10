@@ -59,7 +59,7 @@ export function ReplacePlaceModal({
 
   return (
     <div
-      className={`fixed inset-0 z-2000 flex items-end justify-center bg-black/50 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
+      className={`fixed inset-0 z-2000 flex items-end justify-center bg-ink/50 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
         shown ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={onClose}
@@ -68,16 +68,16 @@ export function ReplacePlaceModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-[85dvh] w-full max-w-120 flex-col overflow-hidden rounded-t-[28px] bg-[#F2EDE8] shadow-2xl transition-transform duration-300 ease-out sm:rounded-[28px]"
+        className="relative flex max-h-[85dvh] w-full max-w-120 flex-col overflow-hidden rounded-t-[28px] bg-background shadow-2xl transition-transform duration-300 ease-out sm:rounded-[28px]"
         style={{ transform: shown ? 'translateY(0)' : 'translateY(48px)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3 border-b border-[#e6ded6] px-5 pb-4 pt-5">
+        <div className="flex items-start justify-between gap-3 border-b border-line px-5 pb-4 pt-5">
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-wider text-[#888]">
+            <p className="text-xs font-bold uppercase tracking-wider text-ink-muted">
               Choisir {meta.noun}
             </p>
-            <h2 id={titleId} className="mt-1 truncate text-lg font-bold text-[#1a1a1a]">
+            <h2 id={titleId} className="mt-1 truncate text-lg font-display font-normal text-ink">
               Remplacer « {place.title} »
             </h2>
           </div>
@@ -86,7 +86,7 @@ export function ReplacePlaceModal({
             onClick={onClose}
             autoFocus
             aria-label="Fermer"
-            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[#ddd] bg-white text-[#555] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-90"
+            className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-line-strong bg-surface text-ink-secondary transition hover:border-brand hover:text-brand active:scale-90"
           >
             <svg
               className="h-4 w-4"
@@ -103,7 +103,7 @@ export function ReplacePlaceModal({
 
         <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain p-3">
           {candidatesQuery.isPending && (
-            <p className="py-10 text-center text-sm font-semibold text-[#888]">
+            <p className="py-10 text-center text-sm font-semibold text-ink-muted">
               <span className="mr-1.5 inline-block animate-pulse" aria-hidden>
                 🔎
               </span>
@@ -112,13 +112,13 @@ export function ReplacePlaceModal({
           )}
 
           {candidatesQuery.isError && (
-            <p className="py-10 text-center text-sm font-medium text-[#FF4D4D]">
+            <p className="py-10 text-center text-sm font-medium text-brand">
               {candidatesQuery.error.message || 'Impossible de charger les propositions.'}
             </p>
           )}
 
           {candidatesQuery.data?.length === 0 && (
-            <p className="py-10 text-center text-sm text-[#888]">
+            <p className="py-10 text-center text-sm text-ink-muted">
               Aucune autre proposition disponible pour cette destination.
             </p>
           )}
@@ -130,7 +130,7 @@ export function ReplacePlaceModal({
             return (
               <div
                 key={candidate.id}
-                className="flex gap-3 rounded-2xl border border-[#eee] bg-white p-3 transition hover:border-[#FF4D4D]"
+                className="flex gap-3 rounded-card border border-brand/15 bg-surface p-3 transition hover:border-brand"
               >
                 <div className="h-17 w-17 shrink-0 overflow-hidden rounded-xl">
                   {candidate.mainMediaUrl ? (
@@ -151,22 +151,22 @@ export function ReplacePlaceModal({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <p className="text-[15px] font-semibold leading-tight text-[#1a1a1a]">
+                  <p className="text-[15px] font-semibold leading-tight text-ink">
                     {candidate.title}
                   </p>
-                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-[#888]">
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-ink-muted">
                     {candidate.imported && (
-                      <span className="rounded-full bg-[rgba(46,204,113,.14)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#1f9d57]">
+                      <span className="rounded-full bg-[rgba(46,204,113,.14)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success-text">
                         Mon inspiration
                       </span>
                     )}
                     {candidate.suggested && (
-                      <span className="rounded-full bg-[rgba(255,77,77,.12)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#E03E3E]">
+                      <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
                         Suggéré
                       </span>
                     )}
                     {candidate.price && (
-                      <span className="font-semibold text-[#555]">{candidate.price}</span>
+                      <span className="font-semibold text-ink-secondary">{candidate.price}</span>
                     )}
                     {candidate.distanceKm != null && (
                       <span>à {formatDistance(candidate.distanceKm)}</span>
@@ -182,7 +182,7 @@ export function ReplacePlaceModal({
                       })
                     }
                     disabled={replaceMutation.isPending}
-                    className="mt-2 cursor-pointer rounded-full border border-[#FF4D4D] px-3.5 py-1.5 text-xs font-semibold text-[#FF4D4D] transition hover:bg-[#FF4D4D] hover:text-white active:scale-95 disabled:opacity-50"
+                    className="mt-2 cursor-pointer rounded-full border border-brand px-3.5 py-1.5 text-xs font-semibold text-brand transition hover:bg-ink hover:text-ink-inverse active:scale-95 disabled:opacity-50"
                   >
                     {isPicking ? 'Remplacement…' : 'Choisir'}
                   </button>
@@ -193,7 +193,7 @@ export function ReplacePlaceModal({
         </div>
 
         {replaceMutation.isError && (
-          <p className="border-t border-[#e6ded6] px-5 py-3 text-xs font-medium text-[#FF4D4D]">
+          <p className="border-t border-line px-5 py-3 text-xs font-medium text-brand">
             {replaceMutation.error.message || 'Impossible de remplacer ce lieu.'}
           </p>
         )}

@@ -1,6 +1,6 @@
 import { Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import type { AppIcon } from './icons';

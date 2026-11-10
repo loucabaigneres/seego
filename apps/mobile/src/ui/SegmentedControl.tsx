@@ -9,7 +9,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import { Text } from './Text';
@@ -61,7 +61,7 @@ export function SegmentedControl<T extends string>({
   }));
 
   return (
-    <View role={ROLES[kind].group} className={cn('rounded-full bg-surface p-1', className)}>
+    <View role={ROLES[kind].group} className={cn('rounded-full border border-line-strong bg-background p-1', className)}>
       <View
         className="flex-row"
         onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
@@ -108,7 +108,7 @@ function SegmentLabel({ label, index, position }: SegmentLabelProps) {
     color: interpolateColor(
       Math.abs(position.get() - index),
       [0, 1],
-      [colors.ink.inverse, colors.ink.secondary],
+      [colors.accent, colors.ink.secondary],
     ),
   }));
 

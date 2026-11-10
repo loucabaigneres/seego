@@ -18,7 +18,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 
 import { categoryMeta, cleanDescription, placePhotos } from '@/domain/place';
 import { useHardwareBack } from '@/hooks/useHardwareBack';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, cn, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { ImageIcon, MapPinIcon, XIcon } from '@/ui/icons';
 
