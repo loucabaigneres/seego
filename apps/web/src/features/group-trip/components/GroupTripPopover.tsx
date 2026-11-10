@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { SelectField } from '@/components/SelectField';
 import { useEffect, useRef, useState } from 'react'
 import { ConfirmOverlay } from './ConfirmOverlay'
 import { InviteLinkSection } from './InviteLinkSection'
@@ -103,8 +104,8 @@ export function GroupTripPopover() {
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold transition active:scale-95 ${
           isOpen
-            ? 'border-[#FF4D4D] bg-[#FF4D4D] text-white'
-            : 'border-[#ded7cb] bg-white/70 text-[#1A1A1A] hover:bg-white'
+            ? 'border-brand bg-brand text-accent'
+            : 'border-line bg-background/70 text-ink hover:bg-background'
         }`}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -116,14 +117,14 @@ export function GroupTripPopover() {
         </svg>
         <span className="hidden sm:inline">Groupes</span>
         {trips && trips.length > 0 && (
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#1A1A1A] text-[9px] font-bold text-white">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-ink text-[9px] font-bold text-ink-inverse">
             {trips.length}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[calc(100vw-2rem)] max-w-sm rounded-3xl border border-[#ded7cb] bg-white p-5 shadow-2xl sm:w-96 overflow-hidden">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[calc(100vw-2rem)] max-w-sm rounded-card border border-brand/15 bg-surface p-5 shadow-2xl sm:w-96 overflow-hidden">
           {/* ── Confirmation : Retrait d'un membre ── */}
           {memberToRemove && activeTrip && (
             <ConfirmOverlay
@@ -132,7 +133,7 @@ export function GroupTripPopover() {
               message={
                 <>
                   Veux-tu vraiment retirer{' '}
-                  <span className="font-semibold text-[#1a1a1a]">{memberToRemove.name}</span> de ce voyage de groupe ?
+                  <span className="font-semibold text-ink">{memberToRemove.name}</span> de ce voyage de groupe ?
                 </>
               }
               confirmLabel="Retirer"
@@ -159,14 +160,14 @@ export function GroupTripPopover() {
 
           {isLoadingTrips ? (
             <div className="space-y-3 py-6 text-center">
-              <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-[#FF4D4D] border-t-transparent" />
-              <p className="text-xs text-[#888]">Chargement…</p>
+              <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+              <p className="text-xs text-ink-muted">Chargement…</p>
             </div>
           ) : !trips || trips.length === 0 ? (
             <div className="space-y-4 py-2">
               <div className="text-center">
-                <h3 className="text-sm font-black text-[#1A1A1A]">Voyages de groupe</h3>
-                <p className="mt-1 text-xs text-[#777]">
+                <h3 className="text-sm font-black text-ink">Voyages de groupe</h3>
+                <p className="mt-1 text-xs text-ink-muted">
                   Crée un groupe ou rejoins un voyage existant avec un code d'invitation.
                 </p>
               </div>
@@ -175,7 +176,7 @@ export function GroupTripPopover() {
                 type="button"
                 disabled={isCreating}
                 onClick={() => createGroup({})}
-                className="w-full cursor-pointer rounded-2xl bg-[#FF4D4D] py-3 text-xs font-bold text-white shadow-md shadow-red-500/25 transition hover:brightness-105 active:scale-95 disabled:opacity-50"
+                className="w-full cursor-pointer rounded-2xl bg-brand py-3 text-xs font-bold text-accent shadow-md shadow-brand/25 transition hover:brightness-105 active:scale-95 disabled:opacity-50"
               >
                 {isCreating ? 'Création en cours…' : '+ Créer un voyage de groupe'}
               </button>
@@ -193,30 +194,30 @@ export function GroupTripPopover() {
             <div className="space-y-4">
               {trips.length > 1 && (
                 <div>
-                  <label className="block text-[11px] font-semibold text-[#888] mb-1">
+                  <label className="mb-1 block text-xs font-medium text-ink">
                     Sélectionner un voyage
                   </label>
-                  <select
+                  <SelectField
                     value={activeTrip?.id}
                     onChange={(e) => setSelectedTripId(e.target.value)}
-                    className="w-full rounded-xl border border-[#ddd] bg-[#F2EDE8] px-3 py-2 text-xs font-semibold text-[#1A1A1A] outline-none"
+                    className="py-2 text-xs font-semibold"
                   >
                     {trips.map((t) => (
                       <option key={t.id} value={t.id}>
                         {t.destination ?? 'Destination à définir'} ({t.role === 'owner' ? 'Hôte' : 'Membre'})
                       </option>
                     ))}
-                  </select>
+                  </SelectField>
                 </div>
               )}
 
               {activeTrip && (
                 <>
-                  <div className="border-b border-[#eee] pb-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#888]">
+                  <div className="border-b border-line pb-3">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-ink-muted">
                       {activeTrip.role === 'owner' ? '★ Hôte' : 'Membre'}
                     </span>
-                    <p className="text-sm font-black text-[#1A1A1A]">
+                    <p className="text-sm font-black text-ink">
                       {activeTrip.destination ?? 'Destination à définir'}
                     </p>
                   </div>
@@ -251,12 +252,12 @@ export function GroupTripPopover() {
               />
 
               {/* Actions de bas de popover */}
-              <div className="space-y-2 border-t border-[#eee] pt-2 text-center">
+              <div className="space-y-2 border-t border-line pt-2 text-center">
                 <button
                   type="button"
                   disabled={isCreating}
                   onClick={() => createGroup({})}
-                  className="cursor-pointer text-[11px] font-semibold text-[#888] transition hover:text-[#FF4D4D]"
+                  className="cursor-pointer text-[11px] font-semibold text-ink-muted transition hover:text-brand"
                 >
                   {isCreating ? 'Création…' : '+ Nouveau voyage de groupe'}
                 </button>
@@ -266,7 +267,7 @@ export function GroupTripPopover() {
                     <button
                       type="button"
                       onClick={() => setShowDeleteTripConfirm(true)}
-                      className="cursor-pointer text-[10px] font-semibold text-red-500 hover:text-red-700 transition"
+                      className="cursor-pointer text-[10px] font-semibold text-brand hover:text-brand transition"
                     >
                       Supprimer ce voyage de groupe
                     </button>

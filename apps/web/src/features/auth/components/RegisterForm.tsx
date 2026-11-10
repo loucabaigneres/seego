@@ -52,7 +52,7 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
             <Link
               to="/login"
               search={{ redirect }}
-              className="font-bold text-[#FF4D4D] hover:underline"
+              className="font-bold text-brand hover:underline"
             >
               Se connecter
             </Link>

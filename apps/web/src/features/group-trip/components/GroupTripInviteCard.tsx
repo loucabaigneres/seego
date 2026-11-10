@@ -38,17 +38,17 @@ export function GroupTripInviteCard({
 
   if (!session?.user && !isAlreadyGroup && !inviteCode) {
     return (
-      <div className="flex items-center justify-between gap-4 rounded-[28px] border border-[#eee] bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-4 rounded-card border border-brand/15 bg-surface p-5">
         <div>
-          <h3 className="text-sm font-bold text-[#1a1a1a]">Partir à plusieurs ?</h3>
-          <p className="mt-0.5 text-xs text-[#888]">
+          <h3 className="text-sm font-bold text-ink">Partir à plusieurs ?</h3>
+          <p className="mt-0.5 text-xs text-ink-muted">
             Connecte-toi pour transformer ce voyage en groupe et inviter tes amis.
           </p>
         </div>
         <Link
           to="/login"
           search={{ redirect: `/trip/${tripId}` }}
-          className="shrink-0 rounded-full border border-[#ddd] bg-white px-4 py-2.5 text-xs font-bold text-[#1a1a1a] transition hover:border-[#1a1a1a] active:scale-95"
+          className="shrink-0 rounded-full border border-line-strong bg-surface px-4 py-2.5 text-xs font-bold text-ink transition hover:border-ink active:scale-95"
         >
           Se connecter
         </Link>
@@ -58,15 +58,15 @@ export function GroupTripInviteCard({
 
   if (isAlreadyGroup || inviteCode) {
     return (
-      <div className="rounded-[28px] border border-[#eee] bg-white p-5 shadow-sm">
+      <div className="rounded-card border border-brand/15 bg-surface p-5">
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-0.5 text-[11px] font-bold text-success-text">
+              <span className="h-1.5 w-1.5 rounded-full bg-success" />
               Voyage de groupe actif
             </span>
-            <p className="mt-1 text-sm font-bold text-[#1a1a1a]">
-              Code d'invitation (24 h) : <span className="font-mono text-[#FF4D4D]">{inviteCode}</span>
+            <p className="mt-1 text-sm font-bold text-ink">
+              Code d'invitation (24 h) : <span className="tabular-nums text-brand">{inviteCode}</span>
             </p>
           </div>
           {isOwner && (
@@ -74,14 +74,14 @@ export function GroupTripInviteCard({
               type="button"
               disabled={isRegenerating}
               onClick={() => regenerateCode({ tripId })}
-              className="cursor-pointer text-[11px] font-semibold text-[#888] underline hover:text-[#1a1a1a]"
+              className="cursor-pointer text-[11px] font-semibold text-ink-muted underline hover:text-ink"
             >
               {isRegenerating ? 'Régénération…' : '↻ Nouveau code'}
             </button>
           )}
         </div>
 
-        <p className="mt-2 text-xs text-[#888]">
+        <p className="mt-2 text-xs text-ink-muted">
           Partage ce lien avec tes amis pour qu'ils rejoignent cet itinéraire :
         </p>
 
@@ -90,12 +90,12 @@ export function GroupTripInviteCard({
             type="text"
             readOnly
             value={inviteUrl}
-            className="flex-1 rounded-xl border border-[#ddd] bg-[#F2EDE8] px-3.5 py-2 text-xs text-[#1a1a1a] outline-none select-all"
+            className="flex-1 rounded-xl border border-line-strong bg-background px-3 py-2 text-xs text-ink outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20 select-all"
           />
           <button
             type="button"
             onClick={handleCopy}
-            className="cursor-pointer rounded-xl bg-[#FF4D4D] px-4 py-2 text-xs font-bold text-white shadow-sm shadow-red-500/20 transition hover:brightness-105 active:scale-95"
+            className="cursor-pointer rounded-xl bg-brand px-4 py-2 text-xs font-bold text-accent shadow-sm shadow-brand/20 transition hover:brightness-105 active:scale-95"
           >
             {copied ? 'Copié !' : 'Copier'}
           </button>
@@ -105,10 +105,10 @@ export function GroupTripInviteCard({
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-[28px] border border-[#eee] bg-white p-5 shadow-sm">
+    <div className="flex items-center justify-between gap-4 rounded-card border border-brand/15 bg-surface p-5">
       <div>
-        <h3 className="text-sm font-bold text-[#1a1a1a]">Partir à plusieurs ?</h3>
-        <p className="mt-0.5 text-xs text-[#888]">
+        <h3 className="text-sm font-bold text-ink">Partir à plusieurs ?</h3>
+        <p className="mt-0.5 text-xs text-ink-muted">
           Transforme cet itinéraire en voyage de groupe et invite tes amis.
         </p>
       </div>
@@ -116,7 +116,7 @@ export function GroupTripInviteCard({
         type="button"
         disabled={isCreating}
         onClick={() => createOrConvert({ tripId, destination: destination ?? undefined })}
-        className="shrink-0 cursor-pointer rounded-full bg-[#1a1a1a] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-black active:scale-95 disabled:opacity-50"
+        className="shrink-0 cursor-pointer rounded-full bg-ink px-4 py-2.5 text-xs font-bold text-ink-inverse transition hover:bg-ink active:scale-95 disabled:opacity-50"
       >
         {isCreating ? 'Création…' : 'Inviter des amis'}
       </button>

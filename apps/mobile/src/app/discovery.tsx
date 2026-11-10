@@ -27,7 +27,7 @@ function DiscoveryDeck({ tripId }: { tripId: string }) {
           <DeckHeader likeCount={0} />
           {feed.hasFailed ? (
             <ErrorState
-              className="rounded-card bg-surface"
+              className="rounded-card border border-brand/15 bg-surface"
               title="Impossible de charger les lieux"
               onRetry={feed.retry}
             />

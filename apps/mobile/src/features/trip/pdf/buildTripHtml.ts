@@ -2,7 +2,7 @@ import { formatDate } from '@/domain/date';
 import { categoryMeta, cleanDescription, parseWktPoint } from '@/domain/place';
 import { daySummary, inPlanningOrder } from '@/domain/trip';
 import { tripDisplayTitle, tripFacts } from '@/domain/trip-summary';
-import { colors, radii } from '@/theme/tokens';
+import { colors, radii, webFonts } from '@seego/ui';
 
 export interface PdfActivity {
   id: string;
@@ -35,10 +35,12 @@ export interface TripPdfInput {
   coverImage: string | null;
 }
 
+// shortcut: the print WebView cannot reach the self-hosted files in @seego/ui/fonts, so the same
+// families come from Google Fonts; inline them as base64 if offline export becomes a need.
 const FONTS_URL =
-  'https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Instrument+Serif&display=block';
-const SERIF = "'Instrument Serif', Georgia, serif";
-const SANS = "'Hanken Grotesk', Helvetica, Arial, sans-serif";
+  'https://fonts.googleapis.com/css2?family=Frauncesfamily=Fraunces:ital,wght@0,400;1,400&family=Hanken+Grotesk:wght@400;600;700&display=block';
+const SERIF = webFonts.display;
+const SANS = webFonts.sans;
 
 /** Catalogue and user text goes into HTML: it must never be read as markup. */
 export function escapeHtml(value: string): string {
@@ -135,7 +137,7 @@ export function buildTripHtml({ trip, itinerary, coverImage }: TripPdfInput): st
   @page { size: A4; margin: 32px; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   /* Explicit paper colour: a dark-mode WebView would otherwise print on black. */
-  html { color-scheme: light; background: ${colors.surface.raised};
+  html { color-scheme: light; background: ${colors.background};
     -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: ${SANS}; font-size: 11px; line-height: 1.45; color: ${colors.ink.DEFAULT}; }
   .hero { position: relative; height: 230px; border-radius: ${radii.card}px; overflow: hidden;
@@ -151,7 +153,7 @@ export function buildTripHtml({ trip, itinerary, coverImage }: TripPdfInput): st
     border: 1px solid ${colors.ink.inverse}; font-size: 9px; }
   .overline { font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
     color: ${colors.ink.muted}; margin-bottom: 10px; }
-  .day { break-inside: avoid; page-break-inside: avoid; background: ${colors.surface.DEFAULT};
+  .day { break-inside: avoid; page-break-inside: avoid; background: ${colors.surface};
     border-radius: ${radii.card}px; padding: 10px; margin-bottom: 14px; }
   .day-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 10px; }
   .day-head-left { display: flex; align-items: center; gap: 8px; }
@@ -159,9 +161,9 @@ export function buildTripHtml({ trip, itinerary, coverImage }: TripPdfInput): st
     border-radius: 999px; padding: 3px 10px; font-size: 10px; }
   .muted { color: ${colors.ink.muted}; font-size: 9.5px; }
   .day-body { display: flex; flex-direction: column; gap: 6px; }
-  .place { display: flex; gap: 9px; background: ${colors.surface.raised};
+  .place { display: flex; gap: 9px; background: ${colors.background};
     border-radius: ${radii.field}px; padding: 9px; }
-  .index { flex: none; width: 18px; height: 18px; border-radius: 999px; background: ${colors.surface.DEFAULT};
+  .index { flex: none; width: 18px; height: 18px; border-radius: 999px; background: ${colors.surface};
     color: ${colors.brand}; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
   .thumb { flex: none; width: 56px; height: 56px; border-radius: 10px; object-fit: cover; }
   .place-body { flex: 1; min-width: 0; }
@@ -174,7 +176,7 @@ export function buildTripHtml({ trip, itinerary, coverImage }: TripPdfInput): st
   .link { display: inline-block; margin-top: 4px; color: ${colors.brand}; font-weight: 600;
     font-size: 9.5px; text-decoration: none; }
   .footer { margin-top: 18px; text-align: right; font-weight: 700; color: ${colors.ink.muted}; }
-  .footer span { color: ${colors.primary.DEFAULT}; }
+  .footer span { color: ${colors.cta}; }
 </style>
 </head>
 <body>

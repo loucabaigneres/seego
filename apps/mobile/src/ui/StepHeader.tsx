@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { ArrowLeftIcon } from './icons';
 import { ProgressBar } from './ProgressBar';

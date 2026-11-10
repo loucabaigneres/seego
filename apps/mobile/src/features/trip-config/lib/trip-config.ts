@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-import { validate, type FieldErrors } from '@/features/auth/lib/validation';
+import { validate, type FieldErrors } from '@/lib/validate';
 import type { RouterInputs } from '@/lib/trpc';
 
 export type TripConfigInput = RouterInputs['submitTripConfiguration'];

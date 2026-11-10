@@ -42,7 +42,7 @@ export function ConfirmDialog({
 
   return (
     <div
-      className={`fixed inset-0 z-2100 flex items-end justify-center bg-black/50 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
+      className={`fixed inset-0 z-2100 flex items-end justify-center bg-ink/50 backdrop-blur-[2px] transition-opacity duration-300 sm:items-center sm:p-6 ${
         shown ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={() => !loading && onCancel()}
@@ -51,21 +51,21 @@ export function ConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative w-full max-w-95 rounded-t-[28px] bg-[#F2EDE8] p-6 shadow-2xl transition-transform duration-300 ease-out sm:rounded-[28px]"
+        className="relative w-full max-w-95 rounded-t-[28px] bg-background p-6 shadow-2xl transition-transform duration-300 ease-out sm:rounded-[28px]"
         style={{ transform: shown ? 'translateY(0)' : 'translateY(48px)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id={titleId} className="text-lg font-extrabold text-[#1a1a1a]">
+        <h2 id={titleId} className="text-lg font-display font-normal text-ink">
           {title}
         </h2>
-        {message && <p className="mt-2 text-sm leading-relaxed text-[#555]">{message}</p>}
+        {message && <p className="mt-2 text-sm leading-relaxed text-ink-secondary">{message}</p>}
 
         <div className="mt-6 flex gap-3">
           <button
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex-1 cursor-pointer rounded-2xl border border-[#ddd] bg-white px-4 py-3 text-sm font-semibold text-[#555] transition hover:border-[#1a1a1a]/20 active:scale-95 disabled:opacity-50"
+            className="flex-1 cursor-pointer rounded-2xl border border-line-strong bg-background px-4 py-3 text-sm font-semibold text-ink-secondary transition hover:border-ink/20 active:scale-95 disabled:opacity-50"
           >
             {cancelLabel}
           </button>
@@ -74,7 +74,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={loading}
             autoFocus
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#FF4D4D] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/25 transition hover:brightness-105 active:scale-95 disabled:opacity-60"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-bold text-accent shadow-lg shadow-brand/25 transition hover:brightness-105 active:scale-95 disabled:opacity-60"
           >
             {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {confirmLabel}

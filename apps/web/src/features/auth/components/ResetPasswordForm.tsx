@@ -43,12 +43,12 @@ export function ResetPasswordForm({ token, linkError }: ResetPasswordFormProps) 
       <AuthCard
         title="Nouveau mot de passe"
         footer={
-          <Link to="/forgot-password" className="font-bold text-[#FF4D4D] hover:underline">
+          <Link to="/forgot-password" className="font-bold text-brand hover:underline">
             Refaire une demande
           </Link>
         }
       >
-        <p className="mt-4 text-sm text-[#555]">
+        <p className="mt-4 text-sm text-ink-secondary">
           Ce lien est invalide ou a expiré. Fais une nouvelle demande de réinitialisation.
         </p>
       </AuthCard>

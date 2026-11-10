@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 
-import { colors, fonts } from '@/theme/tokens';
+import { colors, fonts } from '@seego/ui';
 import { HouseIcon, SuitcaseRollingIcon, UserIcon, type AppIcon } from '@/ui/icons';
 
 const ACTIVE_COLOR = colors.brand;

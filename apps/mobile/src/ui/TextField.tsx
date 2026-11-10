@@ -1,7 +1,7 @@
 import { useState, type Ref } from 'react';
 import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import { EyeIcon, EyeSlashIcon } from './icons';
@@ -36,8 +36,8 @@ export function TextField({
       </Text>
       <View
         className={cn(
-          'min-h-14 flex-row items-center rounded-field border bg-surface-raised',
-          error ? 'border-primary-text' : isFocused ? 'border-brand' : 'border-line-strong',
+          'min-h-14 flex-row items-center rounded-field border bg-background',
+          error ? 'border-brand' : isFocused ? 'border-brand' : 'border-line-strong',
           !editable && 'opacity-50',
         )}
       >
@@ -75,7 +75,7 @@ export function TextField({
         )}
       </View>
       {error && (
-        <Text variant="caption" tone="primary">
+        <Text variant="caption" tone="brand">
           {error}
         </Text>
       )}

@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Sheet, Text } from '@/ui';
 import { DownloadSimpleIcon, ShareNetworkIcon, type AppIcon } from '@/ui/icons';
 

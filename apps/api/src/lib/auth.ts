@@ -19,6 +19,8 @@ const devOrigins = [
   'http://localhost:8081',
 ];
 
+export const isApiOverHttps = env.BETTER_AUTH_URL.startsWith('https://');
+
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: 'pg',
@@ -54,6 +56,20 @@ export const auth = betterAuth({
     //     }
     //   : {}),
   },
+  // Le front (app.seego.fr / *.vercel.app) et l'API sont sur des sites différents :
+  // le cookie de session doit être SameSite=None; Secure pour être renvoyé en cross-site.
+  // En local (API en HTTP) on garde les valeurs par défaut. On se base sur l'URL de l'API
+  // et non sur NODE_ENV, qui vaut 'development' par défaut s'il n'est pas défini sur l'hébergeur.
+  ...(isApiOverHttps
+    ? {
+        advanced: {
+          defaultCookieAttributes: {
+            sameSite: 'none' as const,
+            secure: true,
+          },
+        },
+      }
+    : {}),
   trustedOrigins: [
     'https://app.seego.fr',
     'https://seego-app.vercel.app',

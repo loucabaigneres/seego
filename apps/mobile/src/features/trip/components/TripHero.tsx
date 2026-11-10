@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-nativ
 
 import { tripDisplayTitle, tripFacts, tripStatusMeta } from '@/domain/trip-summary';
 import type { RouterOutputs } from '@/lib/trpc';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, PhotoScrim, Tag, Text } from '@/ui';
 import { ArrowLeftIcon, HouseIcon, MapPinIcon, MapTrifoldIcon, type AppIcon } from '@/ui/icons';
 
