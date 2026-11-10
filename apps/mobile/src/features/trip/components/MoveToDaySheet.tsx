@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { formatDate, pluralize } from '@/domain/date';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Sheet, Text } from '@/ui';
 import { CaretRightIcon } from '@/ui/icons';
 
