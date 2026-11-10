@@ -5,6 +5,8 @@ import { env } from '@/config/env';
 export const authClient = createAuthClient({
   // L'URL racine de ton API Fastify où est branché le handler Better Auth
   baseURL: env.VITE_API_URL,
+  // Envoie le cookie de session sur les requêtes cross-origin (front et API sur des domaines différents)
+  fetchOptions: { credentials: 'include' },
   plugins: [emailOTPClient()],
 });
 

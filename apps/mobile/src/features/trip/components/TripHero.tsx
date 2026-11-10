@@ -1,40 +1,18 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { formatDate, pluralize } from '@/domain/date';
 import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
 import type { RouterOutputs } from '@/lib/trpc';
-import { colors } from '@/theme/tokens';
-import { Badge, PhotoScrim, Tag, Text } from '@/ui';
-import { ArrowLeftIcon, HouseIcon, MapPinIcon, MapTrifoldIcon, type AppIcon } from '@/ui/icons';
+import { colors } from '@seego/ui';
+import { Badge, IconButton, PhotoScrim, Tag, Text } from '@/ui';
+import { ArrowLeftIcon, HouseIcon, MapPinIcon, MapTrifoldIcon } from '@/ui/icons';
 
 function leaveTrip() {
   // Opened from a link, the trip has nothing to go back to.
   if (router.canGoBack()) router.back();
   else router.replace('/');
-}
-
-function HeroButton({
-  label,
-  icon: Icon,
-  onPress,
-}: {
-  label: string;
-  icon: AppIcon;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      role="button"
-      aria-label={label}
-      onPress={onPress}
-      hitSlop={8}
-      className="size-11 items-center justify-center rounded-full bg-scrim active:opacity-80"
-    >
-      <Icon size={20} color={colors.ink.inverse} />
-    </Pressable>
-  );
 }
 
 export interface TripHeroProps {
@@ -66,9 +44,14 @@ export function TripHero({ trip, coverImage, plannedCount, onLayout }: TripHeroP
 
       <View className="absolute inset-x-0 top-0 flex-row items-center justify-between p-3">
         <View className="flex-row gap-2">
-          <HeroButton label="Retour" icon={ArrowLeftIcon} onPress={leaveTrip} />
+          <IconButton variant="scrim" label="Retour" icon={ArrowLeftIcon} onPress={leaveTrip} />
           {/* At the end of the creation flow, "Retour" walks back through the form and the deck. */}
-          <HeroButton label="Accueil" icon={HouseIcon} onPress={() => router.dismissTo('/')} />
+          <IconButton
+            variant="scrim"
+            label="Accueil"
+            icon={HouseIcon}
+            onPress={() => router.dismissTo('/')}
+          />
         </View>
         <Badge label={status.label} tone={status.tone} />
       </View>

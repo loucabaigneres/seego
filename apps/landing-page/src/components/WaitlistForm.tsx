@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { ArrowRight, Check, Loader2, Mail, PartyPopper } from 'lucide-react';
+import { ArrowRight, Loader2, Mail, PartyPopper } from 'lucide-react';
 import { isValidEmail, submitWaitlist } from '../lib/waitlist';
 
 type Status = 'idle' | 'loading' | 'error';
@@ -10,8 +10,6 @@ type WaitlistFormProps = {
   onJoined: (email: string) => void;
   /** Which form this is ('hero' | 'footer') — recorded as utm_content for conversion stats. */
   position: string;
-  /** 'dark' tweaks the helper text for use on a dark background (CTA band). */
-  tone?: 'light' | 'dark';
   /** 'start' aligns the form left on desktop; 'center' keeps it centered. */
   align?: 'center' | 'start';
 };
@@ -20,7 +18,6 @@ export function WaitlistForm({
   joinedEmail,
   onJoined,
   position,
-  tone = 'light',
   align = 'center',
 }: WaitlistFormProps) {
   const [email, setEmail] = useState('');
@@ -32,15 +29,15 @@ export function WaitlistForm({
   if (joinedEmail) {
     return (
       <div
-        className={`flex max-w-md items-start gap-3 rounded-2xl border border-accent/20 bg-white/90 p-4 text-left shadow-sm ${alignClass}`}
+        className={`flex max-w-md items-start gap-3 rounded-2xl border border-cta/20 bg-background/90 p-4 text-left shadow-sm ${alignClass}`}
         role="status"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-accent">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-brand">
           <PartyPopper className="h-5 w-5" />
         </span>
         <div>
           <p className="text-sm font-bold text-ink">Tu es sur la liste !</p>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-ink-muted">
             On prévient <span className="font-semibold text-ink">{joinedEmail}</span> dès que l'app
             mobile sort.
           </p>
@@ -70,14 +67,12 @@ export function WaitlistForm({
     }
   };
 
-  const helperColor = tone === 'dark' ? 'text-white/60' : 'text-muted';
-
   return (
     <form onSubmit={handleSubmit} noValidate className={`w-full max-w-md ${alignClass}`}>
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <div className="relative flex-1">
           <Mail
-            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+            className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
             aria-hidden="true"
           />
           <input
@@ -95,13 +90,13 @@ export function WaitlistForm({
                 setError(null);
               }
             }}
-            className="h-13 w-full rounded-2xl border border-line bg-white/90 pl-11 pr-4 text-sm font-medium text-ink shadow-sm outline-none transition placeholder:text-muted/70 focus:border-accent focus:ring-4 focus:ring-accent/15"
+            className="h-13 w-full rounded-2xl border border-line bg-background/90 pl-11 pr-4 text-sm font-medium text-ink shadow-sm outline-none transition placeholder:text-ink-muted focus:border-cta focus:ring-4 focus:ring-cta/15"
           />
         </div>
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="group inline-flex h-13 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-accent px-6 text-sm font-bold text-white shadow-md shadow-accent/25 transition hover:brightness-105 focus-visible:ring-4 focus-visible:ring-accent/30 focus-visible:outline-none active:scale-95 disabled:cursor-wait disabled:opacity-80"
+          className="group inline-flex h-13 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-cta px-6 text-sm font-bold text-ink shadow-md shadow-cta/25 transition hover:brightness-105 focus-visible:ring-4 focus-visible:ring-cta/30 focus-visible:outline-none active:scale-95 disabled:cursor-wait disabled:opacity-80"
         >
           {status === 'loading' ? (
             <>
@@ -117,16 +112,11 @@ export function WaitlistForm({
         </button>
       </div>
 
-      <p className={`mt-2.5 flex items-center gap-1.5 text-xs ${helperColor}`} aria-live="polite">
-        {error ? (
-          <span className="font-semibold text-accent">{error}</span>
-        ) : (
-          <>
-            <Check className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
-            Pas de spam. Juste un e-mail le jour du lancement.
-          </>
-        )}
-      </p>
+      {error && (
+        <p className="mt-2.5 text-xs font-semibold text-brand" role="alert">
+          {error}
+        </p>
+      )}
     </form>
   );
 }

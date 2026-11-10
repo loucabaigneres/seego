@@ -48,6 +48,7 @@ export default function OnboardingScreen() {
         )}
         <Button
           label={quiz.isLastStep ? 'Découvrir mes destinations' : 'Continuer'}
+          variant={quiz.isLastStep ? 'cta' : 'primary'}
           disabled={!quiz.canContinue}
           onPress={quiz.goForward}
         />

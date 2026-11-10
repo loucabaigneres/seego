@@ -1,4 +1,4 @@
-import { categoryColors } from '@/theme/tokens';
+import { categoryColors } from '@seego/ui';
 
 /** Category values as stored in the catalogue (`discovery_content.tags.category`). */
 export type PlaceCategory = 'hotel' | 'activité' | 'restaurant';

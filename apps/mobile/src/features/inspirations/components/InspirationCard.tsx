@@ -3,7 +3,7 @@ import { Pressable, View } from 'react-native';
 
 import { cleanDescription } from '@/domain/place';
 import type { RouterOutputs } from '@/lib/trpc';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, Text } from '@/ui';
 import { ArrowSquareOutIcon } from '@/ui/icons';
 
@@ -21,7 +21,7 @@ export function InspirationCard({ inspiration }: { inspiration: InspirationItem 
       aria-label={`Ouvrir le lien ${platformLabel(inspiration.platform)}`}
       accessibilityHint={shortUrl(inspiration.originalUrl)}
       onPress={() => WebBrowser.openBrowserAsync(inspiration.originalUrl)}
-      className="gap-3 rounded-card bg-surface p-5 active:opacity-80"
+      className="gap-3 rounded-card border border-brand/15 bg-surface p-5 active:opacity-80"
     >
       <View className="flex-row items-center gap-3">
         <Badge label={platformLabel(inspiration.platform)} tone="brand" />

@@ -33,7 +33,7 @@ export function TripList() {
   if (trips.length === 0) {
     return (
       <EmptyState
-        className="flex-none rounded-card bg-surface py-10"
+        className="flex-none rounded-card border border-brand/15 bg-surface py-10"
         icon={MapTrifoldIcon}
         title="Pas encore de voyage"
         description="Lance le quiz ou swipe quelques destinations pour créer ton premier itinéraire."
