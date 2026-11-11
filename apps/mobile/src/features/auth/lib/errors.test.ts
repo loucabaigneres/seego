@@ -11,8 +11,8 @@ describe('authErrorMessage', () => {
   });
 
   it('translates e-mail verification code errors', () => {
-    expect(authErrorMessage({ code: 'INVALID_OTP' })).toBe('Code invalide ou expiré.');
-    expect(authErrorMessage({ code: 'OTP_EXPIRED' })).toBe('Code invalide ou expiré.');
+    expect(authErrorMessage({ code: 'INVALID_OTP' })).toBe('Code invalide.');
+    expect(authErrorMessage({ code: 'OTP_EXPIRED' })).toBe('Code expiré.');
     expect(authErrorMessage({ code: 'TOO_MANY_ATTEMPTS' })).toMatch(/nouveau code/);
   });
 
