@@ -1,6 +1,6 @@
+import { colors } from '@seego/ui';
 import { TextInput, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
 import { Button, cn, Notice, Sheet, Spinner, Text } from '@/ui';
 
 import type { EmailVerification } from '../hooks/useEmailVerification';
