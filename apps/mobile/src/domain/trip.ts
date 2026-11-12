@@ -31,3 +31,31 @@ export function daySummary(activities: { category: string | null }[]): string {
     .filter(Boolean)
     .join(' · ');
 }
+
+interface DayActivities<Activity> {
+  activities: Activity[];
+}
+
+/** Number of places planned across the itinerary ("12 étapes"). */
+export function plannedCount(itinerary: DayActivities<unknown>[]): number {
+  return itinerary.reduce((total, day) => total + day.activities.length, 0);
+}
+
+/** Cover photo: the first itinerary place that has one, else a liked place, else null. */
+export function tripCoverImage(
+  itinerary: DayActivities<{ mainMediaUrl: string | null }>[],
+  likedPlaces: DayActivities<{ mainMediaUrl: string | null }> | null,
+): string | null {
+  const places = [
+    ...itinerary.flatMap((day) => day.activities),
+    ...(likedPlaces?.activities ?? []),
+  ];
+  return places.find((place) => place.mainMediaUrl)?.mainMediaUrl ?? null;
+}
+
+/** The planner emits each day as a route (hotel → morning → lunch → afternoon → dinner). */
+export function inPlanningOrder<Activity extends { orderIndex: number }>(
+  activities: Activity[],
+): Activity[] {
+  return [...activities].sort((a, b) => a.orderIndex - b.orderIndex);
+}

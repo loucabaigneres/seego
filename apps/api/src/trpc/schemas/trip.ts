@@ -8,7 +8,8 @@ export const tripFormSchema = z.object({
   ages: z.array(z.union([z.number(), z.object({ value: z.number() }).transform((o) => o.value)])),
   intensity: z.enum(['chill', 'balanced', 'intense']),
   averagePrice: z.enum(['budget', 'mid', 'premium']),
-  interests: z.array(z.string()).optional().default([]),
+  // No default: an omitted field must not wipe the interests seeded by the onboarding quiz.
+  interests: z.array(z.string()).optional(),
   dietaryRestrictions: z
     .union([z.string(), z.array(z.string()).transform((arr) => arr.join(', '))])
     .optional()

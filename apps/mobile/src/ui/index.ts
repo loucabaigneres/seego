@@ -11,6 +11,7 @@ export { cn } from './cn';
 export { ComingSoonScreen } from './ComingSoonScreen';
 export { DateField } from './DateField';
 export { GoogleLogo } from './GoogleLogo';
+export { IconButton } from './IconButton';
 export { Notice } from './Notice';
 export { NumberStepper } from './NumberStepper';
 export { PhotoScrim } from './PhotoScrim';

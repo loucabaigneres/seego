@@ -7,7 +7,7 @@ import { colors } from '@seego/ui';
 import { Badge, Text } from '@/ui';
 import { CaretRightIcon } from '@/ui/icons';
 
-import { tripDisplayTitle, tripStatusMeta } from '../lib/trip-summary';
+import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
 
 export type TripListItem = RouterOutputs['user']['getTrips'][number];
 
