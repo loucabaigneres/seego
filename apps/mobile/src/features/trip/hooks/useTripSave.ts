@@ -51,6 +51,7 @@ export function useTripSave(tripId: string, trip: Trip | null) {
     run: () => (state === 'save' ? mutation.mutate({ tripId }) : signInToSave('/auth/sign-in')),
     signUp: () => signInToSave('/auth/sign-up'),
     isPending: mutation.isPending,
+    justSaved: mutation.isSuccess,
     failed: mutation.isError,
   };
 }

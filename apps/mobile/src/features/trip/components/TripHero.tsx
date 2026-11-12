@@ -6,7 +6,13 @@ import { tripDisplayTitle, tripFacts, tripStatusMeta } from '@/domain/trip-summa
 import type { RouterOutputs } from '@/lib/trpc';
 import { colors } from '@seego/ui';
 import { Badge, IconButton, PhotoScrim, Tag, Text } from '@/ui';
-import { ArrowLeftIcon, HouseIcon, MapPinIcon, MapTrifoldIcon } from '@/ui/icons';
+import {
+  ArrowLeftIcon,
+  HouseIcon,
+  MapPinIcon,
+  MapTrifoldIcon,
+  PencilSimpleIcon,
+} from '@/ui/icons';
 
 function leaveTrip() {
   // Opened from a link, the trip has nothing to go back to.
@@ -19,9 +25,11 @@ export interface TripHeroProps {
   coverImage: string | null;
   plannedCount: number;
   onLayout?: (event: LayoutChangeEvent) => void;
+  /** Shown only to the trip's owner. */
+  onRename?: () => void;
 }
 
-export function TripHero({ trip, coverImage, plannedCount, onLayout }: TripHeroProps) {
+export function TripHero({ trip, coverImage, plannedCount, onLayout, onRename }: TripHeroProps) {
   const status = tripStatusMeta(trip.status);
   const facts = tripFacts(trip, plannedCount);
 
@@ -48,7 +56,17 @@ export function TripHero({ trip, coverImage, plannedCount, onLayout }: TripHeroP
             onPress={() => router.dismissTo('/')}
           />
         </View>
-        <Badge label={status.label} tone={status.tone} />
+        <View className="flex-row items-center gap-2">
+          <Badge label={status.label} tone={status.tone} />
+          {onRename && (
+            <IconButton
+              variant="scrim"
+              label="Renommer le voyage"
+              icon={PencilSimpleIcon}
+              onPress={onRename}
+            />
+          )}
+        </View>
       </View>
 
       <View className="absolute inset-x-0 bottom-0 gap-2 p-6">

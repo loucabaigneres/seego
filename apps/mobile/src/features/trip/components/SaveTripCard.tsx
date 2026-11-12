@@ -6,8 +6,11 @@ import { BookmarkSimpleIcon, LockSimpleIcon } from '@/ui/icons';
 import type { useTripSave } from '../hooks/useTripSave';
 
 export function SaveTripCard({ save }: { save: ReturnType<typeof useTripSave> }) {
+  // Once saved, the "Finalisé" badge says it: the notice only confirms the save just made.
   if (save.state === 'saved') {
-    return <Notice tone="success" message="Sauvegardé dans ton profil" />;
+    return save.justSaved ? (
+      <Notice tone="success" message="C’est enregistré, retrouve-le dans l’onglet Voyages." />
+    ) : null;
   }
 
   const isGuest = save.state === 'sign-in';

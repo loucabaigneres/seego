@@ -21,7 +21,7 @@ export const userRouter = createTRPCRouter({
     const [tripsCount] = await ctx.db
       .select({ value: count() })
       .from(trip)
-      .where(eq(trip.userId, ctx.user.id));
+      .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)));
 
     const [likedCount] = await ctx.db
       .select({ value: count() })
@@ -47,7 +47,7 @@ export const userRouter = createTRPCRouter({
         createdAt: trip.createdAt,
       })
       .from(trip)
-      .where(eq(trip.userId, ctx.user.id))
+      .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))
       .orderBy(desc(trip.createdAt));
   }),
 
@@ -97,6 +97,33 @@ export const userRouter = createTRPCRouter({
       }
 
       return { success: true, trip: updatedTrip };
+    }),
+
+  deleteTrip: protectedProcedure
+    .input(z.object({ tripId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const [deletedTrip] = await ctx.db
+        .update(trip)
+        .set({ deletedAt: new Date(), updatedAt: new Date() })
+        .where(
+          and(
+            eq(trip.id, input.tripId),
+            eq(trip.userId, ctx.user.id),
+            // A group trip has members: only group.deleteGroupTrip may remove it.
+            eq(trip.isGroup, false),
+            isNull(trip.deletedAt),
+          ),
+        )
+        .returning({ id: trip.id });
+
+      if (!deletedTrip) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "Ce voyage n'existe pas ou vous n'avez pas l'autorisation de le supprimer.",
+        });
+      }
+
+      return { success: true };
     }),
 
   saveTripToAccount: protectedProcedure
