@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import type { AppIcon } from './icons';
@@ -9,11 +9,18 @@ import { Spinner } from './Spinner';
 import { Text } from './Text';
 
 const VARIANTS = {
-  // Vino, like the onboarding choice icons (product decision 2026-10-07: no corallo buttons).
-  primary: { container: 'bg-brand', text: 'text-ink-inverse', icon: colors.ink.inverse },
-  secondary: { container: 'bg-brand', text: 'text-ink-inverse', icon: colors.ink.inverse },
-  outline: { container: 'border border-brand', text: 'text-brand', icon: colors.brand },
-  ghost: { container: '', text: 'text-brand underline', icon: colors.brand },
+  // Vino with pesca text, like the onboarding choice icons.
+  primary: { container: 'bg-brand', text: 'text-accent', icon: colors.accent, spinner: 'accent' },
+  secondary: { container: 'bg-brand', text: 'text-accent', icon: colors.accent, spinner: 'accent' },
+  // The one highlighted action of a screen (apricot, notte text).
+  cta: { container: 'bg-cta', text: 'text-ink', icon: colors.ink.DEFAULT, spinner: 'ink' },
+  outline: {
+    container: 'border border-brand',
+    text: 'text-brand',
+    icon: colors.brand,
+    spinner: 'brand',
+  },
+  ghost: { container: '', text: 'text-brand underline', icon: colors.brand, spinner: 'brand' },
 } as const;
 
 const SIZES = {
@@ -46,7 +53,6 @@ export function Button({
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const styles = VARIANTS[variant];
-  const spinnerTone = variant === 'primary' || variant === 'secondary' ? 'inverse' : 'brand';
 
   return (
     <Pressable
@@ -63,7 +69,7 @@ export function Button({
       )}
       {...props}
     >
-      {loading && <Spinner tone={spinnerTone} />}
+      {loading && <Spinner tone={styles.spinner} />}
       {!loading && leading}
       <Text variant="label" className={styles.text}>
         {label}

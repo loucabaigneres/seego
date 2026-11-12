@@ -1,7 +1,6 @@
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
-
+import { IconButton } from './IconButton';
 import { ArrowLeftIcon } from './icons';
 import { ProgressBar } from './ProgressBar';
 import { Text } from './Text';
@@ -20,15 +19,7 @@ export function StepHeader({ label, backLabel, progress, segments, onBack }: Ste
   return (
     <View className="gap-4">
       <View className="flex-row items-center justify-between">
-        <Pressable
-          role="button"
-          aria-label={backLabel}
-          onPress={onBack}
-          hitSlop={8}
-          className="-ml-2 size-11 items-center justify-center rounded-full active:bg-surface"
-        >
-          <ArrowLeftIcon size={24} color={colors.ink.DEFAULT} />
-        </Pressable>
+        <IconButton label={backLabel} icon={ArrowLeftIcon} onPress={onBack} className="-ml-2" />
         <Text variant="overline">{label}</Text>
       </View>
       <ProgressBar value={progress} segments={segments} />

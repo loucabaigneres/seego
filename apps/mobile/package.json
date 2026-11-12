@@ -4,8 +4,6 @@
   "version": "1.0.0",
   "dependencies": {
     "@better-auth/expo": "~1.6.23",
-    "@expo-google-fonts/hanken-grotesk": "^0.4.3",
-    "@expo-google-fonts/instrument-serif": "^0.4.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "9.2.1",
     "@tanstack/react-query": "^5.104.1",
@@ -51,6 +49,7 @@
   "devDependencies": {
     "@seego/api": "workspace:*",
     "@seego/eslint-config": "workspace:*",
+    "@seego/ui": "workspace:*",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
     "babel-preset-expo": "~58.0.24",
@@ -76,6 +75,9 @@
     "preset": "jest-expo",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
-    }
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg|@seego/ui))"
+    ]
   }
 }

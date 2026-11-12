@@ -32,6 +32,27 @@ src/
   lib/            tRPC client, env, storage, guest id
 ```
 
+## Development build (Android, Windows)
+
+Expo Go no longer works (fonts are embedded natively by the `expo-font` config plugin).
+
+**Prerequisites (once)**
+
+- Android Studio (SDK + an emulator), JDK **17** (`winget install Microsoft.OpenJDK.17`): JDK 24+ breaks the CMake step.
+- Windows long paths enabled (admin PowerShell, then reboot):
+  `New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name LongPathsEnabled -Value 1 -PropertyType DWORD -Force`
+- Replace the SDK's ninja 1.10 with 1.12.1 (pnpm paths exceed 260 chars, old ninja fails with
+  `build.ninja still dirty after 100 tries`): unzip `ninja-win.zip` from ninja-build v1.12.1 into
+  `%LOCALAPPDATA%\Android\Sdk\cmake\3.22.1\bin`.
+- `JAVA_HOME` → JDK 17 and `ANDROID_HOME` → `%LOCALAPPDATA%\Android\Sdk` (env vars or per terminal).
+
+**Run**
+
+```bash
+npx expo run:android            # builds, installs on the emulator, starts Metro
+npx expo prebuild --clean       # only after changing app.json plugins or a native dependency
+```
+
 ## Rules
 
 0. Code flows one way: **shared → features → app**, enforced by ESLint (`no-restricted-imports`).
@@ -44,5 +65,5 @@ src/
 3. API types come from `RouterOutputs` / `RouterInputs` (`@/lib/trpc`), never from relative imports into `apps/api`.
 4. Every query renders its loading, error (with retry) and empty states using `@/ui`.
 5. UI copy is French and uses "tu".
-6. Follow the charte (DA V1, Sept. 2026): one corallo (`primary`) button per screen, no shadows,
+6. Follow the charte (DA V1, Sept. 2026): vino for actions, albicocca (`cta`) as the sparse secondary accent, no shadows,
    no emojis in the UI, icons from `@/ui/icons` (Phosphor), serif for titles, sans for actions.

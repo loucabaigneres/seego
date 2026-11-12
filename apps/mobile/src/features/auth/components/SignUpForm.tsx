@@ -71,6 +71,7 @@ export function SignUpForm() {
 
       <Button
         label="Créer mon compte"
+        variant="cta"
         loading={form.isSubmitting}
         onPress={form.submit}
         className="mt-1"

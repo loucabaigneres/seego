@@ -20,7 +20,7 @@ function RootLayout() {
   useClaimGuestTrips();
 
   return (
-    <div className="min-h-screen bg-[#F2EDE8] text-[#1a1a1a]">
+    <div className="min-h-screen bg-background text-ink">
       {/* Keeps <head> in sync with the active route */}
       <HeadContent />
       <Navbar userActions={<GroupTripPopover />} />

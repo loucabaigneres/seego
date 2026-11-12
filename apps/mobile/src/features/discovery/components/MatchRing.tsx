@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import Animated, { useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Text } from '@/ui';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -50,7 +50,7 @@ export function MatchRing({ percent }: { percent: number }) {
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke={colors.brand}
+          stroke={colors.cta}
           strokeWidth={STROKE}
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}

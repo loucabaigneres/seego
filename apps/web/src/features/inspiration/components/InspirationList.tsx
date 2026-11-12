@@ -64,15 +64,15 @@ export function InspirationList({
 
   if (importsQuery.isLoading) {
     return (
-      <p className="p-6 text-center text-sm font-medium text-[#888]">Chargement de tes imports…</p>
+      <p className="p-6 text-center text-sm font-medium text-ink-muted">Chargement de tes imports…</p>
     );
   }
 
   if (all.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#ddd] bg-white p-10 text-center shadow-sm">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-line-strong bg-background p-10 text-center shadow-sm">
         <span className="text-4xl">✨</span>
-        <p className="text-sm font-semibold text-[#1a1a1a]">
+        <p className="text-sm font-semibold text-ink">
           Tu n'as pas encore importé d'inspiration.
         </p>
         {emptyAction}
@@ -89,7 +89,7 @@ export function InspirationList({
       />
 
       {visible.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[#ddd] bg-white p-6 text-center text-sm text-[#888]">
+        <p className="rounded-2xl border border-dashed border-line-strong bg-background p-6 text-center text-sm text-ink-muted">
           Aucune publication de ce type.
         </p>
       ) : (
@@ -121,7 +121,7 @@ export function InspirationList({
       )}
 
       {(addToTripMutation.isError || deleteMutation.isError) && (
-        <p className="text-center text-xs font-medium text-[#FF4D4D]">
+        <p className="text-center text-xs font-medium text-brand">
           Une action a échoué, réessaie.
         </p>
       )}

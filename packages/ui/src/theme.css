@@ -1,0 +1,42 @@
+/* AUTO-GENERATED from packages/ui/src — run `pnpm --filter @seego/ui generate:css`. Do not edit. */
+@theme {
+  --color-background: #F7F0E8;
+  --color-surface: #EADBCB;
+  --color-ink: #22090F;
+  --color-ink-secondary: #3A2227;
+  --color-ink-muted: #6A5055;
+  --color-ink-inverse: #F7F0E8;
+  --color-brand: #5C1426;
+  --color-accent: #F5C6A8;
+  --color-success: #5F6B3A;
+  --color-success-text: #505C2F;
+  --color-line: rgba(34,9,15,0.12);
+  --color-line-strong: #9C8474;
+  --color-cta: #F08A5D;
+  --color-scrim: rgba(34,9,15,0.55);
+
+  --radius-sheet: 28px;
+  --radius-button: 28px;
+  --radius-card: 20px;
+  --radius-field: 16px;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 72px;
+  --text-display--line-height: 72px;
+  --text-title: 38px;
+  --text-title--line-height: 40px;
+  --text-section: 26px;
+  --text-section--line-height: 30px;
+  --text-label: 17px;
+  --text-label--line-height: 22px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-control: 15px;
+  --text-control--line-height: 20px;
+  --text-caption: 14px;
+  --text-caption--line-height: 20px;
+  --text-overline: 12px;
+  --text-overline--line-height: 16px;
+}
