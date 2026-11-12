@@ -2,8 +2,7 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
-import { formatDate, pluralize } from '@/domain/date';
-import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
+import { tripDisplayTitle, tripFacts, tripStatusMeta } from '@/domain/trip-summary';
 import type { RouterOutputs } from '@/lib/trpc';
 import { colors } from '@seego/ui';
 import { Badge, IconButton, PhotoScrim, Tag, Text } from '@/ui';
@@ -24,11 +23,7 @@ export interface TripHeroProps {
 
 export function TripHero({ trip, coverImage, plannedCount, onLayout }: TripHeroProps) {
   const status = tripStatusMeta(trip.status);
-  const facts = [
-    formatDate(trip.startDate),
-    trip.durationDays ? pluralize(trip.durationDays, 'jour') : '',
-    plannedCount > 0 ? pluralize(plannedCount, 'étape') : '',
-  ].filter(Boolean);
+  const facts = tripFacts(trip, plannedCount);
 
   return (
     <View onLayout={onLayout} className="h-72 overflow-hidden rounded-card bg-ink">
