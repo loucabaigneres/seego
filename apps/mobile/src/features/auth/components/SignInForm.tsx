@@ -1,21 +1,35 @@
+import { router } from 'expo-router';
 import { useRef } from 'react';
-import { View, type TextInput } from 'react-native';
+import { View, type TextInputInstance } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
 
 import { useAuthForm } from '../hooks/useAuthForm';
+import { useEmailVerification } from '../hooks/useEmailVerification';
+import { finishSignIn } from '../lib/navigation';
 import { signInSchema } from '../lib/validation';
-import { closeAuth } from '../lib/navigation';
+import { VerifyEmailSheet } from './VerifyEmailSheet';
 
 export function SignInForm() {
-  const passwordRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInputInstance>(null);
   const form = useAuthForm({
     schema: signInSchema,
     initialValues: { email: '', password: '' },
     request: (credentials) => authClient.signIn.email(credentials),
-    onSuccess: closeAuth,
+    onSuccess: finishSignIn,
+    // An account whose e-mail is not confirmed yet gets a fresh code instead of an error.
+    onError: async (error, credentials) => {
+      if (error.code !== 'EMAIL_NOT_VERIFIED') return false;
+      await authClient.emailOtp.sendVerificationOtp({
+        email: credentials.email,
+        type: 'email-verification',
+      });
+      verification.open(credentials);
+      return true;
+    },
   });
+  const verification = useEmailVerification({ onSignInFailed: form.setFormError });
 
   return (
     <View className="gap-5">
@@ -48,6 +62,13 @@ export function SignInForm() {
         returnKeyType="go"
         onSubmitEditing={form.submit}
       />
+      <Button
+        label="Mot de passe oublié ?"
+        variant="ghost"
+        size="sm"
+        className="-mt-3 self-end px-0"
+        onPress={() => router.push('/auth/forgot-password')}
+      />
 
       {form.formError && <Notice message={form.formError} />}
 
@@ -58,6 +79,8 @@ export function SignInForm() {
         onPress={form.submit}
         className="mt-1"
       />
+
+      <VerifyEmailSheet verification={verification} />
     </View>
   );
 }

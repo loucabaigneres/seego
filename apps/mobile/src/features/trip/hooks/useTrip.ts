@@ -1,15 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { splitTripDays } from '@/domain/trip';
+import { splitTripDays, tripCoverImage } from '@/domain/trip';
 import { trpc, type RouterOutputs } from '@/lib/trpc';
 
 import { useDaySelection } from './useDaySelection';
 import { useItineraryView } from './useItineraryView';
+import { usePlanningDraft } from './usePlanningDraft';
+import { useReplacePlace } from './useReplacePlace';
+import { useTripPdf } from './useTripPdf';
+import { useTripSave } from './useTripSave';
 
 export type TripDay = RouterOutputs['discovery']['getTrip']['days'][number];
 export type TripActivity = TripDay['activities'][number];
+export type Trip = RouterOutputs['discovery']['getTrip']['trip'];
 
-/** A trip and its days, the day on screen, and the generation of its itinerary when it has none yet. */
+/**
+ * A trip and its days, the day on screen, the generation of its itinerary when it has none yet,
+ * and its manual edits (planning draft, replacing a place).
+ */
 export function useTrip(tripId: string) {
   const queryClient = useQueryClient();
   const query = useQuery(trpc.discovery.getTrip.queryOptions({ tripId }));
@@ -24,8 +32,20 @@ export function useTrip(tripId: string) {
   );
 
   const days = splitTripDays(query.data?.days ?? []);
-  const selection = useDaySelection(days.itinerary);
+  const edit = usePlanningDraft(tripId, days.itinerary);
+  const replace = useReplacePlace(tripId);
+  // While editing, the picker and the timeline show the draft.
+  const selection = useDaySelection(edit.draft ?? days.itinerary);
   const itineraryView = useItineraryView(selection.scrollToPicker);
+  const trip = query.data?.trip ?? null;
+  const save = useTripSave(tripId, trip);
+  const pdf = useTripPdf(
+    trip && {
+      trip,
+      itinerary: days.itinerary,
+      coverImage: tripCoverImage(days.itinerary, days.likedPlaces),
+    },
+  );
   const errorCode = query.error?.data?.code;
 
   return {
@@ -34,10 +54,20 @@ export function useTrip(tripId: string) {
     notFound: errorCode === 'NOT_FOUND' || errorCode === 'BAD_REQUEST',
     loadFailed: query.isError,
     retry: () => query.refetch(),
-    trip: query.data?.trip ?? null,
+    trip,
     days,
+    pdf,
+    save,
     selection,
     itineraryView,
+    edit: {
+      ...edit,
+      start: () => {
+        itineraryView.setView('itinerary');
+        edit.start();
+      },
+    },
+    replace,
     isGenerated: query.data?.isGenerated ?? false,
     generate: {
       run: () => generation.mutate({ tripId }),

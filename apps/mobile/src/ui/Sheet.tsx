@@ -1,6 +1,6 @@
 import { useIsFocused } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -67,7 +67,12 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
       <Animated.View style={backdropStyle} className="absolute inset-0 bg-scrim">
         <Pressable role="button" aria-label="Fermer" onPress={onClose} className="flex-1" />
       </Animated.View>
-      <View className="flex-1 justify-end" pointerEvents="box-none">
+      {/* A modal window is not resized by the keyboard: lift the sheet above it (e.g. a code input). */}
+      <KeyboardAvoidingView
+        behavior="padding"
+        className="flex-1 justify-end"
+        pointerEvents="box-none"
+      >
         <Animated.View
           className={cn('max-h-[92%] rounded-t-sheet bg-background px-6 pt-3', className)}
           style={[{ paddingBottom: insets.bottom + 16 }, sheetStyle]}
@@ -80,7 +85,7 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
           )}
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

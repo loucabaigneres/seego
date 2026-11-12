@@ -1,10 +1,17 @@
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
+import { View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { plannedCount, tripCoverImage } from '@/domain/trip';
 import { DayTimeline } from '@/features/trip/components/DayTimeline';
+import { EditPlanningBar } from '@/features/trip/components/EditPlanningBar';
 import { GenerateItineraryCard } from '@/features/trip/components/GenerateItineraryCard';
 import { ItineraryToolbar } from '@/features/trip/components/ItineraryToolbar';
+import { MoveToDaySheet } from '@/features/trip/components/MoveToDaySheet';
+import { PdfActionsSheet } from '@/features/trip/components/PdfActionsSheet';
+import { PlanningEditHeader } from '@/features/trip/components/PlanningEditHeader';
+import { ReplacePlaceSheet } from '@/features/trip/components/ReplacePlaceSheet';
+import { SaveTripCard } from '@/features/trip/components/SaveTripCard';
 import { TripHero } from '@/features/trip/components/TripHero';
 import { TripMap } from '@/features/trip/components/TripMap';
 import { useTrip } from '@/features/trip/hooks/useTrip';
@@ -25,8 +32,12 @@ function TripPage({ tripId }: { tripId: string }) {
     retry,
     trip,
     days,
+    pdf,
+    save,
     selection,
     itineraryView,
+    edit,
+    replace,
     isGenerated,
     generate,
   } = useTrip(tripId);
@@ -52,56 +63,95 @@ function TripPage({ tripId }: { tripId: string }) {
   }
 
   return (
-    <Screen
-      scroll
-      contentClassName="gap-4"
-      // Child 1 is the toolbar: the day picker stays reachable on long days.
-      stickyHeaderIndices={isGenerated ? [1] : undefined}
-      scrollRef={selection.scrollRef}
-      onScroll={selection.onScroll}
-      // The map takes the drags; switching back to the itinerary gives them to the page again.
-      scrollEnabled={!showMap}
-    >
-      <TripHero
-        trip={trip}
-        coverImage={tripCoverImage(days.itinerary, days.likedPlaces)}
-        plannedCount={plannedCount(days.itinerary)}
-        onLayout={selection.onHeroLayout}
-      />
+    <>
+      <Screen
+        scroll
+        contentClassName="gap-4"
+        // Child 2 is the toolbar (after the hero and the save card): the day picker stays
+        // reachable on long days. Keep both rendered (even empty) so the index holds.
+        stickyHeaderIndices={isGenerated ? [2] : undefined}
+        scrollRef={selection.scrollRef}
+        onScroll={selection.onScroll}
+        // The map takes the drags; switching back to the itinerary gives them to the page again.
+        scrollEnabled={!showMap}
+        footer={
+          edit.isEditing && (
+            <EditPlanningBar
+              isSaving={edit.isSaving}
+              errorMessage={edit.errorMessage}
+              onCancel={edit.cancel}
+              onSave={edit.save}
+            />
+          )
+        }
+      >
+        <TripHero
+          trip={trip}
+          coverImage={tripCoverImage(days.itinerary, days.likedPlaces)}
+          plannedCount={plannedCount(days.itinerary)}
+        />
+        {/* Its bottom is where the sticky day picker starts. */}
+        <View onLayout={selection.onHeroLayout}>
+          {!edit.isEditing && <SaveTripCard save={save} />}
+        </View>
 
-      {isGenerated && (
-        <ItineraryToolbar
-          days={days.itinerary}
-          selectedId={selection.selectedId}
-          onSelect={selection.select}
-          view={itineraryView.view}
-          onViewChange={itineraryView.setView}
-          onLayout={itineraryView.onToolbarLayout}
-        />
-      )}
-      {showMap ? (
-        <TripMap days={selection.shownDays} height={itineraryView.mapHeight} />
-      ) : isGenerated ? (
-        // No slide on first display: only a pick in the day picker animates.
-        <LayoutAnimationConfig skipEntering>
-          <Animated.View
-            key={selection.selectedId}
-            entering={(selection.direction === 'forward' ? FadeInRight : FadeInLeft).duration(220)}
-            className="gap-10"
-          >
-            {selection.shownDays.map((day) => (
-              <DayTimeline key={day.id} day={day} />
-            ))}
-          </Animated.View>
-        </LayoutAnimationConfig>
-      ) : (
-        <GenerateItineraryCard
-          likedPlaces={days.likedPlaces?.activities ?? []}
-          isPending={generate.isPending}
-          failed={generate.failed}
-          onGenerate={generate.run}
-        />
-      )}
-    </Screen>
+        {isGenerated && (
+          <ItineraryToolbar
+            days={days.itinerary}
+            selectedId={selection.selectedId}
+            onSelect={selection.select}
+            view={itineraryView.view}
+            onViewChange={itineraryView.setView}
+            onLayout={itineraryView.onToolbarLayout}
+            canSwitchView={!edit.isEditing}
+          />
+        )}
+        {isGenerated && !showMap && (
+          <PlanningEditHeader isEditing={edit.isEditing} onStart={edit.start} pdf={pdf} />
+        )}
+        {showMap ? (
+          <TripMap days={selection.shownDays} height={itineraryView.mapHeight} />
+        ) : isGenerated ? (
+          // No slide on first display: only a pick in the day picker animates.
+          <LayoutAnimationConfig skipEntering>
+            <Animated.View
+              key={selection.selectedId}
+              entering={(selection.direction === 'forward' ? FadeInRight : FadeInLeft).duration(
+                220,
+              )}
+              className="gap-10"
+            >
+              {selection.shownDays.map((day) => (
+                <DayTimeline
+                  key={day.id}
+                  day={day}
+                  edit={
+                    edit.draft
+                      ? { day: edit.editDay(day.id), canChangeDay: edit.draft.length > 1 }
+                      : undefined
+                  }
+                  onReplace={edit.isEditing ? undefined : replace.open}
+                />
+              ))}
+            </Animated.View>
+          </LayoutAnimationConfig>
+        ) : (
+          <GenerateItineraryCard
+            likedPlaces={days.likedPlaces?.activities ?? []}
+            isPending={generate.isPending}
+            failed={generate.failed}
+            onGenerate={generate.run}
+          />
+        )}
+      </Screen>
+
+      <ReplacePlaceSheet replace={replace} />
+      <PdfActionsSheet visible={pdf.isChoosing} onPick={pdf.run} onClose={pdf.dismiss} />
+      <MoveToDaySheet
+        targets={edit.moveTargets}
+        onPick={edit.moveTo}
+        onClose={edit.closeMoveToDay}
+      />
+    </>
   );
 }
