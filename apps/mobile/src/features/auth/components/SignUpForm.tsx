@@ -5,8 +5,9 @@ import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
 
 import { useAuthForm } from '../hooks/useAuthForm';
+import { useEmailVerification } from '../hooks/useEmailVerification';
 import { signUpSchema } from '../lib/validation';
-import { closeAuth } from '../lib/navigation';
+import { VerifyEmailSheet } from './VerifyEmailSheet';
 
 export function SignUpForm() {
   const emailRef = useRef<TextInputInstance>(null);
@@ -14,10 +15,11 @@ export function SignUpForm() {
   const form = useAuthForm({
     schema: signUpSchema,
     initialValues: { name: '', email: '', password: '' },
-    // Better Auth signs the new user in straight away.
     request: (account) => authClient.signUp.email(account),
-    onSuccess: closeAuth,
+    // No session yet: the API has e-mailed a code that must be confirmed before signing in.
+    onSuccess: ({ email, password }) => verification.open({ email, password }),
   });
+  const verification = useEmailVerification({ onSignInFailed: form.setFormError });
 
   return (
     <View className="gap-5">
@@ -76,6 +78,8 @@ export function SignUpForm() {
         onPress={form.submit}
         className="mt-1"
       />
+
+      <VerifyEmailSheet verification={verification} />
     </View>
   );
 }

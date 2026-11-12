@@ -21,6 +21,8 @@ export const signUpSchema = z.object({
     .max(PASSWORD_MAX_LENGTH, `${PASSWORD_MAX_LENGTH} caractères maximum.`),
 });
 
+export const forgotPasswordSchema = z.object({ email });
+
 export type SignInValues = z.input<typeof signInSchema>;
 export type SignUpValues = z.input<typeof signUpSchema>;
 
