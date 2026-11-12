@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigation } from 'expo-router';
-import { usePreventRemove } from 'expo-router/react-navigation';
+import { usePreventRemove } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform } from 'react-native';
 
@@ -37,7 +36,6 @@ function confirmDiscard(onDiscard: () => void) {
  */
 export function usePlanningDraft(tripId: string, itinerary: TripDay[]) {
   const queryClient = useQueryClient();
-  const navigation = useNavigation();
   /** `null` outside edit mode. */
   const [draft, setDraft] = useState<TripDay[] | null>(null);
   /** Place whose "Déplacer vers…" sheet is open. */
@@ -59,8 +57,12 @@ export function usePlanningDraft(tripId: string, itinerary: TripDay[]) {
   const isDirty = draft !== null && isDraftDirty(draft, itinerary);
 
   // Covers Android's back button and the iOS back gesture.
-  usePreventRemove(isDirty && !mutation.isPending, ({ data }) =>
-    confirmDiscard(() => navigation.dispatch(data.action)),
+  // Router 58: drop the draft (prevention off), then `repeat` replays the blocked action.
+  usePreventRemove(isDirty && !mutation.isPending, ({ repeat }) =>
+    confirmDiscard(() => {
+      setDraft(null);
+      repeat();
+    }),
   );
 
   const update = (edit: (days: TripDay[]) => TripDay[]) => setDraft((d) => d && edit(d));

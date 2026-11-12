@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { View, type TextInput } from 'react-native';
+import { View, type TextInputInstance } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
@@ -9,7 +9,7 @@ import { signInSchema } from '../lib/validation';
 import { closeAuth } from '../lib/navigation';
 
 export function SignInForm() {
-  const passwordRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInputInstance>(null);
   const form = useAuthForm({
     schema: signInSchema,
     initialValues: { email: '', password: '' },

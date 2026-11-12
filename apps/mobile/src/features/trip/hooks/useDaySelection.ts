@@ -3,7 +3,7 @@ import type {
   LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  ScrollView,
+  ScrollViewInstance,
 } from 'react-native';
 
 import type { TripDay } from './useTrip';
@@ -16,7 +16,7 @@ export function useDaySelection(days: TripDay[]) {
   const [selectedId, setSelectedId] = useState<string>(ALL_DAYS);
   // Which way the picker moved on the last pick, so the new day can slide in from that side.
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const scrollY = useRef(0);
   // Where the picker sits, i.e. below the hero: the picker's own onLayout reports y = 0 once
   // ScrollView wraps it as a sticky header.
