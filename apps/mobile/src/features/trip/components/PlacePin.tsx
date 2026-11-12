@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 
 import { categoryMeta } from '@/domain/place';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { CategoryIcon } from './category-icons';
 

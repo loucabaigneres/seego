@@ -22,8 +22,8 @@ function ImportVideoPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-extrabold text-[#1a1a1a]">Importer une inspiration</h1>
-      <p className="mt-1 text-sm font-medium text-[#888]">
+      <h1 className="text-2xl font-display font-normal text-ink">Importer une inspiration</h1>
+      <p className="mt-1 text-sm font-medium text-ink-muted">
         Colle le lien d'un reel, d'une vidéo ou d'un post : notre IA en fait un compte rendu et
         repère les lieux (avec leur adresse) pour nourrir tes futurs voyages.
       </p>
@@ -34,7 +34,7 @@ function ImportVideoPage() {
         />
       </div>
 
-      <h2 className="mt-10 text-lg font-extrabold text-[#1a1a1a]">Mes imports récents</h2>
+      <h2 className="mt-10 text-lg font-display font-normal text-ink">Mes imports récents</h2>
       <div className="mt-4">
         <InspirationList />
       </div>

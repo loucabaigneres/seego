@@ -18,14 +18,14 @@ function TripConfigurePage() {
 
   if (configure.isLoadingTrip) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F2EDE8]">
-        <p className="text-[#888]">Chargement…</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-ink-muted">Chargement…</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-[#F2EDE8] px-4 py-8">
+    <div className="min-h-screen bg-background px-4 py-8">
       <TripForm
         initialDestination={configure.initialDestination}
         onSubmit={configure.submit}

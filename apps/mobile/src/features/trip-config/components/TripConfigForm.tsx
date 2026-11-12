@@ -57,7 +57,10 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
         {config.hasFailed && (
           <Notice message="Impossible de préparer ton voyage pour le moment. Vérifie ta connexion et réessaie." />
         )}
-        <Button label={submitLabel(config)} loading={config.isSubmitting} onPress={config.goForward} />
+        <Button
+          label={submitLabel(config)}
+          variant={config.isLastStep ? 'cta' : 'primary'}
+          loading={config.isSubmitting} onPress={config.goForward} />
       </View>
     </>
   );

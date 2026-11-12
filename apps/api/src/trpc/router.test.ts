@@ -3,6 +3,21 @@ import { eq } from 'drizzle-orm';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('../lib/email.js', () => ({ sendWaitlistConfirmation: vi.fn() }));
+// CI has no .env: env.ts would exit while the router's imports load.
+vi.mock('../env.js', () => ({
+  env: {
+    NODE_ENV: 'test',
+    PORT: 3000,
+    DATABASE_URL: 'postgres://user:pass@localhost:1/none',
+    BETTER_AUTH_SECRET: 'test-secret-0123456789',
+    BETTER_AUTH_URL: 'http://localhost:3000',
+    GOOGLE_CLIENT_ID: 'test',
+    GOOGLE_CLIENT_SECRET: 'test',
+    FRONTEND_URL: 'http://localhost:5173',
+    AI_MODEL: 'google:gemini-flash-lite-latest',
+    RESEND_API_KEY: 're_test',
+  },
+}));
 
 const { appRouter } = await import('./router.js');
 

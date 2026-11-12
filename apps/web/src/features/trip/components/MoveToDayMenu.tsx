@@ -62,8 +62,8 @@ export function MoveToDayMenu({ targets, onPick }: { targets: Day[]; onPick: (da
         aria-haspopup="menu"
         aria-expanded={anchor !== null}
         aria-controls={anchor ? menuId : undefined}
-        className={`inline-flex h-8 cursor-pointer items-center gap-1 rounded-full border bg-white pl-3 pr-2 text-xs font-semibold transition active:scale-95 ${
-          anchor ? 'border-[#FF4D4D] text-[#FF4D4D]' : 'border-[#ddd] text-[#555] hover:border-[#FF4D4D] hover:text-[#FF4D4D]'
+        className={`inline-flex h-8 cursor-pointer items-center gap-1 rounded-full border bg-surface pl-3 pr-2 text-xs font-semibold transition active:scale-95 ${
+          anchor ? 'border-brand text-brand' : 'border-line-strong text-ink-secondary hover:border-brand hover:text-brand'
         }`}
       >
         Déplacer vers…
@@ -85,9 +85,9 @@ export function MoveToDayMenu({ targets, onPick }: { targets: Day[]; onPick: (da
           id={menuId}
           role="menu"
           style={{ left: anchor.left, top: anchor.top, bottom: anchor.bottom }}
-          className="fixed z-2000 max-h-64 w-52 overflow-y-auto rounded-2xl border border-[#eee] bg-white p-1.5 shadow-[0_18px_40px_-16px_rgba(26,26,26,0.4)] scrollbar-thin"
+          className="fixed z-2000 max-h-64 w-52 overflow-y-auto rounded-card border border-brand/15 bg-surface p-1.5 shadow-[0_18px_40px_-16px_rgba(26,26,26,0.4)] scrollbar-thin"
         >
-          <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-wider text-[#aaa]">
+          <p className="px-2.5 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-wider text-ink-muted">
             Déplacer vers
           </p>
           {targets.map((d) => (
@@ -99,12 +99,12 @@ export function MoveToDayMenu({ targets, onPick }: { targets: Day[]; onPick: (da
                 setAnchor(null)
                 onPick(d.id)
               }}
-              className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-left outline-none transition hover:bg-[#FBF3EF] focus-visible:bg-[#FBF3EF]"
+              className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-left outline-none transition hover:bg-background focus-visible:bg-background"
             >
-              <span className="inline-flex h-6 items-center rounded-full bg-[#FF4D4D] px-2.5 text-[11px] font-bold text-white">
+              <span className="inline-flex h-6 items-center rounded-full bg-brand px-2.5 text-[11px] font-bold text-accent">
                 Jour {d.dayIndex}
               </span>
-              <span className="truncate text-[11px] font-medium text-[#888]">
+              <span className="truncate text-[11px] font-medium text-ink-muted">
                 {d.targetDate
                   ? formatDate(d.targetDate)
                   : `${d.activities.length} lieu${d.activities.length > 1 ? 'x' : ''}`}

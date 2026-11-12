@@ -59,7 +59,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Global verifications via Turbo
-        run: pnpx turbo run format lint build typecheck --filter=@seego/api --filter=@seego/database --filter=@seego/web
+        run: pnpx turbo run format lint build typecheck test --filter=@seego/api --filter=@seego/database --filter=@seego/web --filter=@seego/ui --filter=@seego/mobile
 
   build-and-push-docker:
     name: Build and Push Docker Image
@@ -85,6 +85,8 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
+          build-args: |
+            GIT_SHA=${{ github.sha }}
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/seego-api:${{ needs.setup-environment.outputs.docker_tag }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/seego-api:buildcache

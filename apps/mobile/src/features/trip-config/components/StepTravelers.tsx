@@ -50,7 +50,7 @@ export function StepTravelers({ values, errors, dispatch }: StepProps) {
           ))}
         </View>
         {errors.ages && (
-          <Text variant="caption" tone="primary">
+          <Text variant="caption" tone="brand">
             {errors.ages}
           </Text>
         )}

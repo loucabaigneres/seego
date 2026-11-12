@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, cn, Spinner, Text } from '@/ui';
 import { ArrowRightIcon, type AppIcon } from '@/ui/icons';
 
@@ -45,8 +45,8 @@ export function ChoiceCard({
       disabled={isDisabled}
       onPress={onPress}
       className={cn(
-        'gap-5 rounded-card p-6 active:opacity-90',
-        featured ? 'bg-brand' : 'bg-surface',
+        'gap-5 rounded-card border p-6 active:opacity-90',
+        featured ? 'border-brand bg-brand' : 'border-brand/15 bg-surface',
         disabled && 'opacity-60',
       )}
     >

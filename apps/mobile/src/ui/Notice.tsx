@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 import { CheckCircleIcon, WarningCircleIcon } from './icons';
@@ -8,7 +8,7 @@ import { Text } from './Text';
 
 const TONES = {
   warning: { icon: WarningCircleIcon, color: colors.brand, text: 'brand', role: 'alert' },
-  success: { icon: CheckCircleIcon, color: colors.success, text: 'success', role: 'status' },
+  success: { icon: CheckCircleIcon, color: colors.success.DEFAULT, text: 'success', role: 'status' },
 } as const;
 
 export interface NoticeProps {
@@ -23,7 +23,7 @@ export function Notice({ message, tone = 'warning', className }: NoticeProps) {
   return (
     <View
       role={role}
-      className={cn('flex-row items-center gap-3 rounded-field bg-surface p-4', className)}
+      className={cn('flex-row items-center gap-3 rounded-field border border-brand/15 bg-surface p-4', className)}
     >
       <Icon size={20} color={color} />
       <Text variant="caption" tone={text} className="flex-1">

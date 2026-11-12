@@ -1,4 +1,5 @@
 import { forwardRef, useState, type InputHTMLAttributes } from 'react';
+import { FIELD_CLASS } from './formStyles';
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
@@ -18,14 +19,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, Props>(function Passwo
         ref={ref}
         value={value}
         type={showText ? 'text' : 'password'}
-        className={`w-full border border-[#ddd] p-3 pr-12 rounded-xl bg-white focus:border-[#FF4D4D] focus:ring-2 focus:ring-[#FF4D4D]/20 outline-none transition text-[#1a1a1a] ${className}`}
+        className={`${FIELD_CLASS} pr-12 ${className}`}
       />
       {hasText && (
         <button
           type="button"
           onClick={() => setVisible((v) => !v)}
           aria-label={showText ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
-          className="absolute inset-y-0 right-0 flex items-center px-4 text-[#888] hover:text-[#1a1a1a] transition cursor-pointer"
+          className="absolute inset-y-0 right-0 flex items-center px-4 text-ink-muted hover:text-ink transition cursor-pointer"
         >
           {showText ? (
             <svg

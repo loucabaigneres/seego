@@ -1,6 +1,6 @@
 import { Pressable, View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { cn, Text } from '@/ui';
 import { CheckCircleIcon, CircleIcon, type AppIcon } from '@/ui/icons';
 
@@ -23,8 +23,8 @@ export function OptionTile({ icon: Icon, title, description, selected, onPress }
       accessibilityHint={description}
       onPress={onPress}
       className={cn(
-        'min-h-11 flex-row items-center gap-4 rounded-card p-4 active:opacity-80',
-        selected ? 'bg-brand' : 'bg-surface-raised',
+        'min-h-11 flex-row items-center gap-4 rounded-card border p-4 active:opacity-80',
+        selected ? 'border-brand bg-brand' : 'border-line-strong bg-background',
       )}
     >
       <Icon
@@ -33,7 +33,7 @@ export function OptionTile({ icon: Icon, title, description, selected, onPress }
         color={selected ? colors.accent : colors.brand}
       />
       <View className="flex-1 gap-0.5">
-        <Text variant="label" tone={selected ? 'inverse' : 'default'}>
+        <Text variant="label" tone={selected ? 'accent' : 'default'}>
           {title}
         </Text>
         <Text variant="caption" tone={selected ? 'inverse' : 'muted'}>
