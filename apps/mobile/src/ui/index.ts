@@ -8,7 +8,6 @@ export { Button } from './Button';
 export { Card } from './Card';
 export { Chip } from './Chip';
 export { cn } from './cn';
-export { ComingSoonScreen } from './ComingSoonScreen';
 export { DateField } from './DateField';
 export { GoogleLogo } from './GoogleLogo';
 export { IconButton } from './IconButton';

@@ -1,14 +1,23 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { View } from 'react-native';
 
-import { EmptyState, ErrorState, Skeleton } from '@/ui';
+import { tripDisplayTitle } from '@/domain/trip-summary';
+import { Button, EmptyState, ErrorState, Notice, Skeleton } from '@/ui';
 import { MapTrifoldIcon } from '@/ui/icons';
 
+import { useDeleteTrip } from '../hooks/useDeleteTrip';
 import { useMyTrips } from '../hooks/useMyTrips';
 import { TripCard } from './TripCard';
 
+// shortcut: user.getTrips returns every trip and the list shows them 10 at a time; paginate in the API if accounts reach hundreds of trips.
+const PAGE_SIZE = 10;
+
 export function TripList() {
   const { trips, isLoading, hasFailed, retry } = useMyTrips();
+  const deletion = useDeleteTrip();
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const hiddenCount = Math.max(trips.length - visibleCount, 0);
 
   if (isLoading) {
     return (
@@ -44,9 +53,24 @@ export function TripList() {
 
   return (
     <View className="gap-3">
-      {trips.map((trip) => (
-        <TripCard key={trip.id} trip={trip} />
+      {deletion.failed && (
+        <Notice message="Impossible de supprimer ce voyage pour le moment. Réessaie." />
+      )}
+      {trips.slice(0, visibleCount).map((trip) => (
+        <TripCard
+          key={trip.id}
+          trip={trip}
+          onDelete={() => deletion.remove(trip.id, tripDisplayTitle(trip))}
+          isDeleting={deletion.deletingId === trip.id}
+        />
       ))}
+      {hiddenCount > 0 && (
+        <Button
+          label={`Voir plus de voyages (${hiddenCount})`}
+          variant="outline"
+          onPress={() => setVisibleCount((count) => count + PAGE_SIZE)}
+        />
+      )}
     </View>
   );
 }

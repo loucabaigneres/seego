@@ -1,14 +1,16 @@
 import { View } from 'react-native';
 
-import { EmptyState, ErrorState, Skeleton } from '@/ui';
+import { EmptyState, ErrorState, Notice, Skeleton } from '@/ui';
 import { SparkleIcon } from '@/ui/icons';
 
+import { useDeleteInspiration } from '../hooks/useDeleteInspiration';
 import { useMyInspirations } from '../hooks/useMyInspirations';
 import { InspirationCard } from './InspirationCard';
 
 /** The user's imported inspirations with their loading, empty and error states. */
 export function InspirationList() {
   const { inspirations, isLoading, hasFailed, retry } = useMyInspirations();
+  const deletion = useDeleteInspiration();
 
   if (isLoading) {
     return (
@@ -43,8 +45,16 @@ export function InspirationList() {
 
   return (
     <View className="gap-3">
+      {deletion.failed && (
+        <Notice message="Impossible de supprimer cette inspiration pour le moment. Réessaie." />
+      )}
       {inspirations.map((inspiration) => (
-        <InspirationCard key={inspiration.id} inspiration={inspiration} />
+        <InspirationCard
+          key={inspiration.id}
+          inspiration={inspiration}
+          onDelete={() => deletion.remove(inspiration.id)}
+          isDeleting={deletion.deletingId === inspiration.id}
+        />
       ))}
     </View>
   );
