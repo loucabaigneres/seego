@@ -98,3 +98,8 @@ const COUNTRY_FLAGS: Record<string, string> = {
 export function countryFlag(country: string | null | undefined): string {
   return (country && COUNTRY_FLAGS[country]) || '';
 }
+
+/** "850 m" under a kilometre, "1,2 km" above. */
+export function formatDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1).replace('.', ',')} km`;
+}

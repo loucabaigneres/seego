@@ -2,6 +2,7 @@ import {
   categoryMeta,
   cleanDescription,
   countryFlag,
+  formatDistance,
   offerHost,
   parseWktPoint,
   placePhotos,
@@ -85,5 +86,12 @@ describe('countryFlag', () => {
   it('returns an empty string for unknown or missing countries', () => {
     expect(countryFlag('Atlantide')).toBe('');
     expect(countryFlag(null)).toBe('');
+  });
+});
+
+describe('formatDistance', () => {
+  it('shows metres under 1 km and French decimals above', () => {
+    expect(formatDistance(0.85)).toBe('850 m');
+    expect(formatDistance(1.24)).toBe('1,2 km');
   });
 });
