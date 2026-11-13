@@ -1,0 +1,1 @@
+ALTER TABLE "waitlist_leads" ADD COLUMN "unsubscribed_at" timestamp with time zone;
