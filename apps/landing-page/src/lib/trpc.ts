@@ -10,7 +10,8 @@ import { env } from '../env';
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
-      url: `${env.VITE_API_URL}/trpc`,
+      // Strip trailing slashes: `http://host/` + `/trpc` would give `//trpc`, which the API answers with a 404.
+      url: `${env.VITE_API_URL.replace(/\/+$/, '')}/trpc`,
     }),
   ],
 });
