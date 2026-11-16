@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { env } from '../env.js';
+import { buildUnsubscribeUrl } from './unsubscribe.js';
 
 export const resend = new Resend(env.RESEND_API_KEY);
 
@@ -54,5 +55,6 @@ export function sendWaitlistConfirmation(to: string) {
     to,
     subject: 'Bienvenue dans la communauté Seego !',
     template: TEMPLATES.waitlistConfirmation,
+    variables: { UNSUBSCRIBE_URL: buildUnsubscribeUrl(to) },
   });
 }
