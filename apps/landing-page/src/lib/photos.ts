@@ -4,6 +4,8 @@ export const PHOTOS = {
   lisbon: 'photo-1697748525265-7431cba075b6',
   // Rome, the Colosseum at dusk. Photo: David Köhler
   rome: 'photo-1552832230-c0197dd311b5',
+  // Santorini, Oia at dusk
+  santorini: 'photo-1570077188670-e3a8d69ac5ff',
   // Airplane wing above the clouds. Photo: Johny Goerend
   wing: 'photo-1593182440709-4b7b56482c55',
 };

@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import { CloudOff, Layers, Map } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { CloudOff, Layers, Map } from 'lucide-react';
 import { motion, useScroll, type MotionValue } from 'motion/react';
-import { useScrub } from '../lib/useScrub';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { PhoneMockup } from '../components/PhoneMockup';
-import { PHOTOS, unsplash } from '../lib/photos';
 import { Reveal } from '../components/Reveal';
+import { PHOTOS, unsplash } from '../lib/photos';
+import { useScrub } from '../lib/useScrub';
 import { Cross, LineReveal, SectionLabel } from './ui';
 
 type Feature = {
@@ -25,9 +25,9 @@ function Photo({ id, alt, drift }: { id: string; alt: string; drift: MotionValue
         loading="lazy"
         draggable={false}
         style={{ x: drift }}
-        className="absolute inset-y-0 -left-[10%] h-full w-[120%] max-w-none object-cover"
+        className="absolute inset-y-0 left-[-10%] h-full w-[120%] max-w-none object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent" />
+      <div className="absolute inset-0 bg-linear-to-t from-ink/40 to-transparent" />
     </div>
   );
 }
@@ -39,8 +39,17 @@ const FEATURES: Feature[] = [
     description:
       'Oublie les 30 onglets ouverts. Swipe à droite les destinations et activités qui te font envie, à gauche le reste.',
     visual: () => (
-      <div className="absolute inset-0 flex items-center justify-center bg-accent">
-        <div className="w-[48%] max-w-[200px] translate-y-[28%]">
+      <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-brand">
+        {/* Soft glow + dot grid behind the device */}
+        <div
+          className="absolute inset-0 bg-[radial-gradient(circle_at_50%_70%,var(--color-cta)_0%,transparent_60%)] opacity-40"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 opacity-25 bg-[radial-gradient(rgb(255_255_255/0.6)_1px,transparent_1px)] bg-size-[22px_22px]"
+          aria-hidden="true"
+        />
+        <div className="w-[66%] max-w-72.5 translate-y-[24%]">
           <PhoneMockup />
         </div>
       </div>
@@ -120,7 +129,7 @@ export function FeatureRail() {
   const cards = FEATURES.map(({ icon: Icon, title, description, visual }, i) => (
     <article
       key={title}
-      className={`relative flex shrink-0 flex-col overflow-hidden rounded-[2rem] bg-surface shadow-sm ${
+      className={`relative flex shrink-0 flex-col overflow-hidden rounded-4xl bg-surface shadow-sm ${
         wide ? 'h-[72svh] w-[56vw] lg:w-[40vw]' : 'w-full'
       }`}
     >
