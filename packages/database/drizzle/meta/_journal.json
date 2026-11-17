@@ -50,6 +50,13 @@
       "when": 1794911973031,
       "tag": "0006_catalogue_expand",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794912351366,
+      "tag": "0007_catalogue_switch",
+      "breakpoints": true
     }
   ]
 }
