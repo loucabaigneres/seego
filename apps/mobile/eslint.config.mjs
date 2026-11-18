@@ -38,7 +38,7 @@ export default [
   // Unidirectional architecture: shared -> features -> app.
   // Shared code may not depend on features or on the app layer.
   {
-    files: ['src/{domain,hooks,lib,theme,ui}/**/*.{ts,tsx}', 'src/env.ts'],
+    files: ['src/{domain,hooks,lib,ui}/**/*.{ts,tsx}', 'src/env.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

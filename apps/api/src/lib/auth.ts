@@ -1,7 +1,7 @@
 import { drizzleAdapter } from '@better-auth/drizzle-adapter';
 import { expo } from '@better-auth/expo';
 import { betterAuth } from 'better-auth';
-import { emailOTP } from 'better-auth/plugins';
+import { admin, emailOTP } from 'better-auth/plugins';
 import { env } from '../env.js';
 import { db } from './db.js';
 import { sendResetPasswordEmail, sendVerificationCode } from './email.js';
@@ -28,6 +28,12 @@ export const auth = betterAuth({
   // Lets the mobile app send its session cookie and receive OAuth redirects on its deep link.
   plugins: [
     expo(),
+    // Rôles et modération (colonnes `role`, `banned`, ... déjà présentes dans le schéma `user`).
+    // Le rôle par défaut reste 'traveler' (défaut de la colonne) ; seul 'admin' ouvre le back-office.
+    admin({
+      defaultRole: 'traveler',
+      adminRoles: ['admin'],
+    }),
     emailOTP({
       otpLength: 6,
       expiresIn: 600,

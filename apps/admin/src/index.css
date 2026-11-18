@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@seego/ui/css';
+@import '@seego/ui/fonts.css';
+
+/*
+ * shadcn/ui theme mapped onto the @seego/ui tokens (single source of truth for the brand):
+ * the components keep their semantic classes (bg-primary, text-muted-foreground, border-input...)
+ * and get the Seego palette. Only names that do not exist in @seego/ui are declared here, so the
+ * Seego tokens (bg-background, text-ink, bg-brand, rounded-card...) keep working unchanged.
+ *
+ * One deliberate exception: `accent`. In shadcn it is the subtle highlight of focused menu items;
+ * in @seego/ui it is the albicocca tint. The back-office follows shadcn (`bg-accent` = surface);
+ * use `bg-cta` for the albicocca accent. No dark theme: @seego/ui has none yet.
+ */
+@theme inline {
+  --font-heading: var(--font-display);
+
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-background);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-brand);
+  --color-primary-foreground: var(--color-ink-inverse);
+  --color-secondary: var(--color-surface);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-surface);
+  --color-muted-foreground: var(--color-ink-muted);
+  --color-accent: var(--color-surface);
+  --color-accent-foreground: var(--color-ink);
+  /* The charte uses vino (brand) for errors too. */
+  --color-destructive: var(--color-brand);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-strong);
+  --color-ring: var(--color-brand);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

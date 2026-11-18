@@ -22,6 +22,7 @@ The codebase is divided into executable applications and shared packages.
 ```bash
 seego/
 ├── apps/
+│   ├── admin/            # The back-office (Vite + React + TanStack Router/Table), admins only
 │   ├── api/              # The backend server (Fastify + tRPC + Better Auth)
 │   ├── mobile/           # The mobile application (React Native + Expo)
 │   └── web/              # The frontend web application (Vite + React)
@@ -42,7 +43,7 @@ Ensure you have the following tools installed on your machine:
 - [Node.js](https://nodejs.org/) (Version 24 LTS)
 - [pnpm](https://pnpm.io/installation) (`npm install -g pnpm@10.33.2`)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Docker-Compose)
-- **Expo Go** installed on your physical device (iOS or Android), or a local emulator/simulator (Xcode/Android Studio).
+- For the mobile app, a native toolchain to build the development build: **Android Studio** (SDK + emulator, JDK 17) and/or **Xcode** (iOS simulator, macOS only). Expo Go is not supported (see [`apps/mobile/README.md`](apps/mobile/README.md)).
 
 ### 2. Install Dependencies
 
@@ -63,7 +64,7 @@ Create `apps/api/.env`:
 DATABASE_URL=postgres://admin:password@db:5432/seego
 PORT=3000
 NODE_ENV=development
-BETTER_AUTH_SECRET=generate_a_random_string_here
+BETTER_AUTH_SECRET=generate_a_random_string_here_at_least_10_chars
 BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=found_in_your_google_cloud_console
 GOOGLE_CLIENT_SECRET=found_in_your_google_cloud_console
@@ -72,9 +73,18 @@ FRONTEND_URL=http://localhost:5173
 # AI Analysis Configuration (optional to start the server, required to analyze posts)
 AI_MODEL=google:gemini-flash-lite-latest
 GEMINI_API_KEY=your_google_ai_studio_api_key
+
+# Transactional emails via Resend (required: the server refuses to start without it, must start with "re_")
+RESEND_API_KEY=re_your_resend_api_key
 ```
 
 Create `apps/web/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+Create `apps/admin/.env` (copy `apps/admin/.env.example`):
 
 ```env
 VITE_API_URL=http://localhost:3000
@@ -86,18 +96,18 @@ Create `apps/mobile/.env`:
 EXPO_PUBLIC_API_URL=http://localhost:3000
 ```
 
-> ⚠️ **Note for Mobile testing:** _If you are testing the mobile app on a physical device using Expo Go, `localhost` will not work. You must replace it with your computer's local IP address (e.g., `EXPO_PUBLIC_API_URL=http://192.168.1.X:3000`)._
+> ⚠️ **Note for Mobile testing:** _If you are testing the mobile app on a physical device, `localhost` will not work. You must replace it with your computer's local IP address (e.g., `EXPO_PUBLIC_API_URL=http://192.168.1.X:3000`)._
 
 #### Mobile authentication (Better Auth)
 
-The mobile app signs in through the API's Better Auth, with the `@better-auth/expo` plugin: the session lives in SecureStore, and everything runs in Expo Go (no development build).
+The mobile app signs in through the API's Better Auth, with the `@better-auth/expo` plugin: the session lives in SecureStore. Auth runs in the development build (Expo Go is no longer supported).
 
 - **Email / password** works on every target, including a LAN IP.
 - **Google** uses the browser redirect flow, so Google must reach the API's callback (`<BETTER_AUTH_URL>/api/auth/callback/google`, listed in the Google Cloud Console). Google refuses private IPs, so:
   - **iOS simulator**: `http://localhost:3000` works as is.
   - **Android emulator or USB device**: run `adb reverse tcp:3000 tcp:3000`, then use `EXPO_PUBLIC_API_URL=http://localhost:3000`.
   - **Physical iPhone**: expose the API through an HTTPS tunnel (e.g. `ngrok http 3000`), set the tunnel URL as `BETTER_AUTH_URL` (API) and `EXPO_PUBLIC_API_URL` (mobile), and add `<tunnel>/api/auth/callback/google` to the Google console.
-- The API trusts the app scheme `seego://` and, in development, Expo Go (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
+- The API trusts the app scheme `seego://` and, in development, Expo dev URLs (`exp://`) and the web preview (`http://localhost:8081`). See `apps/api/src/lib/auth.ts`.
 
 Create `packages/database/.env`:
 
@@ -139,19 +149,30 @@ pnpm turbo run dev --filter=@seego/web
 
 ✅ The Web App will be accessible at `http://localhost:5173`
 
-#### Run the Mobile App:
+#### Run the Admin (back-office):
 
 ```bash
-pnpm turbo run dev --filter=@seego/mobile
+pnpm turbo run dev --filter=@seego/admin
 ```
 
-Or
+✅ The Admin will be accessible at `http://localhost:5175`. Only accounts with the Better Auth `admin` role can sign in: see [`apps/admin/README.md`](apps/admin/README.md) to promote one.
+
+#### Run the Mobile App:
+
+The mobile app needs a development build (fonts are embedded natively by the `expo-font` config plugin, so Expo Go no longer works). Build and install it on an emulator/simulator or a connected device; this also starts Metro:
+
+```bash
+pnpm --filter @seego/mobile android   # npx expo run:android
+pnpm --filter @seego/mobile ios       # npx expo run:ios (macOS only)
+```
+
+Rebuild only after changing `app.json` plugins or a native dependency (`npx expo prebuild --clean` from `apps/mobile`). Once the app is installed, you can just start Metro:
 
 ```bash
 pnpm turbo run dev --filter=@seego/mobile --ui=tui
 ```
 
-✅ Scan the QR code in your terminal with the Expo Go app on your phone, or press `i` to open the iOS simulator / `a` for the Android emulator.
+Android prerequisites (JDK 17, Windows long paths, ninja version) are listed in [`apps/mobile/README.md`](apps/mobile/README.md).
 
 ---
 
@@ -196,6 +217,7 @@ Thanks to Turborepo, you can run commands from the root to target specific proje
 | **Start the API**             | `pnpm turbo run dev --filter=@seego/api`    |
 | **Start the Web App**         | `pnpm turbo run dev --filter=@seego/web`    |
 | **Start the Mobile App**      | `pnpm turbo run dev --filter=@seego/mobile` |
+| **Start the Admin**           | `pnpm turbo run dev --filter=@seego/admin`  |
 | **Format the entire project** | `pnpm run format`                           |
 | **Lint the entire project**   | `pnpm run lint`                             |
 | **Generate DB migration**     | `pnpm --filter @seego/database db:generate` |
