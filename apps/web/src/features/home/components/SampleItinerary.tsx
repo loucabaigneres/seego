@@ -1,33 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { motion, useInView, useReducedMotion } from 'motion/react';
+import { useRef, useState } from 'react';
 import { unsplash } from '../lib/photos';
 import { SAMPLE_TRIP } from '../lib/sampleTrip';
 
-const STEP_MS = 160;
-
 /**
  * Shows what Seego builds: a ticket-shaped itinerary that writes itself once it scrolls into view
- * (and again when another day is picked). Self-contained, removing it only means deleting its line on the home page.
+ * (and again when another day is picked), animated with `motion`. Self-contained, removing it only means deleting its line on the home page.
  */
 export function SampleItinerary({ onStart }: { onStart: () => void }) {
   const [day, setDay] = useState(0);
-  const [visible, setVisible] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(ticketRef, { once: true, amount: 0.35 });
+  const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    const node = ticketRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
+  // With reduced motion the hidden state looks like the shown one, so nothing moves.
+  const hiddenStop = reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 };
+  const hiddenLine = reduceMotion ? { scaleY: 1 } : { scaleY: 0 };
 
   const current = SAMPLE_TRIP.days[day];
 
@@ -102,19 +90,31 @@ export function SampleItinerary({ onStart }: { onStart: () => void }) {
             <div id="sample-panel" role="tabpanel" aria-labelledby={`sample-tab-${day}`} className="px-5 pb-6 pt-4">
               <p className="font-display text-xl text-ink">{current.theme}</p>
 
-              <ol key={`${day}-${visible}`} className="relative mt-5">
+              <motion.ol
+                key={day}
+                initial="hidden"
+                animate={inView ? 'shown' : 'hidden'}
+                variants={{ hidden: {}, shown: { transition: { staggerChildren: 0.16, delayChildren: 0.25 } } }}
+                className="relative mt-5"
+              >
                 {/* The route line draws itself before the stops appear */}
-                <span
+                <motion.span
                   aria-hidden
-                  className="absolute bottom-3 left-[3.9rem] top-3 w-px origin-top bg-brand/25 motion-safe:animate-[sample-line_0.9s_ease-out_both]"
+                  variants={{
+                    hidden: hiddenLine,
+                    shown: { scaleY: 1, transition: { duration: 0.9, ease: 'easeOut' } },
+                  }}
+                  style={{ originY: 0 }}
+                  className="absolute bottom-3 left-[3.9rem] top-3 w-px bg-brand/25"
                 />
-                {current.stops.map((stop, i) => (
-                  <li
+                {current.stops.map((stop) => (
+                  <motion.li
                     key={stop.time}
-                    className={`relative flex gap-4 pb-5 last:pb-0 ${
-                      visible ? 'motion-safe:animate-[sample-stop_0.5s_ease-out_both]' : 'opacity-0 motion-reduce:opacity-100'
-                    }`}
-                    style={{ animationDelay: `${i * STEP_MS + 250}ms` }}
+                    variants={{
+                      hidden: hiddenStop,
+                      shown: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+                    }}
+                    className="relative flex gap-4 pb-5 last:pb-0"
                   >
                     <span className="w-10 shrink-0 pt-0.5 text-sm font-semibold tabular-nums text-ink">{stop.time}</span>
                     <span aria-hidden className="relative z-10 mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 border-brand bg-surface" />
@@ -122,9 +122,9 @@ export function SampleItinerary({ onStart }: { onStart: () => void }) {
                       <p className="text-base font-semibold leading-tight text-ink">{stop.title}</p>
                       <p className="mt-0.5 text-sm text-ink-secondary">{stop.detail}</p>
                     </div>
-                  </li>
+                  </motion.li>
                 ))}
-              </ol>
+              </motion.ol>
             </div>
           </div>
         </div>
