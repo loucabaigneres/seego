@@ -30,3 +30,24 @@
 .leaflet-tooltip-top.tm-tooltip::before {
   border-top-color: var(--color-ink);
 }
+
+/* Home page: sample itinerary that writes itself */
+@keyframes sample-stop {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sample-line {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
