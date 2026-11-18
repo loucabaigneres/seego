@@ -9,18 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root';
-import { Route as ResetPasswordRouteImport } from './routes/reset-password';
-import { Route as RegisterRouteImport } from './routes/register';
-import { Route as ProfileRouteImport } from './routes/profile';
-import { Route as OnboardingRouteImport } from './routes/onboarding';
-import { Route as LoginRouteImport } from './routes/login';
-import { Route as ImportVideoRouteImport } from './routes/importVideo';
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password';
 import { Route as DiscoveryRouteImport } from './routes/discovery';
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password';
+import { Route as ImportVideoRouteImport } from './routes/importVideo';
 import { Route as IndexRouteImport } from './routes/index';
-import { Route as TripConfigureRouteImport } from './routes/trip/configure';
-import { Route as TripTripIdRouteImport } from './routes/trip.$tripId';
 import { Route as JoinInviteCodeRouteImport } from './routes/join.$inviteCode';
+import { Route as LoginRouteImport } from './routes/login';
+import { Route as OnboardingRouteImport } from './routes/onboarding';
+import { Route as ProfileRouteImport } from './routes/profile';
+import { Route as RegisterRouteImport } from './routes/register';
+import { Route as ResetPasswordRouteImport } from './routes/reset-password';
+import { Route as TripTripIdRouteImport } from './routes/trip.$tripId';
+import { Route as TripConfigureRouteImport } from './routes/trip/configure';
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',

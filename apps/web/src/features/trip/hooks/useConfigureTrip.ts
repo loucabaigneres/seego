@@ -1,7 +1,12 @@
+import { trpc } from '@/lib/trpc';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { trpc } from '@/lib/trpc';
+import { useState } from 'react';
 import type { TripFormValues } from '../lib/tripForm';
+import { tripDurationDays, tripToFormValues } from '../lib/tripForm';
+
+/** Duration of the progress bar's fill animation (see ProgressBar). */
+const PROGRESS_FILL_MS = 600;
 
 /**
  * Trip configuration form: saves the answers, generates the itinerary, then opens the trip.
@@ -14,35 +19,47 @@ export function useConfigureTrip(tripId: string | undefined) {
   const existingTripQuery = useQuery({
     ...trpc.getTripConfiguration.queryOptions({ tripId: tripId! }),
     enabled: !!tripId,
+    // Always read the saved answers fresh: they change every time the form is submitted.
+    gcTime: 0,
+    refetchOnMount: 'always',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitTripMutation = useMutation(trpc.submitTripConfiguration.mutationOptions());
   const generateMutation = useMutation(trpc.discovery.generateItinerary.mutationOptions());
 
   const submit = async (data: TripFormValues) => {
+    const { endDate, ...fields } = data;
     const finalDietary = [...data.dietaryOptions, data.dietaryCustom].filter(Boolean).join(', ');
     const finalMedical = [...data.medicalOptions, data.medicalCustom].filter(Boolean).join(', ');
 
+    setIsSubmitting(true);
+    // Keeps the form's progress bar on screen long enough to visibly reach 100 %.
+    const barFilled = new Promise((resolve) => setTimeout(resolve, PROGRESS_FILL_MS));
+
     try {
       const result = await submitTripMutation.mutateAsync({
-        ...data,
+        ...fields,
+        durationDays: tripDurationDays(data.startDate, endDate),
         ages: data.ages.map((a) => a.value),
         dietaryRestrictions: finalDietary,
         medicalConditions: finalMedical,
         tripId,
       });
       await generateMutation.mutateAsync({ tripId: result.tripId });
+      await barFilled;
       navigate({ to: '/trip/$tripId', params: { tripId: result.tripId } });
     } catch (error) {
       console.error('❌ Erreur lors de la création du voyage :', error);
       alert('Une erreur est survenue, regarde la console.');
+      setIsSubmitting(false);
     }
   };
 
   return {
     isLoadingTrip: !!tripId && existingTripQuery.isPending,
-    initialDestination: existingTripQuery.data?.destination ?? 'Paris',
-    isSubmitting: submitTripMutation.isPending || generateMutation.isPending,
+    initialValues: existingTripQuery.data ? tripToFormValues(existingTripQuery.data) : undefined,
+    isSubmitting,
     submit,
   };
 }
