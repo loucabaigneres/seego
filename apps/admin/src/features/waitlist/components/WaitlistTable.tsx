@@ -1,10 +1,11 @@
 import { Search } from 'lucide-react';
 import { DataTable } from '@/components/data-table/DataTable';
 import { ErrorState } from '@/components/QueryState';
-import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -28,7 +29,7 @@ export function WaitlistTable() {
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-heading text-section text-foreground">Waitlist</h1>
+          <h1 className="type-section">Waitlist</h1>
           <p className="text-sm text-muted-foreground">
             {query.isSuccess
               ? `${total} inscrit${total > 1 ? 's' : ''}${hasFilters ? ' (filtrés)' : ''}`
@@ -37,17 +38,18 @@ export function WaitlistTable() {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
+          <InputGroup className="w-64">
+            <InputGroupInput
               type="search"
               placeholder="Rechercher un e-mail"
               aria-label="Rechercher un e-mail"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-64 pl-8"
             />
-          </div>
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+          </InputGroup>
           <Select
             items={STATUS_OPTIONS}
             value={status}
@@ -59,11 +61,13 @@ export function WaitlistTable() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {STATUS_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                {STATUS_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -76,7 +80,10 @@ export function WaitlistTable() {
           ))}
         </div>
       ) : query.isError ? (
-        <ErrorState message="Impossible de charger la waitlist." onRetry={() => void query.refetch()} />
+        <ErrorState
+          description="Impossible de charger la waitlist."
+          onRetry={() => void query.refetch()}
+        />
       ) : (
         <DataTable
           columns={waitlistColumns}

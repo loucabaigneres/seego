@@ -7,7 +7,9 @@ Stack : Vite + React 19, TanStack Router (routes dans `src/app/routes`, `routeTr
 ## shadcn/ui
 
 - `src/components/ui/*` est généré par le CLI (config dans `components.json`). Pour ajouter un composant : `pnpm dlx shadcn@latest add <nom>`, depuis `apps/admin`. On peut retoucher ces fichiers, c'est le principe de shadcn, mais pense à le noter si tu le fais.
-- Thème : dans `src/index.css`, les variables shadcn (`primary`, `muted-foreground`, `border`, `input`, `ring`…) pointent vers les tokens `@seego/ui`. Il ne faut pas les remplacer par des couleurs en dur. Exception : `accent` suit la sémantique shadcn (surface) ; pour l'albicocca, utilise `cta`.
+- Thème : dans `src/index.css`, on suit la convention shadcn (variables de rôle dans `:root`, enregistrées dans `@theme inline`), et ces variables pointent vers les tokens `@seego/ui`. Pas de couleur en dur. `accent` suit la sémantique shadcn (surface) ; pour l'albicocca, utilise `cta`. Les statuts positifs utilisent `<Badge variant="success">`. Il n'y a ni ombres ni mode sombre (`dark:` ne s'active que sous une classe `.dark`).
+- Typographie : pour les titres de page, utilise les utilitaires `type-title` / `type-section` / `type-label` plutôt que `text-<taille>` (que `cn()` confond avec une couleur), et ne surcharge pas la typographie des composants via `className`.
+- Règles du skill shadcn (`.agents/skills/shadcn`) : formulaires en `FieldGroup` + `Field`, champ avec icône en `InputGroup`, `SelectItem` dans un `SelectGroup`, `Spinner` + `data-icon` pour les boutons en chargement, `Empty` / `Alert` pour les états vides ou d'erreur.
 - Tableaux : `src/components/data-table/` (`DataTable` générique paginé côté serveur, `DataTablePagination`) suit le [guide Data Table](https://ui.shadcn.com/docs/components/base/data-table). Pour une nouvelle liste, il suffit d'un fichier de colonnes (`createColumnHelper<DataTableFeatures, T>()`) et d'un hook qui gère la pagination et la requête tRPC (voir `src/features/waitlist`).
 
 ## Lancer en local

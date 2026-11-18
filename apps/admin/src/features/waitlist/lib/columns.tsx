@@ -29,7 +29,7 @@ export const waitlistColumns = columnHelper.columns([
           Désinscrit
         </Badge>
       ) : (
-        <Badge className="bg-success/15 text-success-text">Inscrit</Badge>
+        <Badge variant="success">Inscrit</Badge>
       );
     },
   }),

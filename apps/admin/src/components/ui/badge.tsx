@@ -18,6 +18,8 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // Seego: positive status (uses the @seego/ui success tokens).
+        success: "bg-success/15 text-success-text [a]:hover:bg-success/25",
       },
     },
     defaultVariants: {

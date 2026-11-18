@@ -32,11 +32,11 @@ function AuthedLayout() {
     <>
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <span className="font-heading text-label text-primary">Seego Admin</span>
+          <span className="type-label text-primary">Seego Admin</span>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="ghost" size="sm" onClick={() => void handleSignOut()}>
-              <LogOut />
+              <LogOut data-icon="inline-start" />
               Déconnexion
             </Button>
           </div>

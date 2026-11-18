@@ -1,8 +1,11 @@
+import { CircleAlert } from 'lucide-react';
 import { type SubmitEvent, useState } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import { AdminLoginError, useAdminLogin } from '@/features/auth/hooks/useAdminLogin';
 
 export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
@@ -24,43 +27,47 @@ export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-section">Seego Admin</CardTitle>
+        <CardTitle>Seego Admin</CardTitle>
         <CardDescription>Connecte-toi avec ton compte administrateur.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="password">Mot de passe</Label>
-            <Input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-
-          {errorMessage && (
-            <p role="alert" className="text-sm font-medium text-destructive">
-              {errorMessage}
-            </p>
-          )}
-
-          <Button type="submit" disabled={login.isPending} className="mt-2">
-            {login.isPending ? 'Connexion…' : 'Se connecter'}
-          </Button>
+        <form onSubmit={handleSubmit}>
+          <FieldGroup>
+            {errorMessage && (
+              <Alert variant="destructive">
+                <CircleAlert />
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
+            <Field>
+              <FieldLabel htmlFor="email">E-mail</FieldLabel>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="password">Mot de passe</FieldLabel>
+              <Input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Field>
+            <Field>
+              <Button type="submit" disabled={login.isPending}>
+                {login.isPending && <Spinner data-icon="inline-start" />}
+                Se connecter
+              </Button>
+            </Field>
+          </FieldGroup>
         </form>
       </CardContent>
     </Card>

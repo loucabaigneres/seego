@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -38,11 +39,13 @@ export function DataTablePagination<TData extends RowData>({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {pageSizeOptions.map((size) => (
-              <SelectItem key={size} value={size}>
-                {size}
-              </SelectItem>
-            ))}
+            <SelectGroup>
+              {pageSizeOptions.map((size) => (
+                <SelectItem key={size} value={size}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectGroup>
           </SelectContent>
         </Select>
       </div>
