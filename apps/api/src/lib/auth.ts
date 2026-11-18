@@ -80,6 +80,9 @@ export const auth = betterAuth({
     'https://app.seego.fr',
     'https://seego-app.vercel.app',
     'https://seego-*-arthurgramonts-projects.vercel.app',
+    // Back-office (apps/admin): production and the stable staging alias set by the CD.
+    'https://admin.seego.fr',
+    'https://admin-staging.seego.fr',
     env.FRONTEND_URL,
     // Mobile app scheme (`scheme` in apps/mobile/app.json).
     'seego://',

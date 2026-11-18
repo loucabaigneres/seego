@@ -38,6 +38,21 @@ Le changement s'applique dès la requête suivante, car il n'y a pas de cache de
 - Côté front, le layout `_authed.tsx` et la page de login ne servent qu'à l'UX : un compte non admin est déconnecté juste après sa connexion.
 - Le plugin admin de Better Auth (`apps/api/src/lib/auth.ts`) expose aussi `authClient.admin.*` (listUsers, setRole, banUser…), pour les prochaines fonctionnalités.
 
+## Déploiement
+
+| Environnement | Branche   | URL                            |
+| ------------- | --------- | ------------------------------ |
+| Production    | `main`    | https://admin.seego.fr         |
+| Staging       | `develop` | https://admin-staging.seego.fr |
+
+- Projet Vercel `seego-admin` (Root Directory `apps/admin`, sans intégration Git), déployé par le job `deploy-admin` de `.github/workflows/cd.yml`, après l'API. Le secret GitHub est `VERCEL_PROJECT_ID_ADMIN`.
+- En staging, la CI attache chaque déploiement de `develop` à `admin-staging.seego.fr` avec `vercel alias set`.
+- Variables Vercel (Production et Preview) : `VITE_API_URL`, `VITE_USE_API_PROXY=true`, `API_PROXY_TARGET` (URL de l'API, sans slash final). Le navigateur appelle `/api/*` sur le domaine de l'admin, et `api/[...path].ts` relaie vers l'API : le cookie de session est donc first-party.
+- `vercel.json` gère le rewrite de la SPA et les en-têtes de sécurité (`noindex`, CSP `'self'`, `X-Frame-Options: DENY`…). Si l'admin doit appeler un domaine externe, il faut l'ajouter à la CSP.
+- DNS (GoDaddy) : CNAME `admin` et `admin-staging` vers la valeur affichée par Vercel.
+- Domaines admin déclarés côté API : `trustedOrigins` (`apps/api/src/lib/auth.ts`) et CORS (`apps/api/src/index.ts`).
+- Créer un admin en staging ou en prod : `DATABASE_URL=<url de la base> pnpm --filter @seego/database db:promote-admin <email>`.
+
 ## À venir
 
-Projet Vercel, proxy `api/[...path].ts` (cookie first-party, comme `apps/web`), CI/CD, ajout du domaine de prod dans le CORS et dans `trustedOrigins`, puis Google OAuth.
+2FA pour les admins (plugin `twoFactor` de Better Auth), puis Google OAuth (URI de redirection `https://admin.seego.fr/api/auth/callback/google`).

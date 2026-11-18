@@ -36,6 +36,11 @@ await server.register(cors, {
       return callback(null, true);
     }
 
+    // Back-office (apps/admin). Normally same-origin through its Vercel proxy.
+    if (origin === 'https://admin.seego.fr' || origin === 'https://admin-staging.seego.fr') {
+      return callback(null, true);
+    }
+
     if (origin.startsWith('http://localhost')) {
       return callback(null, true);
     }
