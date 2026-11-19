@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getAdminSession, signOut } from '@/lib/auth-client';
@@ -17,6 +17,11 @@ export const Route = createFileRoute('/_authed')({
   component: AuthedLayout,
 });
 
+const NAV_LINKS = [
+  { to: '/waitlist', label: 'Waitlist' },
+  { to: '/admins', label: 'Administrateurs' },
+] as const;
+
 function AuthedLayout() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
@@ -32,7 +37,27 @@ function AuthedLayout() {
     <>
       <header className="border-b">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <span className="type-label text-primary">Seego Admin</span>
+          <div className="flex items-center gap-6">
+            <span className="type-label text-primary">Seego Admin</span>
+            <nav className="flex items-center gap-1">
+              {NAV_LINKS.map((link) => (
+                <Button
+                  key={link.to}
+                  variant="ghost"
+                  size="sm"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      to={link.to}
+                      activeProps={{ 'aria-current': 'page', className: 'bg-muted' }}
+                    />
+                  }
+                >
+                  {link.label}
+                </Button>
+              ))}
+            </nav>
+          </div>
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <Button variant="ghost" size="sm" onClick={() => void handleSignOut()}>

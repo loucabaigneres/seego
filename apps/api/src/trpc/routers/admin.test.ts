@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../lib/email.js', () => ({ sendWaitlistConfirmation: vi.fn() }));
+vi.mock('../../lib/email.js', () => ({
+  sendWaitlistConfirmation: vi.fn(),
+  sendAdminRoleNotice: vi.fn(),
+}));
 // CI has no .env: env.ts would exit while the router's imports load.
 vi.mock('../../env.js', () => ({
   env: {
@@ -66,6 +69,30 @@ describe('admin.waitlist.list', () => {
 
   it('caps the page size', async () => {
     await expect(callerAs('admin').admin.waitlist.list({ pageSize: 500 })).rejects.toMatchObject({
+      code: 'BAD_REQUEST',
+    });
+  });
+});
+
+describe('admin.admins', () => {
+  it('reserves every procedure to admins', async () => {
+    const traveler = callerAs('traveler').admin.admins;
+    await expect(traveler.list()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.lookup({ email: 'a@seego.fr' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+    await expect(
+      traveler.grant({ userId: 'u2', confirmEmail: 'a@seego.fr', password: 'x' }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.revoke({ userId: 'u2', password: 'x' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+  });
+
+  it('rejects a malformed e-mail before touching the database', async () => {
+    await expect(
+      callerAs('admin').admin.admins.lookup({ email: 'not-an-email' }),
+    ).rejects.toMatchObject({
       code: 'BAD_REQUEST',
     });
   });
