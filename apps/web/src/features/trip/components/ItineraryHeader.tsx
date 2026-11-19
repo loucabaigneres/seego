@@ -1,3 +1,4 @@
+import { track } from '@/lib/analytics'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import type { Day, Trip } from '../types'
 import { TripPdfDocument } from './TripPdf'
@@ -32,6 +33,7 @@ export function ItineraryHeader({ trip, days, isEditing, onStartEditing }: Itine
             <PDFDownloadLink
               document={<TripPdfDocument trip={trip} days={days} />}
               fileName={`${trip.destination ?? 'voyage'}-itineraire.pdf`}
+              onClick={() => track('trip_pdf_downloaded')}
             >
               {({ loading }) => (
                 <button

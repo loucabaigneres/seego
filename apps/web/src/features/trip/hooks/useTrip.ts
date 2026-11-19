@@ -1,4 +1,5 @@
 import { useGuestId } from '@/hooks/useGuestId';
+import { track } from '@/lib/analytics';
 import { authClient } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -24,7 +25,10 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
 
   const generateMutation = useMutation(
     trpc.discovery.generateItinerary.mutationOptions({
-      onSuccess: () => query.refetch(),
+      onSuccess: () => {
+        track('itinerary_generated', { source: 'trip_page' });
+        query.refetch();
+      },
     }),
   );
 
@@ -33,6 +37,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const closeReplace = useCallback(() => setReplacing(null), []);
   const { refetch: refetchTrip } = query;
   const handleReplaced = useCallback(() => {
+    track('activity_replaced');
     setReplacing(null);
     refetchTrip();
   }, [refetchTrip]);
@@ -43,6 +48,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const updatePlanningMutation = useMutation(
     trpc.discovery.updatePlanning.mutationOptions({
       onSuccess: async () => {
+        track('itinerary_edited');
         await query.refetch();
         setDraft(null);
       },
@@ -52,6 +58,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const { mutate: saveToProfile, isPending: isSavingTrip } = useMutation(
     trpc.user.saveTripToAccount.mutationOptions({
       onSuccess: () => {
+        track('trip_saved_to_account');
         query.refetch();
         queryClient.invalidateQueries(trpc.user.getProfile.queryFilter());
         queryClient.invalidateQueries(trpc.user.getTrips.queryFilter());
@@ -65,6 +72,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
     trpc.user.renameTrip.mutationOptions({
       // Awaited so the editor closes on the new title, not the stale one.
       onSuccess: async () => {
+        track('trip_renamed');
         queryClient.invalidateQueries(trpc.user.getTrips.queryFilter());
         await query.refetch();
       },
@@ -86,6 +94,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const canEditConfiguration = isOwner || Boolean(trip && trip.userId === guestId);
 
   const saveTrip = () => {
+    track('trip_save_clicked', { is_logged_in: Boolean(session?.user) });
     if (!session?.user) {
       navigate({
         to: '/login',

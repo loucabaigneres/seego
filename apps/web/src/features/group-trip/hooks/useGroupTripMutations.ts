@@ -1,5 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { track } from '@/lib/analytics';
 import { trpc } from '@/lib/trpc';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UseGroupTripMutationsOptions {
   onCreated?: (data: { tripId: string; inviteCode: string }) => void;
@@ -28,6 +29,7 @@ export function useGroupTripMutations(options: UseGroupTripMutationsOptions = {}
     trpc.group.createOrConvertGroupTrip.mutationOptions({
       onSuccess: (data) => {
         invalidateTrips();
+        track('group_trip_created');
         if (data.inviteCode !== null) {
           options.onCreated?.({ tripId: data.tripId, inviteCode: data.inviteCode });
         }
@@ -50,9 +52,13 @@ export function useGroupTripMutations(options: UseGroupTripMutationsOptions = {}
     trpc.group.joinGroupTrip.mutationOptions({
       onSuccess: (data) => {
         invalidateTrips();
+        track('group_trip_joined', { method: 'code' });
         options.onJoined?.(data);
       },
-      onError: (err) => options.onJoinError?.(err.message),
+      onError: (err) => {
+        track('group_trip_join_failed', { method: 'code', message: err.message });
+        options.onJoinError?.(err.message);
+      },
     }),
   );
 
@@ -62,6 +68,7 @@ export function useGroupTripMutations(options: UseGroupTripMutationsOptions = {}
         queryClient.invalidateQueries({
           queryKey: trpc.group.getGroupMembers.queryKey({ tripId: variables.tripId }),
         });
+        track('group_member_removed');
         options.onMemberRemoved?.();
       },
     }),
@@ -71,6 +78,7 @@ export function useGroupTripMutations(options: UseGroupTripMutationsOptions = {}
     trpc.group.deleteGroupTrip.mutationOptions({
       onSuccess: () => {
         invalidateTrips();
+        track('group_trip_deleted');
         options.onTripDeleted?.();
       },
     }),

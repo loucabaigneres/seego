@@ -1,7 +1,8 @@
+import { track } from '@/lib/analytics'
+import { authClient } from '@/lib/auth-client'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useGroupTripMutations } from '../hooks/useGroupTripMutations'
-import { authClient } from '@/lib/auth-client'
 
 interface GroupTripInviteCardProps {
   tripId: string
@@ -32,6 +33,7 @@ export function GroupTripInviteCard({
   const handleCopy = () => {
     if (!inviteUrl) return
     navigator.clipboard.writeText(inviteUrl)
+    track('group_invite_copied', { source: 'invite_card' })
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

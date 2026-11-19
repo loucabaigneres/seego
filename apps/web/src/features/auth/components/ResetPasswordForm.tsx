@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
@@ -35,6 +36,7 @@ export function ResetPasswordForm({ token, linkError }: ResetPasswordFormProps) 
       return;
     }
 
+    track('password_reset_completed');
     navigate({ to: '/login' });
   };
 
