@@ -21,7 +21,7 @@ export function StartChoices({ onGuide, onSurprise, isSurpriseLoading }: StartCh
         type="button"
         onClick={onSurprise}
         disabled={isSurpriseLoading}
-        className="flex cursor-pointer flex-col items-start min-h-14 rounded-card border border-ink-inverse/60 bg-ink/45 px-6 py-4 text-left text-ink-inverse backdrop-blur-md transition hover:bg-ink/65 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-inverse disabled:cursor-wait"
+        className="flex cursor-pointer flex-col items-start min-h-14 rounded-card border border-ink-inverse/60 bg-ink/55 px-6 py-4 text-left text-ink-inverse backdrop-blur-md transition hover:bg-ink/65 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink-inverse disabled:cursor-wait"
       >
         <span className="text-base font-bold">Surprends-moi</span>
         <span className="mt-0.5 text-xs text-ink-inverse">
