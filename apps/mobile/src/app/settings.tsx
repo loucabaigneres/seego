@@ -1,6 +1,7 @@
 import { Redirect, router } from 'expo-router';
 
 import { useSignOut } from '@/features/auth/hooks/useSignOut';
+import { AccountEmail } from '@/features/profile/components/AccountEmail';
 import { EditNameForm } from '@/features/profile/components/EditNameForm';
 import { SettingsHeader } from '@/features/profile/components/SettingsHeader';
 import { useProfile } from '@/features/profile/hooks/useProfile';
@@ -23,9 +24,10 @@ export default function SettingsScreen() {
   if (!isSignedIn) return <Redirect href="/profile" />;
 
   return (
-    <Screen scroll contentClassName="gap-8">
+    <Screen scroll contentClassName="gap-7">
       <SettingsHeader />
       <EditNameForm currentName={profile?.user?.name} />
+      <AccountEmail email={profile?.user?.email} />
       <Button
         label="Se déconnecter"
         variant="outline"
