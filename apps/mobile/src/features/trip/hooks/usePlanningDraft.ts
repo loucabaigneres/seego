@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePreventRemove } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform } from 'react-native';
 
 import { trpc } from '@/lib/trpc';
+import { confirmDestructive } from '@/ui/confirm';
 
 import {
   isDraftDirty,
@@ -15,19 +15,14 @@ import {
 } from '../lib/planning-edits';
 import type { TripDay } from './useTrip';
 
-const DISCARD_TITLE = 'Abandonner les modifications ?';
-const DISCARD_MESSAGE = 'Tes changements du planning ne seront pas enregistrés.';
-
 function confirmDiscard(onDiscard: () => void) {
-  // react-native-web's Alert is a no-op.
-  if (Platform.OS === 'web') {
-    if (window.confirm(`${DISCARD_TITLE}\n${DISCARD_MESSAGE}`)) onDiscard();
-    return;
-  }
-  Alert.alert(DISCARD_TITLE, DISCARD_MESSAGE, [
-    { text: 'Continuer', style: 'cancel' },
-    { text: 'Abandonner', style: 'destructive', onPress: onDiscard },
-  ]);
+  confirmDestructive({
+    title: 'Abandonner les modifications ?',
+    message: 'Tes changements du planning ne seront pas enregistrés.',
+    confirmLabel: 'Abandonner',
+    cancelLabel: 'Continuer',
+    onConfirm: onDiscard,
+  });
 }
 
 /**

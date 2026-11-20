@@ -4,14 +4,20 @@ import { Pressable, View } from 'react-native';
 import { cleanDescription } from '@/domain/place';
 import type { RouterOutputs } from '@/lib/trpc';
 import { colors } from '@seego/ui';
-import { Badge, Text } from '@/ui';
-import { ArrowSquareOutIcon } from '@/ui/icons';
+import { Badge, cn, IconButton, Text } from '@/ui';
+import { ArrowSquareOutIcon, TrashIcon } from '@/ui/icons';
 
 import { formatHashtags, platformLabel, shortUrl } from '../lib/inspiration';
 
 export type InspirationItem = RouterOutputs['inspiration']['listMine'][number];
 
-export function InspirationCard({ inspiration }: { inspiration: InspirationItem }) {
+export interface InspirationCardProps {
+  inspiration: InspirationItem;
+  onDelete: () => void;
+  isDeleting: boolean;
+}
+
+export function InspirationCard({ inspiration, onDelete, isDeleting }: InspirationCardProps) {
   const description = cleanDescription(inspiration.description);
   const hashtags = formatHashtags(inspiration.tags);
 
@@ -29,6 +35,13 @@ export function InspirationCard({ inspiration }: { inspiration: InspirationItem 
           {shortUrl(inspiration.originalUrl)}
         </Text>
         <ArrowSquareOutIcon size={20} color={colors.ink.muted} />
+        <IconButton
+          label="Supprimer l’inspiration"
+          icon={TrashIcon}
+          onPress={onDelete}
+          disabled={isDeleting}
+          className={cn('-my-2 -mr-2', isDeleting && 'opacity-50')}
+        />
       </View>
 
       {description ? (
