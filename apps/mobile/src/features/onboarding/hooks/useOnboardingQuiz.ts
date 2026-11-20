@@ -19,7 +19,7 @@ import {
 /** Time the progress bar takes to fill up to 100 % before the "analysing" screen shows. */
 const COMPLETION_ANIMATION_MS = 400;
 /** The "analysing" screen stays at least this long, even when the API answers at once. */
-const MIN_ANALYSIS_MS = 4200;
+const MIN_ANALYSIS_MS = 4000;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
