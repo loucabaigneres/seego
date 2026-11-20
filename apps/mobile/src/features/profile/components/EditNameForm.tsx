@@ -8,8 +8,10 @@ export function EditNameForm({ currentName }: { currentName: string | undefined 
   const form = useEditName(currentName);
 
   return (
-    <View className="gap-4">
-      <Text variant="section">Ton prénom</Text>
+    <View className="gap-3.5">
+      <Text variant="overline" role="heading">
+        Ton profil
+      </Text>
       <TextField
         label="Prénom affiché"
         value={form.value}
