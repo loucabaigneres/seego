@@ -18,6 +18,13 @@ export function formatDayMonth(value: string | null | undefined): string {
   return date.toLocaleDateString(LOCALE, { day: 'numeric', month: 'short' });
 }
 
+/** "octobre 2026" — e.g. "Membre depuis octobre 2026". */
+export function formatMonthYear(value: string | Date | null | undefined): string {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString(LOCALE, { month: 'long', year: 'numeric' });
+}
+
 /** `YYYY-MM-DD` in local time: `toISOString()` is UTC and can shift the day near midnight. */
 export function toIsoDate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');

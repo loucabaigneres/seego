@@ -27,6 +27,7 @@ export function InspirationCard({
 }: InspirationCardProps) {
   const description = cleanDescription(inspiration.description);
   const hashtags = formatHashtags(inspiration.tags);
+  const placeCount = inspiration.extractedPlaces.length;
 
   return (
     <Pressable
@@ -34,9 +35,9 @@ export function InspirationCard({
       aria-label={`Ouvrir le lien ${platformLabel(inspiration.platform)}`}
       accessibilityHint={shortUrl(inspiration.originalUrl)}
       onPress={() => WebBrowser.openBrowserAsync(inspiration.originalUrl)}
-      className="gap-3 rounded-card border border-brand/15 bg-surface p-5 active:opacity-80"
+      className="gap-2.5 rounded-card bg-surface p-4 active:opacity-80"
     >
-      <View className="flex-row items-center gap-3">
+      <View className="flex-row items-center gap-2.5">
         <Badge label={platformLabel(inspiration.platform)} tone="brand" />
         <Text variant="caption" numberOfLines={1} className="flex-1">
           {shortUrl(inspiration.originalUrl)}
@@ -52,24 +53,33 @@ export function InspirationCard({
       </View>
 
       {description ? (
-        <Text tone="secondary" numberOfLines={3}>
+        <Text tone="secondary" numberOfLines={3} className="text-[15px] leading-[22px]">
           {description}
         </Text>
       ) : null}
 
-      <Text variant="caption" tone={hashtags.length ? 'brand' : 'muted'}>
-        {hashtags.length ? hashtags.join('  ') : 'Aucun hashtag détecté'}
-      </Text>
+      {hashtags.length > 0 && (
+        <Text variant="caption" tone="brand" className="font-sans-medium">
+          {hashtags.join('  ')}
+        </Text>
+      )}
 
-      {inspiration.extractedPlaces.length > 0 && (
-        <Button
-          label="Ajouter à un voyage"
-          variant="outline"
-          size="sm"
-          icon={PlusIcon}
-          onPress={onAddToTrip}
-          className="self-start"
-        />
+      {placeCount > 0 && (
+        <View className="flex-row items-center justify-between gap-3 pt-0.5">
+          <Text variant="caption">
+            <Text variant="section" tone="brand" className="text-lg">
+              {placeCount}
+            </Text>{' '}
+            {placeCount > 1 ? 'lieux repérés' : 'lieu repéré'}
+          </Text>
+          <Button
+            label="Ajouter à un voyage"
+            variant="outline"
+            size="sm"
+            icon={PlusIcon}
+            onPress={onAddToTrip}
+          />
+        </View>
       )}
     </Pressable>
   );
