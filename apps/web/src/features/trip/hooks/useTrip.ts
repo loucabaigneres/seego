@@ -1,8 +1,9 @@
+import { useGuestId } from '@/hooks/useGuestId';
+import { authClient } from '@/lib/auth-client';
+import { trpc } from '@/lib/trpc';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useState } from 'react';
-import { authClient } from '@/lib/auth-client';
-import { trpc } from '@/lib/trpc';
 import { moveToDay, moveWithinDay, removeFromDay } from '../lib/draftPlanning';
 import { splitTripDays, toDraft } from '../lib/tripDays';
 import type { Activity, Day } from '../types';
@@ -15,6 +16,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
+  const guestId = useGuestId();
 
   const [showSavedBanner, setShowSavedBanner] = useState(false);
 
@@ -80,6 +82,8 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const trip = query.data?.trip;
   const isLoggedIn = Boolean(session?.user);
   const isOwner = Boolean(session?.user && trip && trip.userId === session.user.id);
+  // A trip created before signing in belongs to this browser's guest id: it can still go back to its form.
+  const canEditConfiguration = isOwner || Boolean(trip && trip.userId === guestId);
 
   const saveTrip = () => {
     if (!session?.user) {
@@ -118,6 +122,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
     query,
     isLoggedIn,
     isOwner,
+    canEditConfiguration,
     save: {
       run: saveTrip,
       isPending: isSavingTrip,

@@ -1,27 +1,28 @@
 import { activity, trip, tripDay, tripMembers, user } from '@seego/database';
 import { TRPCError } from '@trpc/server';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import type { Context } from '../context.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
-function generateInvitePayload() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789_--__--_';
-  let inviteCode = '';
-  const bytes = crypto.randomBytes(8);
+// Upper case only, no 0/O nor 1/I: codes are read aloud and typed by hand. 32 symbols, so a
+// random byte modulo the length stays unbiased.
+const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+export const INVITE_CODE_LENGTH = 8;
 
-  for (let i = 0; i < 8; i++) {
-    inviteCode += chars[bytes[i]! % chars.length];
-  }
-
-  if (!inviteCode.includes('-') && !inviteCode.includes('_')) {
-    const pos = crypto.randomInt(0, 8);
-    const sep = crypto.randomInt(0, 2) === 0 ? '-' : '_';
-    inviteCode = inviteCode.substring(0, pos) + sep + inviteCode.substring(pos + 1);
-  }
-
+export function generateInvitePayload() {
+  const bytes = crypto.randomBytes(INVITE_CODE_LENGTH);
+  const inviteCode = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('');
   const inviteCodeExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   return { inviteCode, inviteCodeExpiresAt };
+}
+
+/** The caller's row in `trip_members` for this trip, if any. */
+function findMembership(ctx: { db: Context['db']; user: { id: string } }, tripId: string) {
+  return ctx.db.query.tripMembers.findFirst({
+    where: (tm, { and, eq }) => and(eq(tm.tripId, tripId), eq(tm.userId, ctx.user.id)),
+  });
 }
 
 export const groupRouter = createTRPCRouter({
@@ -62,12 +63,7 @@ export const groupRouter = createTRPCRouter({
           .where(eq(trip.id, input.tripId))
           .returning();
 
-        const membership = await ctx.db.query.tripMembers.findFirst({
-          where: (tm, { and, eq }) =>
-            and(eq(tm.tripId, updatedTrip.id), eq(tm.userId, ctx.user.id)),
-        });
-
-        if (!membership) {
+        if (!(await findMembership(ctx, updatedTrip.id))) {
           await ctx.db.insert(tripMembers).values({
             tripId: updatedTrip.id,
             userId: ctx.user.id,
@@ -87,6 +83,8 @@ export const groupRouter = createTRPCRouter({
         .insert(trip)
         .values({
           userId: ctx.user.id,
+          // Replaced by "Voyage à <ville>" once the host has swiped its places.
+          title: 'Nouveau voyage de groupe',
           destination: input?.destination ?? 'Destination à définir',
           isGroup: true,
           inviteCode,
@@ -112,9 +110,7 @@ export const groupRouter = createTRPCRouter({
   regenerateInviteCode: protectedProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const membership = await ctx.db.query.tripMembers.findFirst({
-        where: (tm, { and, eq }) => and(eq(tm.tripId, input.tripId), eq(tm.userId, ctx.user.id)),
-      });
+      const membership = await findMembership(ctx, input.tripId);
 
       if (!membership || membership.role !== 'owner') {
         throw new TRPCError({
@@ -145,11 +141,7 @@ export const groupRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const membership = await ctx.db.query.tripMembers.findFirst({
-        where: (tm, { and, eq }) => and(eq(tm.tripId, input.tripId), eq(tm.userId, ctx.user.id)),
-      });
-
-      if (!membership) {
+      if (!(await findMembership(ctx, input.tripId))) {
         throw new TRPCError({ code: 'FORBIDDEN', message: 'Accès refusé au voyage.' });
       }
 
@@ -165,7 +157,12 @@ export const groupRouter = createTRPCRouter({
     .input(z.object({ inviteCode: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       const targetTrip = await ctx.db.query.trip.findFirst({
-        where: (t, { eq }) => eq(t.inviteCode, input.inviteCode.toUpperCase()),
+        // Case-insensitive: codes made before the upper-case alphabet (e.g. "PkB-5ukU") still match.
+        where: (t, { and, isNull, sql }) =>
+          and(
+            sql`upper(${t.inviteCode}) = ${input.inviteCode.trim().toUpperCase()}`,
+            isNull(t.deletedAt),
+          ),
       });
 
       if (!targetTrip) {
@@ -186,11 +183,7 @@ export const groupRouter = createTRPCRouter({
         });
       }
 
-      const existingMember = await ctx.db.query.tripMembers.findFirst({
-        where: (tm, { and, eq }) => and(eq(tm.tripId, targetTrip.id), eq(tm.userId, ctx.user.id)),
-      });
-
-      if (!existingMember) {
+      if (!(await findMembership(ctx, targetTrip.id))) {
         await ctx.db.insert(tripMembers).values({
           tripId: targetTrip.id,
           userId: ctx.user.id,
@@ -218,13 +211,20 @@ export const groupRouter = createTRPCRouter({
       })
       .from(tripMembers)
       .innerJoin(trip, eq(tripMembers.tripId, trip.id))
-      .where(and(eq(tripMembers.userId, ctx.user.id), eq(trip.isGroup, true)))
+      .where(
+        and(eq(tripMembers.userId, ctx.user.id), eq(trip.isGroup, true), isNull(trip.deletedAt)),
+      )
       .orderBy(desc(trip.createdAt));
   }),
 
   getGroupMembers: protectedProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
+      // Members' emails are only shown to the other members.
+      if (!(await findMembership(ctx, input.tripId))) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Accès refusé au voyage.' });
+      }
+
       return ctx.db
         .select({
           id: user.id,
@@ -246,9 +246,7 @@ export const groupRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const callerMembership = await ctx.db.query.tripMembers.findFirst({
-        where: (tm, { and, eq }) => and(eq(tm.tripId, input.tripId), eq(tm.userId, ctx.user.id)),
-      });
+      const callerMembership = await findMembership(ctx, input.tripId);
 
       if (!callerMembership || callerMembership.role !== 'owner') {
         throw new TRPCError({
@@ -271,12 +269,33 @@ export const groupRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  leaveGroupTrip: protectedProcedure
+    .input(z.object({ tripId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const membership = await findMembership(ctx, input.tripId);
+
+      if (!membership) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Tu ne fais pas partie de ce voyage.' });
+      }
+
+      if (membership.role === 'owner') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'L’organisateur ne peut pas quitter son voyage : supprime-le plutôt.',
+        });
+      }
+
+      await ctx.db
+        .delete(tripMembers)
+        .where(and(eq(tripMembers.tripId, input.tripId), eq(tripMembers.userId, ctx.user.id)));
+
+      return { success: true };
+    }),
+
   deleteGroupTrip: protectedProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const callerMembership = await ctx.db.query.tripMembers.findFirst({
-        where: (tm, { and, eq }) => and(eq(tm.tripId, input.tripId), eq(tm.userId, ctx.user.id)),
-      });
+      const callerMembership = await findMembership(ctx, input.tripId);
 
       if (!callerMembership || callerMembership.role !== 'owner') {
         throw new TRPCError({

@@ -1,0 +1,116 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@seego/ui/css';
+@import '@seego/ui/fonts.css';
+
+/* `dark:` only applies under a `.dark` ancestor (never set: the admin is light-only for now),
+   not on the OS preference, otherwise the components' dark: classes would kick in on dark systems. */
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * shadcn/ui theme mapped onto the @seego/ui tokens (single source of truth for the brand),
+ * following the shadcn convention: role variables in :root, registered in @theme inline.
+ * The components keep their semantic classes (bg-primary, text-muted-foreground, border-input...).
+ *
+ * Name clashes with @seego/ui:
+ * - `background`: same role, so the Seego token is kept as is (not re-registered below).
+ * - `accent`: shadcn's menu/hover highlight (= surface) wins in the back-office;
+ *   use `bg-cta` for the albicocca accent.
+ * - `success`: no shadcn slot; the Seego `bg-success` / `text-success-text` are used directly.
+ * No .dark block: @seego/ui has no dark palette yet.
+ */
+:root {
+  --background: var(--color-background);
+  --foreground: var(--color-ink);
+  --card: var(--color-surface);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-background);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-brand);
+  --primary-foreground: var(--color-ink-inverse);
+  --secondary: var(--color-surface);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-surface);
+  --muted-foreground: var(--color-ink-muted);
+  --accent: var(--color-surface);
+  --accent-foreground: var(--color-ink);
+  /* The charte uses vino (brand) for errors too. */
+  --destructive: var(--color-brand);
+  --border: var(--color-line);
+  --input: var(--color-line-strong);
+  --ring: var(--color-brand);
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --font-heading: var(--font-display);
+
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Charte: no shadows (popovers keep a hairline border instead). */
+@theme {
+  --shadow-xs: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+}
+
+/* Seego type scale as `type-*` utilities: `text-<size>` theme keys get mistaken for colours by
+   cn() and dropped next to `text-muted-foreground`. */
+@utility type-title {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  line-height: var(--text-title--line-height);
+}
+
+@utility type-section {
+  font-family: var(--font-display);
+  font-size: var(--text-section);
+  line-height: var(--text-section--line-height);
+}
+
+@utility type-label {
+  font-family: var(--font-display);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}

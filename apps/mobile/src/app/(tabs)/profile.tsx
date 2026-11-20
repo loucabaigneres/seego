@@ -1,23 +1,21 @@
-import { useState } from 'react';
-import { RefreshControl } from 'react-native';
+import { router } from 'expo-router';
+import { RefreshControl, View } from 'react-native';
 
 import { InspirationList } from '@/features/inspirations/components/InspirationList';
 import { GuestInvite } from '@/features/profile/components/GuestInvite';
-import { ProfileContent, type ProfileSegment } from '@/features/profile/components/ProfileContent';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { ProfileSkeleton } from '@/features/profile/components/ProfileSkeleton';
 import { ProfileStats } from '@/features/profile/components/ProfileStats';
 import { SettingsLink } from '@/features/profile/components/SettingsLink';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
-import { TripList } from '@/features/trips/components/TripList';
 import { colors } from '@seego/ui';
-import { ErrorState, Screen } from '@/ui';
+import { Button, ErrorState, Screen, Text } from '@/ui';
+import { PlusIcon } from '@/ui/icons';
 
 export default function ProfileScreen() {
   const { isSessionPending, isSignedIn, profile, isLoading, hasFailed, retry } = useProfile();
   const { isRefreshing, refresh } = useProfileRefresh();
-  const [segment, setSegment] = useState<ProfileSegment>('trips');
 
   if (isSessionPending || isLoading) {
     return (
@@ -62,13 +60,20 @@ export default function ProfileScreen() {
       }
     >
       <ProfileHeader user={profile.user} />
-      <ProfileStats stats={profile.stats} onPressTrips={() => setSegment('trips')} />
-      <ProfileContent
-        segment={segment}
-        onSegmentChange={setSegment}
-        trips={<TripList />}
-        inspirations={<InspirationList />}
-      />
+      <ProfileStats stats={profile.stats} onPressTrips={() => router.navigate('/trips')} />
+      <View className="gap-4">
+        <View className="flex-row items-center justify-between">
+          <Text variant="section">Mes inspirations</Text>
+          <Button
+            label="Importer"
+            variant="outline"
+            size="sm"
+            icon={PlusIcon}
+            onPress={() => router.push('/inspiration/import')}
+          />
+        </View>
+        <InspirationList />
+      </View>
       <SettingsLink />
     </Screen>
   );

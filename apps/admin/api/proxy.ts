@@ -1,4 +1,4 @@
-// Proxy Vercel : le navigateur appelle `https://app.seego.fr/api/*` (même site que le front),
+// Proxy Vercel : le navigateur appelle `https://admin.seego.fr/api/*` (même site que le front),
 // et cette fonction relaie vers l'API. Le cookie de session est ainsi posé en first-party,
 // ce qui évite que Safari (ITP) bloque le cookie cross-site de l'API.
 //
@@ -22,11 +22,16 @@ export default async function handler(request: Request): Promise<Response> {
     return new Response('API_PROXY_TARGET is not configured', { status: 500 });
   }
 
+  // Vercel ne route `api/[...path]` que sur UN segment : vercel.json réécrit donc
+  // `/api/:path*` vers `/api/proxy?__path=:path*`, et on reconstruit le chemin ici.
   const url = new URL(request.url);
+  const path = url.searchParams.get('__path') ?? '';
+  url.searchParams.delete('__path');
+  const originalPath = `/api/${path}`;
   // /api/auth/* -> /api/auth/* (Better Auth) ; /api/<autre> -> /<autre> (trpc, image-proxy, ...)
-  const upstreamPath = url.pathname.startsWith('/api/auth/')
-    ? url.pathname
-    : url.pathname.replace(/^\/api/, '');
+  const upstreamPath = originalPath.startsWith('/api/auth/')
+    ? originalPath
+    : originalPath.replace(/^\/api/, '');
 
   const headers = new Headers(request.headers);
   for (const name of HOP_BY_HOP) headers.delete(name);

@@ -3,6 +3,9 @@ import { View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { plannedCount, tripCoverImage } from '@/domain/trip';
+import { GroupTripCard } from '@/features/group-trip/components/GroupTripCard';
+import { GroupTripSheet } from '@/features/group-trip/components/GroupTripSheet';
+import { useGroupTrip } from '@/features/group-trip/hooks/useGroupTrip';
 import { DayTimeline } from '@/features/trip/components/DayTimeline';
 import { EditPlanningBar } from '@/features/trip/components/EditPlanningBar';
 import { GenerateItineraryCard } from '@/features/trip/components/GenerateItineraryCard';
@@ -10,6 +13,7 @@ import { ItineraryToolbar } from '@/features/trip/components/ItineraryToolbar';
 import { MoveToDaySheet } from '@/features/trip/components/MoveToDaySheet';
 import { PdfActionsSheet } from '@/features/trip/components/PdfActionsSheet';
 import { PlanningEditHeader } from '@/features/trip/components/PlanningEditHeader';
+import { RenameTripSheet } from '@/features/trip/components/RenameTripSheet';
 import { ReplacePlaceSheet } from '@/features/trip/components/ReplacePlaceSheet';
 import { SaveTripCard } from '@/features/trip/components/SaveTripCard';
 import { TripHero } from '@/features/trip/components/TripHero';
@@ -34,6 +38,7 @@ function TripPage({ tripId }: { tripId: string }) {
     days,
     pdf,
     save,
+    rename,
     selection,
     itineraryView,
     edit,
@@ -41,6 +46,7 @@ function TripPage({ tripId }: { tripId: string }) {
     isGenerated,
     generate,
   } = useTrip(tripId);
+  const group = useGroupTrip(tripId, trip);
   const showMap = isGenerated && itineraryView.view === 'map';
 
   if (!trip) {
@@ -89,10 +95,12 @@ function TripPage({ tripId }: { tripId: string }) {
           trip={trip}
           coverImage={tripCoverImage(days.itinerary, days.likedPlaces)}
           plannedCount={plannedCount(days.itinerary)}
+          onRename={rename.canRename && !edit.isEditing ? rename.open : undefined}
         />
-        {/* Its bottom is where the sticky day picker starts. */}
-        <View onLayout={selection.onHeroLayout}>
+        {/* Its bottom is where the sticky day picker starts. One child, so the toolbar stays child 2. */}
+        <View onLayout={selection.onHeroLayout} className="gap-4">
           {!edit.isEditing && <SaveTripCard save={save} />}
+          {!edit.isEditing && <GroupTripCard group={group} />}
         </View>
 
         {isGenerated && (
@@ -141,11 +149,14 @@ function TripPage({ tripId }: { tripId: string }) {
             isPending={generate.isPending}
             failed={generate.failed}
             onGenerate={generate.run}
+            onPickPlaces={() => router.push({ pathname: '/discovery', params: { tripId } })}
           />
         )}
       </Screen>
 
       <ReplacePlaceSheet replace={replace} />
+      <RenameTripSheet rename={rename} />
+      <GroupTripSheet group={group} />
       <PdfActionsSheet visible={pdf.isChoosing} onPick={pdf.run} onClose={pdf.dismiss} />
       <MoveToDaySheet
         targets={edit.moveTargets}
