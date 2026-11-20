@@ -8,7 +8,10 @@ import { Faq } from './components/Faq';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
 import { SectionNav } from './components/SectionNav';
+import { ROUTES } from './lib/legal';
 import { useWaitlistStatus } from './lib/waitlist';
+import { LegalNotice } from './pages/LegalNotice';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { FeatureRail } from './sections/FeatureRail';
 import { IntroHero } from './sections/IntroHero';
 import { JourneyHero } from './sections/JourneyHero';
@@ -31,16 +34,23 @@ const SECTIONS = [
   { id: 'embarquement', label: 'Embarquement' },
 ];
 
+// No router: the site has only a handful of pages, and Vercel rewrites every path to
+// index.html, so the current pathname is enough to pick the page (links do a full load).
+const path = window.location.pathname.replace(/\/+$/, '') || ROUTES.home;
+const isHome = path === ROUTES.home;
+// On the legal pages the section anchors live on the home page.
+const anchor = (id: string) => (isHome ? `#${id}` : `${ROUTES.home}#${id}`);
+
 function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-18 items-center justify-center bg-background/80 px-5 backdrop-blur-md sm:px-8">
-      <a href="#top" className="group flex items-center gap-1.5">
+      <a href={anchor('top')} className="group flex items-center gap-1.5">
         <span className="text-xl font-extrabold tracking-tight text-ink">Seego</span>
         <span className="h-2 w-2 rounded-full bg-cta transition group-hover:scale-125" />
       </a>
       {/* The logo stays centred; the call to action sits on the right */}
       <a
-        href="#embarquement"
+        href={anchor('embarquement')}
         className="group absolute right-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-xs font-bold text-ink-inverse transition hover:bg-cta hover:text-ink sm:right-8 sm:px-4 sm:py-2.5"
       >
         Me prévenir
@@ -57,36 +67,59 @@ function Header() {
  * Seego landing page: smooth scroll, opening promise, scroll-lit manifesto, a pinned 3D journey,
  * sideways rail, web app, departures board, survey, plane window and boarding pass.
  */
-export default function App() {
+function Home() {
   const { joinedEmail, markJoined } = useWaitlistStatus();
   const lenis = useSmoothScroll();
 
   return (
+    <>
+      <main>
+        <IntroHero joinedEmail={joinedEmail} onJoined={markJoined} />
+        <Manifesto />
+        <JourneyHero />
+        <FeatureRail />
+        <WebAppSection />
+        <DeparturesBoard />
+        <SurveySection />
+        <TakeoffReel>
+          <Faq />
+        </TakeoffReel>
+        <BoardingPass joinedEmail={joinedEmail} onJoined={markJoined} />
+      </main>
+      <Footer />
+      <SectionNav sections={SECTIONS} />
+      <ScrollToTop
+        onScrollTop={() =>
+          lenis.current
+            ? lenis.current.scrollTo(0, { duration: 1.8 })
+            : window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      />
+    </>
+  );
+}
+
+function LegalPage() {
+  return (
+    <>
+      {/* The header is fixed: push the page below it */}
+      <main className="pt-18">
+        {path === ROUTES.legalNotice ? <LegalNotice /> : <PrivacyPolicy />}
+      </main>
+      <Footer />
+      <ScrollToTop />
+    </>
+  );
+}
+
+const LEGAL_PATHS: string[] = [ROUTES.privacy, ROUTES.legalNotice];
+
+export default function App() {
+  return (
     <MotionConfig reducedMotion="user">
       <div className="min-h-screen overflow-x-clip bg-background">
         <Header />
-        <main>
-          <IntroHero joinedEmail={joinedEmail} onJoined={markJoined} />
-          <Manifesto />
-          <JourneyHero />
-          <FeatureRail />
-          <WebAppSection />
-          <DeparturesBoard />
-          <SurveySection />
-          <TakeoffReel>
-            <Faq />
-          </TakeoffReel>
-          <BoardingPass joinedEmail={joinedEmail} onJoined={markJoined} />
-        </main>
-        <Footer />
-        <SectionNav sections={SECTIONS} />
-        <ScrollToTop
-          onScrollTop={() =>
-            lenis.current
-              ? lenis.current.scrollTo(0, { duration: 1.8 })
-              : window.scrollTo({ top: 0, behavior: 'smooth' })
-          }
-        />
+        {LEGAL_PATHS.includes(path) ? <LegalPage /> : <Home />}
         <ConsentBanner />
         <Analytics />
       </div>
