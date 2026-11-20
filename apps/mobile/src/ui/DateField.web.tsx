@@ -7,7 +7,15 @@ import type { DateFieldProps } from './DateField';
 import { Text } from './Text';
 
 /** The native picker has no web build: the browser's own date input stands in. */
-export function DateField({ label, value, onChange, minimumDate, error, className }: DateFieldProps) {
+export function DateField({
+  label,
+  value,
+  onChange,
+  minimumDate,
+  maximumDate,
+  error,
+  className,
+}: DateFieldProps) {
   return (
     <View className={cn('gap-2', className)}>
       <Text aria-hidden className="font-sans-medium text-caption text-ink-secondary">
@@ -19,6 +27,7 @@ export function DateField({ label, value, onChange, minimumDate, error, classNam
         aria-invalid={!!error}
         value={value ?? ''}
         min={minimumDate ? toIsoDate(minimumDate) : undefined}
+        max={maximumDate ? toIsoDate(maximumDate) : undefined}
         onChange={(event) => {
           if (event.target.value) onChange(event.target.value);
         }}

@@ -1,33 +1,28 @@
 import { View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 import { cn } from './cn';
 
 export interface ProgressBarProps {
   value: number;
-  segments?: number;
   className?: string;
 }
 
-export function ProgressBar({ value, segments, className }: ProgressBarProps) {
-  const clamped = Math.min(Math.max(value, 0), 1);
+/**
+ * Reanimated CSS transition on a translation, not on `width`: it runs on the UI thread without
+ * a layout pass per frame, so it stays smooth while the swipe deck animates.
+ */
+const FILL_TRANSITION = { transitionProperty: 'transform', transitionDuration: 300 } as const;
 
-  if (segments) {
-    const filled = Math.round(clamped * segments);
-    return (
-      <View className={cn('flex-row gap-1', className)}>
-        {Array.from({ length: segments }, (_, index) => (
-          <View
-            key={index}
-            className={cn('h-1 flex-1 rounded-full', index < filled ? 'bg-cta' : 'bg-surface')}
-          />
-        ))}
-      </View>
-    );
-  }
+export function ProgressBar({ value, className }: ProgressBarProps) {
+  const clamped = Math.min(Math.max(value, 0), 1);
 
   return (
     <View className={cn('h-1 overflow-hidden rounded-full bg-surface', className)}>
-      <View className="h-full rounded-full bg-cta" style={{ width: `${clamped * 100}%` }} />
+      <Animated.View
+        className="h-full w-full rounded-full bg-cta"
+        style={{ transform: [{ translateX: `${(clamped - 1) * 100}%` }], ...FILL_TRANSITION }}
+      />
     </View>
   );
 }

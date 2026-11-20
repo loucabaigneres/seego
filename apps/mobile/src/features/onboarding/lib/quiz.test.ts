@@ -65,9 +65,9 @@ describe('quizReducer', () => {
 });
 
 describe('quiz selectors', () => {
-  it('reports progress, including the current step', () => {
-    expect(quizProgress(initialQuizState)).toBe(0.25);
-    expect(quizProgress({ ...initialQuizState, stepIndex: 3 })).toBe(1);
+  it('reports progress, counting only the questions answered', () => {
+    expect(quizProgress(initialQuizState)).toBe(0);
+    expect(quizProgress({ ...initialQuizState, stepIndex: 3 })).toBe(0.75);
   });
 
   it('knows when the quiz is on its last step', () => {

@@ -80,7 +80,8 @@ export function useTripConfig(tripId: string) {
       key: currentStep(state),
       current: state.stepIndex + 1,
       total: TRIP_CONFIG_STEPS.length,
-      progress: tripConfigProgress(state),
+      // Fills up to 100 % while the itinerary is generated, like the onboarding quiz.
+      progress: isSubmitting ? 1 : tripConfigProgress(state),
     },
     values: state.values,
     errors: state.errors,

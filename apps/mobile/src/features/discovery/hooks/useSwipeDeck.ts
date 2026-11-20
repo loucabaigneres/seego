@@ -26,7 +26,9 @@ export function useSwipeDeck(
   const topCardRef = useRef<SwipeCardHandle>(null);
   /** Horizontal drag of the top card, read by the action buttons. */
   const dragX = useSharedValue(0);
-  const [isLeaving, setIsLeaving] = useState(false);
+  /** Decision of the card flying out, null when none: its like counts before it lands. */
+  const [leaving, setLeaving] = useState<'like' | 'skip' | null>(null);
+  const isLeaving = leaving !== null;
   const shownAt = useRef(0);
   const latestRanking = useRef(0);
 
@@ -57,10 +59,10 @@ export function useSwipeDeck(
     if (!topCard || !card || isLeaving) return;
 
     const swipe: Swipe = { id: topCard.id, liked, viewDurationMs: Date.now() - shownAt.current };
-    setIsLeaving(true);
+    setLeaving(liked ? 'like' : 'skip');
     card.flyOut(liked ? 'like' : 'skip', () => {
       dragX.set(0);
-      setIsLeaving(false);
+      setLeaving(null);
       dispatch({ type: 'swiped', swipe });
 
       const swipes = [...deck.swipes, swipe];
@@ -79,6 +81,8 @@ export function useSwipeDeck(
     cards,
     swipes: deck.swipes,
     likeCount: likeCount(deck.swipes),
+    /** Likes shown by the progress bar: moves on the tap, not 320 ms later when the card is gone. */
+    progressCount: likeCount(deck.swipes) + (leaving === 'like' ? 1 : 0),
     isFinished: deck.queue.length === 0,
     isLeaving,
     topCardRef,

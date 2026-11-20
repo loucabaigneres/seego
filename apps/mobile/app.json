@@ -44,7 +44,21 @@
       "expo-sharing",
       "expo-status-bar",
       "expo-web-browser",
-      "@react-native-community/datetimepicker",
+      [
+        "@react-native-community/datetimepicker",
+        {
+          "android": {
+            "datePicker": {
+              "colorAccent": { "light": "#5C1426" },
+              "colorControlActivated": { "light": "#5C1426" },
+              "textColorPrimary": { "light": "#22090F" },
+              "textColorPrimaryInverse": { "light": "#F7F0E8" },
+              "textColorSecondary": { "light": "#6A5055" },
+              "windowBackground": { "light": "#F7F0E8" }
+            }
+          }
+        }
+      ],
       [
         "expo-share-intent",
         {
