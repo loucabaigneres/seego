@@ -1,77 +1,75 @@
-import type { Href } from 'expo-router';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, View } from 'react-native';
 
-import { colors } from '@seego/ui';
-import { Button, Screen, Text } from '@/ui';
-import { XIcon } from '@/ui/icons';
+import { IconButton, Screen, SegmentedControl, Text, Wordmark } from '@/ui';
+import { ArrowLeftIcon, XIcon } from '@/ui/icons';
 
 import { closeAuth } from '../lib/navigation';
 import { GoogleSignIn } from './GoogleSignIn';
 
+export type AuthTab = 'sign-in' | 'sign-up';
+
+const TABS = [
+  { value: 'sign-in', label: 'Connexion' },
+  { value: 'sign-up', label: 'Inscription' },
+] as const;
+
+const TAB_HREFS = { 'sign-in': '/auth/sign-in', 'sign-up': '/auth/sign-up' } as const;
+
 export interface AuthLayoutProps {
-  overline: string;
   title: string;
-  subtitle: string;
-  switchPrompt: string;
-  switchCta: string;
-  switchHref: Href;
-  /** `false` on screens that are not a sign-in, such as the password reset request. */
-  showGoogle?: boolean;
+  /** Sign-in and sign-up: tabs between the two, Google and a close button. Without it, a back arrow. */
+  tab?: AuthTab;
+  overline?: string;
+  subtitle?: string;
   children: ReactNode;
 }
 
-export function AuthLayout({
-  overline,
-  title,
-  subtitle,
-  switchPrompt,
-  switchCta,
-  switchHref,
-  showGoogle = true,
-  children,
-}: AuthLayoutProps) {
+export function AuthLayout({ title, tab, overline, subtitle, children }: AuthLayoutProps) {
   return (
     <KeyboardAvoidingView
       className="flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Screen scroll contentClassName="gap-8">
-        <Pressable
-          role="button"
-          aria-label="Fermer"
-          onPress={closeAuth}
-          hitSlop={8}
-          className="-mr-2 size-11 items-center justify-center self-end active:opacity-60"
-        >
-          <XIcon size={24} color={colors.ink.DEFAULT} />
-        </Pressable>
+      <Screen scroll contentClassName="gap-5 pt-2">
+        {tab ? (
+          <View className="-mr-2 flex-row items-center justify-between">
+            <Wordmark />
+            <IconButton label="Fermer" icon={XIcon} onPress={closeAuth} />
+          </View>
+        ) : (
+          <IconButton
+            label="Retour"
+            icon={ArrowLeftIcon}
+            // Back to sign-in when it is under this screen, else swap to it.
+            onPress={() => router.dismissTo('/auth/sign-in')}
+            className="-ml-2.5"
+          />
+        )}
 
-        <View className="gap-3">
-          <Text variant="overline">{overline}</Text>
+        <View className="gap-2.5">
+          {overline && <Text variant="overline">{overline}</Text>}
           <Text variant="title" role="heading">
             {title}
           </Text>
-          <Text tone="muted">{subtitle}</Text>
+          {subtitle && <Text tone="muted">{subtitle}</Text>}
         </View>
 
-        {children}
+        {tab && (
+          <>
+            <SegmentedControl
+              segments={TABS}
+              value={tab}
+              variant="soft"
+              // Back to that screen when it is under this one, else swap.
+              onChange={(next) => next !== tab && router.dismissTo(TAB_HREFS[next])}
+            />
+            <GoogleSignIn />
+          </>
+        )}
 
-        {showGoogle && <GoogleSignIn />}
-
-        <View className="mt-auto flex-row flex-wrap items-center justify-center">
-          <Text tone="muted">{switchPrompt}</Text>
-          <Button
-            label={switchCta}
-            variant="ghost"
-            size="sm"
-            // Tight padding keeps prompt and link on one line on small phones.
-            className="px-2"
-            // Back to that screen when it is under this one (forgot password → sign-in), else swap.
-            onPress={() => router.dismissTo(switchHref)}
-          />
-        </View>
+        <View className="flex-1">{children}</View>
       </Screen>
     </KeyboardAvoidingView>
   );

@@ -4,12 +4,14 @@ import { Pressable, TextInput, View, type TextInputInstance, type TextInputProps
 import { colors } from '@seego/ui';
 
 import { cn } from './cn';
-import { EyeIcon, EyeSlashIcon } from './icons';
+import { EyeIcon, EyeSlashIcon, type AppIcon } from './icons';
 import { Text } from './Text';
 
 export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
   label: string;
   error?: string;
+  /** Phosphor icon shown before the input. */
+  icon?: AppIcon;
   className?: string;
   ref?: Ref<TextInputInstance>;
 }
@@ -17,6 +19,7 @@ export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
 export function TextField({
   label,
   error,
+  icon: Icon,
   className,
   editable = true,
   secureTextEntry = false,
@@ -39,8 +42,10 @@ export function TextField({
           'min-h-14 flex-row items-center rounded-field border bg-background',
           error ? 'border-brand' : isFocused ? 'border-brand' : 'border-line-strong',
           !editable && 'opacity-50',
+          Icon && 'pl-4',
         )}
       >
+        {Icon && <Icon size={20} color={isFocused ? colors.brand : colors.ink.muted} />}
         <TextInput
           aria-label={label}
           aria-invalid={!!error}
@@ -58,7 +63,7 @@ export function TextField({
             setIsFocused(false);
             onBlur?.(event);
           }}
-          className="min-h-14 flex-1 px-4 font-sans text-body text-ink"
+          className={cn('min-h-14 flex-1 px-4 font-sans text-body text-ink', Icon && 'pl-3')}
           {...props}
         />
         {secureTextEntry && (
