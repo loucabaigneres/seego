@@ -8,6 +8,7 @@ import { useItineraryView } from './useItineraryView';
 import { usePlanningDraft } from './usePlanningDraft';
 import { useReplacePlace } from './useReplacePlace';
 import { useTripPdf } from './useTripPdf';
+import { useTripRename } from './useTripRename';
 import { useTripSave } from './useTripSave';
 
 export type TripDay = RouterOutputs['discovery']['getTrip']['days'][number];
@@ -39,6 +40,7 @@ export function useTrip(tripId: string) {
   const itineraryView = useItineraryView(selection.scrollToPicker);
   const trip = query.data?.trip ?? null;
   const save = useTripSave(tripId, trip);
+  const rename = useTripRename(tripId, trip);
   const pdf = useTripPdf(
     trip && {
       trip,
@@ -58,6 +60,7 @@ export function useTrip(tripId: string) {
     days,
     pdf,
     save,
+    rename,
     selection,
     itineraryView,
     edit: {
