@@ -2,7 +2,7 @@
   "redirects": [
     {
       "source": "/ig",
-      "destination": "/?utm_source=instagram&utm_medium=social&utm_campaign=bio",
+      "destination": "/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&utm_campaign=beta_launch",
       "permanent": false
     }
   ],
