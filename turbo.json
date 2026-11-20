@@ -32,6 +32,15 @@
     },
     "test": {
       "dependsOn": ["^typecheck"]
+    },
+    "@seego/ui#test": {
+      "dependsOn": ["^typecheck"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/web/src/**",
+        "$TURBO_ROOT$/apps/mobile/src/**",
+        "$TURBO_ROOT$/apps/landing-page/src/**"
+      ]
     }
   }
 }

@@ -7,6 +7,7 @@ import { colors } from '@seego/ui';
 import { Badge, Button, cn, IconButton, Text } from '@/ui';
 import { ArrowSquareOutIcon, PlusIcon, TrashIcon } from '@/ui/icons';
 
+
 import { formatHashtags, platformLabel, shortUrl } from '../lib/inspiration';
 
 export type InspirationItem = RouterOutputs['inspiration']['listMine'][number];
@@ -25,6 +26,7 @@ export function InspirationCard({
   isDeleting,
   onAddToTrip,
 }: InspirationCardProps) {
+
   const description = cleanDescription(inspiration.description);
   const hashtags = formatHashtags(inspiration.tags);
 

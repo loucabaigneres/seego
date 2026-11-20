@@ -1,11 +1,19 @@
+import { DatePicker } from '@/components/DatePicker';
+import { FIELD_CLASS } from '@/components/formStyles';
+import { OptionTile } from '@/components/OptionTile';
+import { ProgressBar } from '@/components/ProgressBar';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { FIELD_CLASS } from '@/components/formStyles';
-import { DatePicker } from '@/components/DatePicker';
-import { OptionTile } from '@/components/OptionTile';
 import type { TripFormValues } from '../lib/tripForm';
-import { DIETARY_OPTIONS, MEDICAL_OPTIONS, tripFormSchema } from '../lib/tripForm';
+import {
+  addDays,
+  DIETARY_OPTIONS,
+  MAX_TRAVELERS,
+  MAX_TRIP_DAYS,
+  MEDICAL_OPTIONS,
+  tripFormSchema,
+} from '../lib/tripForm';
 
 const INTENSITY_OPTIONS = [
   { id: 'chill', title: 'Relax', description: 'Prendre son temps' },
@@ -20,28 +28,33 @@ const BUDGET_OPTIONS = [
 ] as const;
 
 interface TripFormProps {
-  initialDestination?: string;
+  /** Answers to start from (the trip's saved configuration when coming back to the form). */
+  initialValues?: Partial<TripFormValues>;
+  /** Step to open on, 1 to 3. */
+  initialStep?: number;
   onSubmit: (data: TripFormValues) => void;
   isLoading?: boolean;
 }
 
-export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = false }: TripFormProps) {
-  const [step, setStep] = useState(1);
+export function TripForm({ initialValues, initialStep = 1, onSubmit, isLoading = false }: TripFormProps) {
   const totalSteps = 3;
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 1), totalSteps));
 
-  const { register, handleSubmit, control, setValue, trigger, formState: { errors } } = useForm<TripFormValues>({
+  const { register, handleSubmit, control, setValue, getValues, trigger, formState: { errors } } = useForm<TripFormValues>({
     resolver: zodResolver(tripFormSchema as never),
     defaultValues: {
-      destination: initialDestination,
+      destination: 'Paris',
+      startDate: '',
       numberOfPeople: 1,
       ages: [{ value: 25 }],
-      durationDays: 7,
+      endDate: '',
       averagePrice: 'mid',
       intensity: 'balanced',
       dietaryOptions: [],
       dietaryCustom: "",
       medicalOptions: [],
       medicalCustom: "",
+      ...initialValues,
     },
   });
 
@@ -51,10 +64,11 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
   });
 
   const numberOfPeople = useWatch({ control, name: "numberOfPeople" });
+  const startDate = useWatch({ control, name: "startDate" });
 
   useEffect(() => {
     const currentCount = ageFields.length;
-    const targetCount = numberOfPeople || 0;
+    const targetCount = Math.min(numberOfPeople || 0, MAX_TRAVELERS);
 
     if (targetCount > currentCount) {
       for (let i = currentCount; i < targetCount; i++) append({ value: 25 });
@@ -83,7 +97,7 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
     let fieldsToValidate: FieldName[] = [];
 
     if (step === 1) {
-      fieldsToValidate = ['destination', 'startDate', 'durationDays', 'numberOfPeople', 'ages'];
+      fieldsToValidate = ['destination', 'startDate', 'endDate', 'numberOfPeople', 'ages'];
     } else if (step === 2) {
       fieldsToValidate = ['intensity', 'averagePrice'];
     }
@@ -114,12 +128,8 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
           <span className="text-sm font-medium text-ink-muted">Étape {step} sur {totalSteps}</span>
         </div>
 
-        <div className="w-full bg-background rounded-full h-2">
-          <div
-            className="bg-cta h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(step / totalSteps) * 100}%` }}
-          />
-        </div>
+        {/* Fills up to 100 % once the form is submitted, like the onboarding quiz. */}
+        <ProgressBar value={isLoading ? 1 : (step - 1) / totalSteps} />
       </div>
 
       <form
@@ -144,7 +154,16 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
                   control={control}
                   name="startDate"
                   render={({ field }) => (
-                    <DatePicker value={field.value ?? ''} onChange={field.onChange} invalid={!!errors.startDate} />
+                    <DatePicker
+                      value={field.value ?? ''}
+                      invalid={!!errors.startDate}
+                      onChange={(iso) => {
+                        field.onChange(iso);
+                        // The return date must stay within the allowed window after the new departure.
+                        const end = getValues('endDate');
+                        if (end && (end < iso || end > addDays(iso, MAX_TRIP_DAYS - 1))) setValue('endDate', '');
+                      }}
+                    />
                   )}
                 />
                 {errors.startDate && <span className="text-brand text-xs">{errors.startDate.message}</span>}
@@ -153,12 +172,59 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Durée (jours)</label>
-                <input type="number" {...register("durationDays", { valueAsNumber: true })} className={FIELD_CLASS} />
+                <label className="block text-sm font-medium mb-1">Date de retour</label>
+                <Controller
+                  control={control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <DatePicker
+                      key={startDate || 'no-start'}
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      min={startDate || undefined}
+                      max={startDate ? addDays(startDate, MAX_TRIP_DAYS - 1) : undefined}
+                      placeholder={startDate ? 'Choisis une date' : "Choisis d'abord le départ"}
+                      invalid={!!errors.endDate}
+                    />
+                  )}
+                />
+                {errors.endDate && <span className="text-brand text-xs">{errors.endDate.message}</span>}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Nombre de voyageurs</label>
-                <input type="number" min="1" {...register("numberOfPeople", { valueAsNumber: true })} className={FIELD_CLASS} />
+                <label className="block text-sm font-medium mb-1" id="travelers-label">Nombre de voyageurs</label>
+                <Controller
+                  control={control}
+                  name="numberOfPeople"
+                  render={({ field }) => (
+                    <div
+                      role="group"
+                      aria-labelledby="travelers-label"
+                      className="flex items-center justify-between rounded-xl border border-line-strong bg-background p-1.5"
+                    >
+                      <button
+                        type="button"
+                        aria-label="Retirer un voyageur"
+                        disabled={field.value <= 1}
+                        onClick={() => field.onChange(Math.max(1, field.value - 1))}
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-lg text-brand transition hover:bg-accent disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent"
+                      >
+                        −
+                      </button>
+                      <span className="text-base font-semibold text-ink" aria-live="polite">
+                        {field.value}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label="Ajouter un voyageur"
+                        disabled={field.value >= MAX_TRAVELERS}
+                        onClick={() => field.onChange(Math.min(MAX_TRAVELERS, field.value + 1))}
+                        className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-lg text-brand transition hover:bg-accent disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent"
+                      >
+                        +
+                      </button>
+                    </div>
+                  )}
+                />
               </div>
             </div>
 
@@ -166,12 +232,15 @@ export function TripForm({ initialDestination = "Paris", onSubmit, isLoading = f
               <label className="block text-sm font-medium mb-3">Âge des voyageurs</label>
               <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
                 {ageFields.map((field, index) => (
-                  <div key={field.id} className="relative">
-                    <span className="absolute left-3 top-3 text-sm text-ink-muted">#{index + 1}</span>
-                    <input 
-                      type="number" 
-                      {...register(`ages.${index}.value`, { valueAsNumber: true })} 
-                      className={`${FIELD_CLASS} pl-8`} 
+                  <div key={field.id}>
+                    <label htmlFor={`age-${field.id}`} className="mb-1 block text-xs text-ink-muted">
+                      Voyageur {index + 1}
+                    </label>
+                    <input
+                      id={`age-${field.id}`}
+                      type="number"
+                      {...register(`ages.${index}.value`, { valueAsNumber: true })}
+                      className={FIELD_CLASS}
                     />
                   </div>
                 ))}

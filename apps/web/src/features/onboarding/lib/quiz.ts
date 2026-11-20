@@ -42,9 +42,9 @@ export function isLastStep(state: QuizState): boolean {
   return state.stepIndex === LAST_STEP_INDEX;
 }
 
-/** Share of the quiz reached, counting the current step (1/4 on the first one). */
+/** Share of the quiz completed: 0 on the first step, 1 only once the answers are submitted. */
 export function quizProgress(state: QuizState): number {
-  return (state.stepIndex + 1) / QUIZ_QUESTIONS.length;
+  return state.stepIndex / QUIZ_QUESTIONS.length;
 }
 
 function toggle<T>(list: readonly T[], value: T): T[] {

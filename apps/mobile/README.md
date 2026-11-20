@@ -9,12 +9,12 @@ cp .env.example .env   # then set EXPO_PUBLIC_API_URL (see comments in the file)
 pnpm --filter @seego/mobile start
 ```
 
-| Script      | What it does                                   |
-| ----------- | ---------------------------------------------- |
-| `start`     | Expo dev server (Expo Go, emulator, simulator) |
-| `typecheck` | `tsc --noEmit`                                 |
-| `lint`      | ESLint (shared config + React Hooks rules)     |
-| `test`      | Jest (`jest-expo`) — unit tests of pure logic  |
+| Script      | What it does                                  |
+| ----------- | --------------------------------------------- |
+| `start`     | Metro dev server for the development build    |
+| `typecheck` | `tsc --noEmit`                                |
+| `lint`      | ESLint (shared config + React Hooks rules)    |
+| `test`      | Jest (`jest-expo`) — unit tests of pure logic |
 
 ## Where things go
 
@@ -28,9 +28,13 @@ src/
   ui/             Design-system primitives (Text, Button, Card, Chip, Sheet, states…), written
                   in-house on NativeWind: no third-party UI kit
   hooks/          Generic hooks reused across features (useHardwareBack…)
-  theme/tokens.ts Colours, radii, shadows — the only place a colour value may appear
+  domain/         Pure domain helpers shared across features (dates, places, trips), with tests
   lib/            tRPC client, env, storage, guest id
 ```
+
+Colours, typography, radii and spacing come from the shared `@seego/ui` package (exposed to
+NativeWind through `tailwindTheme()` in `tailwind.config.ts`): it is the only place a colour value
+may appear.
 
 ## Development build (Android, Windows)
 
@@ -56,12 +60,12 @@ npx expo prebuild --clean       # only after changing app.json plugins or a nati
 ## Rules
 
 0. Code flows one way: **shared → features → app**, enforced by ESLint (`no-restricted-imports`).
-   Shared folders (`domain`, `hooks`, `lib`, `theme`, `ui`) never import from `features` or `app`;
+   Shared folders (`domain`, `hooks`, `lib`, `ui`) never import from `features` or `app`;
    a feature never imports another feature nor `app` (code needed by several features moves to
    the shared folders; a screen in `src/app` composes features); outside its own folder a feature
    reaches code through the `@/` alias, never `../../`.
 1. No business logic in `app/` screens or in components: put it in `features/*/lib`, with a test.
-2. No hard-coded colours: use token classes (`bg-primary`, `text-ink-muted`, `rounded-card`) or `theme/tokens`.
+2. No hard-coded colours: use token classes (`bg-primary`, `text-ink-muted`, `rounded-card`) or the values exported by `@seego/ui`.
 3. API types come from `RouterOutputs` / `RouterInputs` (`@/lib/trpc`), never from relative imports into `apps/api`.
 4. Every query renders its loading, error (with retry) and empty states using `@/ui`.
 5. UI copy is French and uses "tu".

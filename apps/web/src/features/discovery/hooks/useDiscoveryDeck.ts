@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { trpc } from '@/lib/trpc';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { trpc } from '@/lib/trpc';
-import { buildEffectiveFeed, EXPLORATION_SIZE, LIKE_GOAL } from '../lib/feed';
+import { buildEffectiveFeed, EXPLORATION_SIZE, LIKE_GOAL, PINNED_COUNT } from '../lib/feed';
 import { photosOf } from '../lib/item';
 import type { DiscoveryItem, DragState, LeavingDirection, SaveState, SwipeEntry } from '../types';
 
@@ -43,14 +43,31 @@ export function useDiscoveryDeck(tripId: string | undefined) {
   const rankCitiesQuery = useQuery({
     ...trpc.discovery.rankCities.queryOptions({ swipes: history }),
     enabled: explorationComplete,
+    // Keep the previous ranking while a new one loads, so the deck never flips back to raw order.
+    placeholderData: keepPreviousData,
   });
 
-  const swipedIds = useMemo(() => new Set(history.map((s) => s.id)), [history]);
+  const swipedIds = useMemo(() => history.map((s) => s.id), [history]);
 
+  // Ids of the cards already on screen behind the top card: a re-rank must not move them.
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
   const effectiveFeed = useMemo(
-    () => (explorationComplete ? buildEffectiveFeed(feed, rankCitiesQuery.data, swipedIds) : feed),
-    [feed, explorationComplete, rankCitiesQuery.data, swipedIds],
+    () =>
+      explorationComplete
+        ? buildEffectiveFeed(feed, rankCitiesQuery.data, swipedIds, pinnedIds)
+        : feed,
+    [feed, explorationComplete, rankCitiesQuery.data, swipedIds, pinnedIds],
   );
+  // Adjust state while rendering (React-sanctioned): remember the new visible window.
+  const nextPinnedIds = effectiveFeed
+    .slice(swipedIds.length, swipedIds.length + PINNED_COUNT)
+    .map((item) => item.id);
+  if (
+    nextPinnedIds.length !== pinnedIds.length ||
+    nextPinnedIds.some((id, i) => id !== pinnedIds[i])
+  ) {
+    setPinnedIds(nextPinnedIds);
+  }
 
   // Persisting the recommended trip to the database (on explicit click).
   const saveTrip = useMutation(

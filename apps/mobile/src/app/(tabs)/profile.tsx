@@ -13,6 +13,7 @@ import { colors } from '@seego/ui';
 import { Button, ErrorState, Screen, Text } from '@/ui';
 import { PlusIcon } from '@/ui/icons';
 
+
 export default function ProfileScreen() {
   const { isSessionPending, isSignedIn, profile, isLoading, hasFailed, retry } = useProfile();
   const { isRefreshing, refresh } = useProfileRefresh();
@@ -72,6 +73,7 @@ export default function ProfileScreen() {
             onPress={() => router.push('/inspiration/import')}
           />
         </View>
+
         <InspirationList />
       </View>
       <SettingsLink />
