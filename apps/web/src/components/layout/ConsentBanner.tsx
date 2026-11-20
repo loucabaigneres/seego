@@ -15,8 +15,9 @@ export function ConsentBanner() {
       <p className="text-sm font-bold text-ink">On mesure l'audience, mais seulement si tu veux</p>
       <p className="mt-1 text-xs leading-relaxed text-ink-muted">
         Seego utilise PostHog pour comprendre comment l'app est utilisée et l'améliorer, y compris
-        des enregistrements anonymisés de navigation. Rien n'est enregistré sans ton accord, et tu
-        peux changer d'avis à tout moment depuis le pied de page.
+        des enregistrements anonymisés de navigation. Sans ton accord, on compte seulement les
+        visites de façon anonyme, sans cookie ni rien enregistrer sur ton appareil. Tu peux
+        changer d'avis à tout moment depuis le pied de page.
       </p>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <button
