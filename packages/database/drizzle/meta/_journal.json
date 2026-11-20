@@ -29,6 +29,34 @@
       "when": 1791932255695,
       "tag": "0003_secret_la_nuit",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792355382380,
+      "tag": "0004_easy_lady_bullseye",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794504447304,
+      "tag": "0005_tense_nightshade",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795108655731,
+      "tag": "0006_elite_sphinx",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795168519597,
+      "tag": "0007_catalogue_expand",
+      "breakpoints": true
     }
   ]
 }

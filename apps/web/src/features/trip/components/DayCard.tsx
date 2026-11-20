@@ -33,27 +33,27 @@ export function DayCard({
     .join(' · ')
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-[#eee] bg-white shadow-sm">
+    <div className="overflow-hidden rounded-card border border-brand/15 bg-surface/60">
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="flex w-full cursor-pointer items-center justify-between gap-3 px-4 py-3.5 text-left transition hover:bg-[#faf7f4]"
+        className="flex w-full cursor-pointer items-center justify-between gap-3 bg-brand px-4 py-3.5 text-left transition hover:brightness-110"
       >
         <div className="flex min-w-0 items-center gap-2">
-          <span className="inline-flex h-7 shrink-0 items-center rounded-full bg-[#FF4D4D] px-3 text-xs font-bold text-white">
+          <span className="inline-flex h-7 shrink-0 items-center rounded-full bg-accent px-3 text-xs font-bold text-brand">
             Jour {day.dayIndex}
           </span>
           {day.targetDate && (
-            <span className="shrink-0 text-xs font-medium text-[#888]">
+            <span className="shrink-0 text-xs font-medium text-ink-inverse">
               {formatDate(day.targetDate)}
             </span>
           )}
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
-          {summary && <span className="hidden text-xs text-[#aaa] sm:block">{summary}</span>}
-          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[#ddd] text-[#888]">
+          {summary && <span className="hidden text-xs text-accent sm:block">{summary}</span>}
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-accent/60 text-accent">
             <svg
               className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
               fill="none"
@@ -69,7 +69,7 @@ export function DayCard({
       </button>
 
       {isOpen && (
-        <div className="space-y-2.5 border-t border-[#f0eae3] bg-[#FBF8F5] p-3">
+        <div className="divide-y divide-brand/10 px-3">
           {ordered.map((act, idx) => (
             <ActivityRow
               key={act.id}
@@ -89,7 +89,7 @@ export function DayCard({
                   <button
                     type="button"
                     onClick={() => onReplace(act)}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-[#ddd] px-3 py-1 text-xs font-semibold text-[#555] transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-95"
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-full border border-brand/40 px-3 py-1 text-xs font-semibold text-ink-secondary transition hover:border-brand hover:text-brand active:scale-95"
                   >
                     <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h13l-3-3M20 17H7l3 3" />
@@ -101,7 +101,7 @@ export function DayCard({
             />
           ))}
           {ordered.length === 0 && (
-            <p className="rounded-2xl border border-[#eee] bg-white px-4 py-3 text-xs text-[#888]">
+            <p className="py-4 text-xs text-ink-muted">
               Aucune activité ce jour.
             </p>
           )}

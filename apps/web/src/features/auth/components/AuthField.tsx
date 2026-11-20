@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { FIELD_CLASS } from '@/components/formStyles';
 import { PasswordInput } from '@/components/PasswordInput';
 
 interface AuthFieldProps {
@@ -14,7 +15,7 @@ interface AuthFieldProps {
 export function AuthField({ label, type, value, onChange, minLength, hint }: AuthFieldProps) {
   return (
     <div>
-      <label className="block text-xs font-semibold uppercase text-[#888] mb-1">{label}</label>
+      <label className="mb-2 block text-sm font-medium text-ink">{label}</label>
       {type === 'password' ? (
         <PasswordInput
           required
@@ -29,7 +30,7 @@ export function AuthField({ label, type, value, onChange, minLength, hint }: Aut
           minLength={minLength}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full border border-[#ddd] p-3 rounded-xl bg-white focus:border-[#FF4D4D] focus:ring-2 focus:ring-[#FF4D4D]/20 outline-none transition text-[#1a1a1a]"
+          className={FIELD_CLASS}
         />
       )}
       {hint}

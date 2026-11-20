@@ -19,9 +19,8 @@ const TONES = {
   secondary: 'text-ink-secondary',
   muted: 'text-ink-muted',
   brand: 'text-brand',
-  primary: 'text-primary-text',
   accent: 'text-accent',
-  success: 'text-success',
+  success: 'text-success-text',
   inverse: 'text-ink-inverse',
 } as const;
 

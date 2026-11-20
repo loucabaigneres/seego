@@ -10,6 +10,12 @@ describe('authErrorMessage', () => {
     );
   });
 
+  it('translates e-mail verification code errors', () => {
+    expect(authErrorMessage({ code: 'INVALID_OTP' })).toBe('Code invalide.');
+    expect(authErrorMessage({ code: 'OTP_EXPIRED' })).toBe('Code expiré.');
+    expect(authErrorMessage({ code: 'TOO_MANY_ATTEMPTS' })).toMatch(/nouveau code/);
+  });
+
   it('explains rate limiting whatever the code', () => {
     expect(authErrorMessage({ code: 'INVALID_EMAIL_OR_PASSWORD', status: 429 })).toMatch(
       /Trop de tentatives/,

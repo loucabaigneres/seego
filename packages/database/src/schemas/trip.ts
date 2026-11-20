@@ -13,7 +13,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 import { averagePriceEnum, tripIntensityEnum, tripStatusEnum } from '../enums.js';
-import { discoveryContent } from './inspiration.js';
+import { places } from './catalogue.js';
 import { user } from './auth.js';
 
 export const trip = pgTable('trip', {
@@ -60,7 +60,8 @@ export const activity = pgTable('activity', {
   tripDayId: uuid('trip_day_id')
     .references(() => tripDay.id)
     .notNull(),
-  discoveryContentId: uuid('discovery_content_id').references(() => discoveryContent.id),
+  // Pointe sur `places` (même id que l'ancien discovery_content)
+  discoveryContentId: uuid('discovery_content_id').references(() => places.id),
   title: text('title').notNull(),
   description: text('description'),
   startTime: time('start_time'),

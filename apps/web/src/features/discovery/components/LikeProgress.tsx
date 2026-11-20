@@ -12,10 +12,10 @@ export function LikeProgress({ likes, goalReached, onShowResult }: LikeProgressP
     <div className="flex items-center gap-3">
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between text-xs">
-          <span className="font-semibold text-[#1a1a1a]">
+          <span className="font-semibold text-ink">
             {goalReached ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
           </span>
-          <span className="font-medium tabular-nums text-[#888]">
+          <span className="font-medium tabular-nums text-ink-muted">
             {Math.min(likes, LIKE_GOAL)}/{LIKE_GOAL}
           </span>
         </div>
@@ -31,7 +31,7 @@ export function LikeProgress({ likes, goalReached, onShowResult }: LikeProgressP
             <span
               key={i}
               className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${
-                i < likes ? 'bg-[#FF4D4D]' : 'bg-[#ddd]'
+                i < likes ? 'bg-cta' : 'bg-surface'
               }`}
             />
           ))}
@@ -43,8 +43,8 @@ export function LikeProgress({ likes, goalReached, onShowResult }: LikeProgressP
         disabled={likes === 0}
         className={`flex h-10 shrink-0 items-center gap-1.5 rounded-full px-4 text-xs font-bold transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 ${
           goalReached
-            ? 'bg-[#FF4D4D] text-white shadow-lg shadow-red-500/25'
-            : 'border border-[#ddd] bg-white text-[#1a1a1a] hover:border-[#FF4D4D]'
+            ? 'bg-brand text-accent shadow-lg shadow-brand/25'
+            : 'border border-line-strong bg-background text-ink hover:border-brand'
         }`}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>

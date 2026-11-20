@@ -20,7 +20,7 @@ export function Wordmark({
       )}
     >
       See<Text className="font-display-italic">go</Text>
-      <Text className="text-primary">.</Text>
+      <Text className="text-cta">.</Text>
     </Text>
   );
 }

@@ -10,13 +10,13 @@ export function EditActionBar({
   onSave: () => void
 }) {
   return (
-    <div className="sticky bottom-3 z-1100 mt-4 rounded-3xl border border-[#eee] bg-white/95 p-3 shadow-[0_12px_32px_-12px_rgba(26,26,26,0.35)] backdrop-blur-md">
+    <div className="sticky bottom-3 z-1100 mt-4 rounded-3xl border border-line bg-background/95 p-3 shadow-[0_12px_32px_-12px_rgba(26,26,26,0.35)] backdrop-blur-md">
       <div className="flex gap-2">
         <button
           type="button"
           onClick={onCancel}
           disabled={isPending}
-          className="flex-1 cursor-pointer rounded-full border border-[#ddd] bg-white px-4 py-3 text-sm font-semibold text-[#1a1a1a] transition hover:border-[#1a1a1a] active:scale-[0.98] disabled:opacity-50"
+          className="flex-1 cursor-pointer rounded-full border border-line-strong bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:border-ink active:scale-[0.98] disabled:opacity-50"
         >
           Annuler
         </button>
@@ -24,13 +24,13 @@ export function EditActionBar({
           type="button"
           onClick={onSave}
           disabled={isPending}
-          className="flex-1 cursor-pointer rounded-full bg-[#FF4D4D] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-red-500/25 transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
+          className="flex-1 cursor-pointer rounded-full bg-brand px-4 py-3 text-sm font-bold text-accent shadow-lg shadow-brand/25 transition hover:brightness-105 active:scale-[0.98] disabled:opacity-60"
         >
           {isPending ? 'Enregistrement…' : 'Enregistrer'}
         </button>
       </div>
       {error && (
-        <p className="mt-2 text-center text-xs font-medium text-[#FF4D4D]">{error}</p>
+        <p className="mt-2 text-center text-xs font-medium text-brand">{error}</p>
       )}
     </div>
   )

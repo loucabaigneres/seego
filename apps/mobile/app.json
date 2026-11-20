@@ -21,11 +21,41 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F0E8"
+          "backgroundColor": "#F7F0E8",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
         }
       ],
-      "expo-font",
-      "expo-secure-store"
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "@seego/ui/fonts/native/Fraunces-Regular.ttf",
+            "@seego/ui/fonts/native/Fraunces-Italic.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Regular.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Medium.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-SemiBold.ttf",
+            "@seego/ui/fonts/native/HankenGrotesk-Bold.ttf"
+          ]
+        }
+      ],
+      "expo-secure-store",
+      "expo-image",
+      "expo-sharing",
+      "expo-status-bar",
+      "expo-web-browser",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsText": true
+          },
+          "androidIntentFilters": ["text/*"],
+          "iosAppGroupIdentifier": "group.com.seego.app"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

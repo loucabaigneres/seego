@@ -5,13 +5,22 @@ import { fastifyTRPCPlugin, FastifyTRPCPluginOptions } from '@trpc/server/adapte
 import { fromNodeHeaders } from 'better-auth/node';
 import { sql } from 'drizzle-orm';
 import Fastify from 'fastify';
-import { auth } from './lib/auth.js';
+import { auth, isApiOverHttps } from './lib/auth.js';
 import { db } from './lib/db.js';
 import { registerImageProxy } from './routes/image-proxy.js';
+import { registerUnsubscribe } from './routes/unsubscribe.js';
 import { createContext } from './trpc/context.js';
 import { AppRouter, appRouter } from './trpc/router.js';
 
 const server = Fastify({ logger: true });
+
+// Identifies the build actually running (GIT_SHA is baked into the Docker image by the CD).
+const buildInfo = {
+  gitSha: process.env.GIT_SHA ?? 'unknown',
+  nodeEnv: env.NODE_ENV,
+  betterAuthUrl: env.BETTER_AUTH_URL,
+  crossSiteSessionCookie: isApiOverHttps, // true => session cookie is SameSite=None; Secure
+};
 
 await server.register(cors, {
   origin: (origin, callback) => {
@@ -24,6 +33,11 @@ await server.register(cors, {
     }
 
     if (origin === 'https://app.seego.fr' || origin === 'https://seego-app.vercel.app') {
+      return callback(null, true);
+    }
+
+    // Back-office (apps/admin). Normally same-origin through its Vercel proxy.
+    if (origin === 'https://admin.seego.fr' || origin === 'https://admin-staging.seego.fr') {
       return callback(null, true);
     }
 
@@ -45,7 +59,7 @@ await server.register(cors, {
 server.get('/health', async (request, reply) => {
   try {
     await db.execute(sql`SELECT 1`);
-    return { status: 'ok', timestamp: new Date().toISOString() };
+    return { status: 'ok', timestamp: new Date().toISOString(), ...buildInfo };
   } catch (error) {
     server.log.error(error, 'Health check DB error');
     reply.status(500);
@@ -82,6 +96,9 @@ server.route({
 // Serves catalog images without CORS restrictions, for the PDF renderer.
 registerImageProxy(server);
 
+// Newsletter opt-out link (GET confirmation page + POST, also used for one-click unsubscribe).
+registerUnsubscribe(server);
+
 // Register the tRPC plugin with the Fastify server
 await server.register(fastifyTRPCPlugin, {
   prefix: '/trpc',
@@ -98,6 +115,7 @@ await server.register(fastifyTRPCPlugin, {
   try {
     // Listen on port 3000 and bind to all network interfaces for Docker compatibility
     await server.listen({ port: env.PORT, host: '0.0.0.0' });
+    server.log.info(buildInfo, 'API started');
   } catch (err) {
     server.log.error(err);
     process.exit(1);

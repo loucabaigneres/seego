@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
-import { count, desc, eq } from 'drizzle-orm';
+import { userOnboarding } from '@seego/database';
+import { and, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
@@ -20,7 +21,7 @@ export const userRouter = createTRPCRouter({
     const [tripsCount] = await ctx.db
       .select({ value: count() })
       .from(trip)
-      .where(eq(trip.userId, ctx.user.id));
+      .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)));
 
     const [likedCount] = await ctx.db
       .select({ value: count() })
@@ -46,7 +47,7 @@ export const userRouter = createTRPCRouter({
         createdAt: trip.createdAt,
       })
       .from(trip)
-      .where(eq(trip.userId, ctx.user.id))
+      .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))
       .orderBy(desc(trip.createdAt));
   }),
 
@@ -70,6 +71,61 @@ export const userRouter = createTRPCRouter({
       return { success: true };
     }),
 
+  renameTrip: protectedProcedure
+    .input(
+      z.object({
+        tripId: z.string().uuid(),
+        title: z
+          .string()
+          .trim()
+          .min(1, 'Le titre ne peut pas être vide.')
+          .max(80, 'Le titre doit comporter au plus 80 caractères.'),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const [updatedTrip] = await ctx.db
+        .update(trip)
+        .set({ title: input.title, updatedAt: new Date() })
+        .where(and(eq(trip.id, input.tripId), eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))
+        .returning({ id: trip.id, title: trip.title });
+
+      if (!updatedTrip) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "Ce voyage n'existe pas ou vous n'avez pas l'autorisation de le modifier.",
+        });
+      }
+
+      return { success: true, trip: updatedTrip };
+    }),
+
+  deleteTrip: protectedProcedure
+    .input(z.object({ tripId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const [deletedTrip] = await ctx.db
+        .update(trip)
+        .set({ deletedAt: new Date(), updatedAt: new Date() })
+        .where(
+          and(
+            eq(trip.id, input.tripId),
+            eq(trip.userId, ctx.user.id),
+            // A group trip has members: only group.deleteGroupTrip may remove it.
+            eq(trip.isGroup, false),
+            isNull(trip.deletedAt),
+          ),
+        )
+        .returning({ id: trip.id });
+
+      if (!deletedTrip) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: "Ce voyage n'existe pas ou vous n'avez pas l'autorisation de le supprimer.",
+        });
+      }
+
+      return { success: true };
+    }),
+
   saveTripToAccount: protectedProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -80,7 +136,13 @@ export const userRouter = createTRPCRouter({
           status: 'finalized',
           updatedAt: new Date(),
         })
-        .where(eq(trip.id, input.tripId))
+        .where(
+          and(
+            eq(trip.id, input.tripId),
+            // Your own trip, or one made as a guest: never someone else's (a group's host).
+            or(eq(trip.userId, ctx.user.id), like(trip.userId, 'guest\\_%')),
+          ),
+        )
         .returning();
 
       if (!updatedTrip) {
@@ -88,5 +150,50 @@ export const userRouter = createTRPCRouter({
       }
 
       return { success: true, trip: updatedTrip };
+    }),
+
+  // Moves everything created anonymously on this device (trips, onboarding answers, swipes)
+  // to the logged-in account. Trip status is left untouched.
+  claimGuestTrips: protectedProcedure
+    // Only real guest ids, so a client cannot pass another user's id and take their trips.
+    .input(z.object({ guestId: z.string().regex(/^guest_[0-9a-f-]{36}$/) }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.user.id;
+
+      return await ctx.db.transaction(async (tx) => {
+        const claimedTrips = await tx
+          .update(trip)
+          .set({ userId, updatedAt: new Date() })
+          .where(eq(trip.userId, input.guestId))
+          .returning({ id: trip.id });
+
+        const claimedTripIds = claimedTrips.map((t) => t.id);
+        if (claimedTripIds.length > 0) {
+          await tx
+            .update(userOnboarding)
+            .set({ userId })
+            .where(
+              and(inArray(userOnboarding.tripId, claimedTripIds), isNull(userOnboarding.userId)),
+            );
+        }
+
+        // A place swiped both as guest and as user would break the (user, content) unique index:
+        // keep the account's swipe and drop the guest one.
+        const alreadySwiped = tx
+          .select({ id: swipes.discoveryContentId })
+          .from(swipes)
+          .where(eq(swipes.userId, userId));
+        await tx
+          .delete(swipes)
+          .where(
+            and(
+              eq(swipes.userId, input.guestId),
+              inArray(swipes.discoveryContentId, alreadySwiped),
+            ),
+          );
+        await tx.update(swipes).set({ userId }).where(eq(swipes.userId, input.guestId));
+
+        return { claimedTripsCount: claimedTripIds.length };
+      });
     }),
 });

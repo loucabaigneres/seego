@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { useAuthSubmit } from '../hooks/useAuthSubmit';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
@@ -16,6 +17,10 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await submit((fetchOptions) => authClient.signIn.email({ email, password, fetchOptions }), {
+      onSuccess: () => {
+        track('login_completed', { method: 'email' });
+        goNext();
+      },
       // An account whose e-mail is not confirmed yet gets a fresh code instead of an error.
       onError: async (ctx) => {
         if (ctx.error.code === 'EMAIL_NOT_VERIFIED') {
@@ -51,7 +56,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
             <Link
               to="/register"
               search={{ redirect }}
-              className="font-bold text-[#FF4D4D] hover:underline"
+              className="font-bold text-brand hover:underline"
             >
               Créer un compte
             </Link>
@@ -69,7 +74,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
               <div className="mt-2 text-right">
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-semibold text-[#FF4D4D] hover:underline"
+                  className="text-xs font-semibold text-brand hover:underline"
                 >
                   Mot de passe oublié ?
                 </Link>

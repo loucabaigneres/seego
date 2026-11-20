@@ -1,4 +1,5 @@
 import { expoClient } from '@better-auth/expo/client';
+import { emailOTPClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
@@ -19,6 +20,8 @@ export const authClient = createAuthClient({
       storagePrefix: 'seego',
       storage: SecureStore,
     }),
+    // E-mail accounts confirm their address with a 6-digit code before signing in.
+    emailOTPClient(),
   ],
 });
 

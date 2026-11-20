@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { and, eq, notExists } from 'drizzle-orm';
 import * as z from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from './init.js';
+import { adminRouter } from './routers/admin.js';
 import { discoveryRouter } from './routers/discovery.js';
 import { groupRouter } from './routers/group.js';
 import { inspirationRouter } from './routers/inspiration.js';
@@ -101,6 +102,7 @@ export const appRouter = createTRPCRouter({
         averagePrice: input.averagePrice as typeof trip.$inferInsert.averagePrice,
         dietaryRestrictions: input.dietaryRestrictions,
         medicalConditions: input.medicalConditions,
+        // Drizzle's update skips undefined keys, so an omitted field keeps the quiz-seeded interests.
         interests: input.interests,
         intensity: input.intensity as typeof trip.$inferInsert.intensity,
       };
@@ -123,7 +125,7 @@ export const appRouter = createTRPCRouter({
 
       const [newTrip] = await ctx.db
         .insert(trip)
-        .values({ userId, ...values, status: 'draft' })
+        .values({ userId, ...values, interests: input.interests ?? [], status: 'draft' })
         .returning({ id: trip.id });
 
       return {
@@ -164,6 +166,7 @@ export const appRouter = createTRPCRouter({
   inspiration: inspirationRouter,
   onboarding: onboardingRouter,
   waitlist: waitlistRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

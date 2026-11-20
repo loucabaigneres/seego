@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
-import { radii, typeScale } from '@/theme/tokens';
+import { radii, typeScale } from '@seego/ui';
 
 const twMerge = extendTailwindMerge({
   extend: {

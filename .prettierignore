@@ -3,4 +3,5 @@ dist/
 .turbo/
 
 apps/web/src/routeTree.gen.ts
+apps/admin/src/routeTree.gen.ts
 packages/database/drizzle/*

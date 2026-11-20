@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { useAuthSubmit } from '../hooks/useAuthSubmit';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
@@ -23,6 +24,7 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
       {
         // The account exists but must confirm its e-mail with a code before signing in.
         onSuccess: () => {
+          track('signup_completed', { method: 'email' });
           stopLoading();
           setShowVerify(true);
         },
@@ -52,7 +54,7 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
             <Link
               to="/login"
               search={{ redirect }}
-              className="font-bold text-[#FF4D4D] hover:underline"
+              className="font-bold text-brand hover:underline"
             >
               Se connecter
             </Link>

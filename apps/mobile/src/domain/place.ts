@@ -1,4 +1,4 @@
-import { categoryColors } from '@/theme/tokens';
+import { categoryColors } from '@seego/ui';
 
 /** Category values as stored in the catalogue (`discovery_content.tags.category`). */
 export type PlaceCategory = 'hotel' | 'activité' | 'restaurant';
@@ -97,4 +97,9 @@ const COUNTRY_FLAGS: Record<string, string> = {
 /** Flag emoji for a catalogue country name ("Italie" → 🇮🇹), or '' when unknown. */
 export function countryFlag(country: string | null | undefined): string {
   return (country && COUNTRY_FLAGS[country]) || '';
+}
+
+/** "850 m" under a kilometre, "1,2 km" above. */
+export function formatDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1).replace('.', ',')} km`;
 }

@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { cn } from './cn';
 

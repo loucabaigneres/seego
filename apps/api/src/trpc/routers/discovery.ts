@@ -303,74 +303,84 @@ export const discoveryRouter = {
         }
       }
 
-      if (targetTripId) {
-        // Mise à jour du voyage (conserve isGroup et inviteCode existants)
-        await ctx.db
-          .update(trip)
-          .set({
-            title: `Voyage à ${top.city}`,
-            destination: top.city,
-            status: 'draft',
-            updatedAt: new Date(),
-          })
-          .where(eq(trip.id, targetTripId));
+      // Steps 2 to 4 run in one transaction: a crash midway must not leave the
+      // trip without its liked places (old day 0 deleted, new one not created).
+      const { tripId, activityCount } = await ctx.db.transaction(async (tx) => {
+        let tripId = targetTripId;
 
-        // Nettoyage de l'ancien jour 0 pour éviter les doublons
-        const existingDay0 = await ctx.db.query.tripDay.findFirst({
-          where: (td, { and, eq }) => and(eq(td.tripId, targetTripId!), eq(td.dayIndex, 0)),
-        });
-        if (existingDay0) {
-          await ctx.db.delete(tripDay).where(eq(tripDay.id, existingDay0.id));
+        if (tripId) {
+          // Mise à jour du voyage (conserve isGroup et inviteCode existants)
+          await tx
+            .update(trip)
+            .set({
+              title: `Voyage à ${top.city}`,
+              destination: top.city,
+              status: 'draft',
+              updatedAt: new Date(),
+            })
+            .where(eq(trip.id, tripId));
+
+          // Nettoyage de l'ancien jour 0 pour éviter les doublons
+          const existingDay0 = await tx.query.tripDay.findFirst({
+            where: (td, { and, eq }) => and(eq(td.tripId, tripId!), eq(td.dayIndex, 0)),
+          });
+          if (existingDay0) {
+            // Its liked places first: they reference the day (foreign key).
+            await tx.delete(activity).where(eq(activity.tripDayId, existingDay0.id));
+            await tx.delete(tripDay).where(eq(tripDay.id, existingDay0.id));
+          }
+        } else {
+          const [createdTrip] = await tx
+            .insert(trip)
+            .values({
+              userId,
+              title: `Voyage à ${top.city}`,
+              destination: top.city,
+              status: 'draft',
+            })
+            .returning({ id: trip.id });
+          tripId = createdTrip.id;
         }
-      } else {
-        const [createdTrip] = await ctx.db
-          .insert(trip)
+
+        // 3. A single day to hold the liked places.
+        const [day] = await tx
+          .insert(tripDay)
           .values({
-            userId,
-            title: `Voyage à ${top.city}`,
-            destination: top.city,
-            status: 'draft',
+            tripId,
+            dayIndex: 0,
+            summary: `Lieux likés à ${top.city}`,
           })
-          .returning({ id: trip.id });
-        targetTripId = createdTrip.id;
-      }
+          .returning({ id: tripDay.id });
 
-      // 3. A single day to hold the liked places.
-      const [day] = await ctx.db
-        .insert(tripDay)
-        .values({
-          tripId: targetTripId,
-          dayIndex: 0,
-          summary: `Lieux likés à ${top.city}`,
-        })
-        .returning({ id: tripDay.id });
+        // 4. One activity per liked place that exists in the database.
+        const activityValues = likedInCity.flatMap((item, index) => {
+          const row = rowByUrl.get(item.url);
+          if (!row) return [];
+          return [
+            {
+              tripDayId: day.id,
+              discoveryContentId: row.id,
+              title: row.locationName ?? item.locationName ?? 'Lieu',
+              locationName: row.locationName,
+              coordinates: row.coordinates,
+              orderIndex: index,
+            },
+          ];
+        });
+        if (activityValues.length > 0) {
+          await tx.insert(activity).values(activityValues);
+        }
 
-      // 4. One activity per liked place that exists in the database.
-      const activityValues = likedInCity.flatMap((item, index) => {
-        const row = rowByUrl.get(item.url);
-        if (!row) return [];
-        return [
-          {
-            tripDayId: day.id,
-            discoveryContentId: row.id,
-            title: row.locationName ?? item.locationName ?? 'Lieu',
-            locationName: row.locationName,
-            coordinates: row.coordinates,
-            orderIndex: index,
-          },
-        ];
+        return { tripId, activityCount: activityValues.length };
       });
-      if (activityValues.length > 0) {
-        await ctx.db.insert(activity).values(activityValues);
-      }
 
       return {
-        tripId: targetTripId,
+        tripId,
         destination: top.city,
         country: top.country,
-        activityCount: activityValues.length,
+        activityCount,
         swipesRecorded: swipeValues.length,
-        unresolved: likedInCity.length - activityValues.length,
+        unresolved: likedInCity.length - activityCount,
       };
     }),
 

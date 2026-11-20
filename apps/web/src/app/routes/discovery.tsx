@@ -9,12 +9,20 @@ import { ResultOverlay } from '@/features/discovery/components/ResultOverlay'
 import { SkeletonCard } from '@/features/discovery/components/SkeletonCard'
 import { SwipeActions } from '@/features/discovery/components/SwipeActions'
 import { useDiscoveryDeck } from '@/features/discovery/hooks/useDiscoveryDeck'
+import { seo } from '@/lib/seo'
 
 const discoverySearchSchema = z.object({
   tripId: z.string().optional(),
 })
 
 export const Route = createFileRoute('/discovery')({
+  head: () =>
+    seo({
+      title: 'Découvre des lieux à swiper',
+      description:
+        'Hôtels, activités et restaurants : like ce qui te plaît et Seego en déduit la destination qui te correspond.',
+      path: '/discovery',
+    }),
   validateSearch: (search: Record<string, unknown>) => discoverySearchSchema.parse(search),
   beforeLoad: ({ search }) => {
     if (!search.tripId) {
@@ -29,7 +37,7 @@ function DiscoveryPage() {
   const deck = useDiscoveryDeck(tripId)
 
   return (
-    <div className="flex h-[calc(100dvh-61px)] w-full justify-center overflow-hidden bg-[#F2EDE8] px-4 pb-4 pt-3 md:pb-6 md:pt-5">
+    <div className="flex h-[calc(100dvh-61px)] w-full justify-center overflow-hidden bg-background px-4 pb-4 pt-3 md:pb-6 md:pt-5">
       <div className="flex h-full w-full max-w-105 flex-col">
         <LikeProgress likes={deck.likes} goalReached={deck.goalReached} onShowResult={deck.triggerResult} />
 

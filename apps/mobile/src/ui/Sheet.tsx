@@ -1,5 +1,6 @@
+import { useIsFocused } from 'expo-router';
 import { useEffect, useState, type ReactNode } from 'react';
-import { Modal, Pressable, useWindowDimensions, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, useWindowDimensions, View } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -27,14 +28,18 @@ export interface SheetProps {
 export function Sheet({ visible, onClose, title, children, className }: SheetProps) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
+  // A Modal sits above every screen (on iOS, above screens pushed later too):
+  // it steps aside while its screen is covered, and comes back with it.
+  const isFocused = useIsFocused();
+  const isShown = visible && isFocused;
   // Stays mounted while the closing animation plays, then the modal goes away.
-  const [isMounted, setIsMounted] = useState(visible);
+  const [isMounted, setIsMounted] = useState(isShown);
   /** 0 hidden, 1 open: drives both the backdrop and the sheet. */
   const progress = useSharedValue(0);
-  if (visible && !isMounted) setIsMounted(true);
+  if (isShown && !isMounted) setIsMounted(true);
 
   useEffect(() => {
-    if (visible) {
+    if (isShown) {
       progress.set(withTiming(1, OPEN_TIMING));
     } else {
       progress.set(
@@ -43,7 +48,7 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
         }),
       );
     }
-  }, [visible, progress]);
+  }, [isShown, progress]);
 
   const backdropStyle = useAnimatedStyle(() => ({ opacity: progress.get() }));
   const sheetStyle = useAnimatedStyle(() => ({
@@ -62,7 +67,12 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
       <Animated.View style={backdropStyle} className="absolute inset-0 bg-scrim">
         <Pressable role="button" aria-label="Fermer" onPress={onClose} className="flex-1" />
       </Animated.View>
-      <View className="flex-1 justify-end" pointerEvents="box-none">
+      {/* A modal window is not resized by the keyboard: lift the sheet above it (e.g. a code input). */}
+      <KeyboardAvoidingView
+        behavior="padding"
+        className="flex-1 justify-end"
+        pointerEvents="box-none"
+      >
         <Animated.View
           className={cn('max-h-[92%] rounded-t-sheet bg-background px-6 pt-3', className)}
           style={[{ paddingBottom: insets.bottom + 16 }, sheetStyle]}
@@ -75,7 +85,7 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
           )}
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

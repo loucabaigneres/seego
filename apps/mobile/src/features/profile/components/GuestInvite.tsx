@@ -17,7 +17,7 @@ export function GuestInvite() {
       </View>
 
       <View className="gap-3">
-        <Button label="Se connecter" onPress={() => router.push('/auth/sign-in')} />
+        <Button label="Se connecter" variant="cta" onPress={() => router.push('/auth/sign-in')} />
         <Button
           label="Créer un compte"
           variant="outline"

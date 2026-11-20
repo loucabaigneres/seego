@@ -27,7 +27,7 @@ export function LikedPlacesCarousel({ places }: { places: Destination['likedHere
           aria-label={place.locationName ?? undefined}
           onPress={() => WebBrowser.openBrowserAsync(place.url)}
           style={{ width: TILE_WIDTH }}
-          className="overflow-hidden rounded-field bg-surface-raised active:opacity-80"
+          className="overflow-hidden rounded-field border border-brand/15 bg-surface active:opacity-80"
         >
           <View className="h-24 bg-surface">
             <Image source={place.mainMediaUrl} style={{ flex: 1 }} contentFit="cover" />

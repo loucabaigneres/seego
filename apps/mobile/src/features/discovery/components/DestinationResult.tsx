@@ -1,10 +1,10 @@
 import { Image } from 'expo-image';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { pluralize } from '@/domain/date';
 import { countryFlag } from '@/domain/place';
-import { colors } from '@/theme/tokens';
-import { Badge, Card, PhotoScrim, Tag, Text } from '@/ui';
+import { colors } from '@seego/ui';
+import { Badge, Card, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { CalendarIcon, XIcon } from '@/ui/icons';
 
 import { confidenceLabel, confidencePercent, type Destination } from '../lib/recommendation';
@@ -31,7 +31,7 @@ export function DestinationResult({
   const ambiances = destination.topSubcategories.slice(0, 8);
 
   return (
-    <ScrollView className="flex-1"contentContainerClassName="gap-6 px-6 pb-6">
+    <ScrollView className="flex-1" contentContainerClassName="gap-6 px-6 pb-6">
       <View className="h-72 overflow-hidden rounded-card bg-ink">
         {destination.heroImage && (
           <Image
@@ -41,15 +41,13 @@ export function DestinationResult({
           />
         )}
         <PhotoScrim edge="bottom" className="h-full" />
-        <Pressable
-          role="button"
-          aria-label="Fermer"
+        <IconButton
+          variant="scrim"
+          label="Fermer"
+          icon={XIcon}
           onPress={onClose}
-          hitSlop={8}
-          className="absolute right-3 top-3 size-11 items-center justify-center rounded-full bg-scrim active:opacity-80"
-        >
-          <XIcon size={20} color={colors.ink.inverse} />
-        </Pressable>
+          className="absolute right-3 top-3"
+        />
         <View className="absolute inset-x-0 bottom-0 gap-2 p-6">
           <Badge label="Ta destination idéale" tone="accent" />
           <Text variant="title" tone="inverse" role="heading">

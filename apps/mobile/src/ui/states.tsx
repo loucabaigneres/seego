@@ -1,6 +1,6 @@
 import { View } from 'react-native';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 
 import { Button } from './Button';
 import { cn } from './cn';

@@ -52,7 +52,7 @@ export function LegalNotice() {
           Les informations sur la collecte et le traitement de tes données figurent dans notre{' '}
           <a
             href={ROUTES.privacy}
-            className="font-semibold text-ink underline decoration-accent/50 underline-offset-2 hover:decoration-accent"
+            className="font-semibold text-ink underline decoration-cta/60 underline-offset-2 hover:decoration-cta"
           >
             politique de confidentialité
           </a>

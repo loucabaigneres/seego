@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
@@ -20,6 +21,7 @@ export function ForgotPasswordForm() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
+    track('password_reset_requested');
     setLoading(false);
     setSent(true);
   };
@@ -31,13 +33,13 @@ export function ForgotPasswordForm() {
         sent ? undefined : "Indique ton adresse email, on t'envoie un lien de réinitialisation."
       }
       footer={
-        <Link to="/login" className="font-bold text-[#FF4D4D] hover:underline">
+        <Link to="/login" className="font-bold text-brand hover:underline">
           Retour à la connexion
         </Link>
       }
     >
       {sent ? (
-        <p className="mt-4 text-sm text-[#555]">
+        <p className="mt-4 text-sm text-ink-secondary">
           Si un compte existe avec cette adresse, tu vas recevoir un email avec un lien pour choisir
           un nouveau mot de passe.
         </p>

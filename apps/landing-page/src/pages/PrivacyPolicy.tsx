@@ -130,7 +130,7 @@ export function PrivacyPolicy() {
             <button
               type="button"
               onClick={resetConsent}
-              className="cursor-pointer font-semibold text-ink underline decoration-accent/50 underline-offset-2 hover:decoration-accent"
+              className="cursor-pointer font-semibold text-ink underline decoration-cta/60 underline-offset-2 hover:decoration-cta"
             >
               gérer mes cookies
             </button>

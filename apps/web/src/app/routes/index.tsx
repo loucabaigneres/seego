@@ -1,9 +1,20 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { ChoiceCard } from '@/features/home/components/ChoiceCard';
 import { HomeHero } from '@/features/home/components/HomeHero';
+import { HowItWorks } from '@/features/home/components/HowItWorks';
+import { SampleItinerary } from '@/features/home/components/SampleItinerary';
+import { StartChoices } from '@/features/home/components/StartChoices';
 import { useStartDirectTrip } from '@/features/home/hooks/useStartDirectTrip';
+import { track } from '@/lib/analytics';
+import { seo } from '@/lib/seo';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/')({
+  head: () =>
+    seo({
+      title: 'Seego — Ton prochain voyage, trouvé en un swipe',
+      description:
+        "Trouve ta prochaine escapade : swipe les lieux qui t'inspirent, Seego assemble l'itinéraire, les hébergements et les trajets.",
+      path: '/',
+    }),
   component: IndexPage,
 });
 
@@ -12,31 +23,29 @@ function IndexPage() {
   const directTrip = useStartDirectTrip();
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center bg-[#F2EDE8] px-4 py-12">
-      <div className="w-full max-w-2xl text-center">
-        <HomeHero />
-
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 text-left">
-          <ChoiceCard
-            featured
-            icon="🎯"
-            badge="Recommandé"
-            title="Guide-moi"
-            description="4 questions express (ambiance, météo, compagnie) pour cibler nos meilleures propositions."
-            cta="Lancer le quiz"
-            onClick={() => navigate({ to: '/onboarding' })}
+    <div className="flex flex-1 flex-col bg-background">
+      <HomeHero
+        actions={
+          <StartChoices
+            onGuide={() => {
+              track('trip_start_clicked', { mode: 'guided', source: 'hero' });
+              navigate({ to: '/onboarding' });
+            }}
+            onSurprise={() => {
+              track('trip_start_clicked', { mode: 'surprise', source: 'hero' });
+              directTrip.start();
+            }}
+            isSurpriseLoading={directTrip.isStarting}
           />
-          <ChoiceCard
-            icon="🎲"
-            title="Surprends-moi"
-            description="Envie d'explorer sans filtre ? Swipe directement sur les lieux de nos destinations phares."
-            cta="Swiper directement"
-            loading={directTrip.isStarting}
-            loadingLabel="Préparation du deck…"
-            onClick={directTrip.start}
-          />
-        </div>
-      </div>
+        }
+      />
+      <SampleItinerary
+        onStart={() => {
+          track('trip_start_clicked', { mode: 'guided', source: 'sample_itinerary' });
+          navigate({ to: '/onboarding' });
+        }}
+      />
+      <HowItWorks />
     </div>
   );
 }

@@ -24,7 +24,7 @@ export default function HomeScreen() {
           icon={CompassIcon}
           badge="Recommandé"
           title="Guide-moi"
-          description="Quatre questions express — ambiance, météo, compagnie — pour viser juste du premier coup."
+          description="Quatre questions express : ambiance, météo, compagnie... pour viser juste du premier coup."
           cta="Lancer le quiz"
           onPress={() => router.push('/onboarding')}
         />

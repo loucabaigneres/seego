@@ -1,6 +1,6 @@
 import type { QuizQuestion } from '../lib/quiz';
 import { QUESTIONS } from '../questions';
-import { OptionTile } from './OptionTile';
+import { OptionTile } from '@/components/OptionTile';
 
 interface QuestionStepProps {
   question: QuizQuestion;
@@ -13,8 +13,8 @@ export function QuestionStep({ question, selected, onToggle }: QuestionStepProps
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#1a1a1a]">{copy.title}</h1>
-      <p className="mt-1 text-sm text-[#888] mb-5">{copy.subtitle}</p>
+      <h1 className="text-2xl font-display font-normal text-ink">{copy.title}</h1>
+      <p className="mt-1 text-sm text-ink-muted mb-5">{copy.subtitle}</p>
       <div className="space-y-3">
         {copy.options.map((option) => (
           <OptionTile

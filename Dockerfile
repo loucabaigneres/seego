@@ -17,6 +17,8 @@ COPY turbo.json turbo.json
 RUN pnpm turbo run build --filter=@seego/api...
 
 FROM base AS runner
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
 ENV NODE_ENV=production
 WORKDIR /app
 

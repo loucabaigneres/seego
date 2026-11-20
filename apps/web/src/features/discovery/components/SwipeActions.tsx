@@ -18,7 +18,7 @@ export function SwipeActions({ disabled, skipStamp, likeStamp, onSkip, onDetails
           disabled={disabled}
           aria-label="Passer"
           title="Passer (←)"
-          className="flex h-16 w-16 items-center justify-center rounded-full border border-[#ddd] bg-white text-[#888] shadow-md transition hover:border-[#FF4D4D] hover:text-[#FF4D4D] active:scale-90 disabled:opacity-40"
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-line-strong bg-surface text-ink-muted shadow-md transition hover:border-brand hover:text-brand active:scale-90 disabled:opacity-40"
           style={{ transform: `scale(${1 + skipStamp * 0.12})` }}
         >
           <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
@@ -32,7 +32,7 @@ export function SwipeActions({ disabled, skipStamp, likeStamp, onSkip, onDetails
           disabled={disabled}
           aria-label="Voir les détails"
           title="Voir les détails"
-          className="flex h-12 w-12 items-center justify-center rounded-full border border-[#ddd] bg-white text-[#1a1a1a] shadow-sm transition hover:border-[#1a1a1a] active:scale-90 disabled:opacity-40"
+          className="flex h-12 w-12 items-center justify-center rounded-full border border-line-strong bg-surface text-ink shadow-sm transition hover:border-ink active:scale-90 disabled:opacity-40"
         >
           <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
             <circle cx="12" cy="12" r="9" />
@@ -46,7 +46,7 @@ export function SwipeActions({ disabled, skipStamp, likeStamp, onSkip, onDetails
           disabled={disabled}
           aria-label="J'adore"
           title="J'adore (→)"
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-[#FF4D4D] text-white shadow-lg shadow-red-500/30 transition hover:brightness-105 active:scale-90 disabled:opacity-40"
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-brand text-ink-inverse shadow-lg shadow-brand/30 transition hover:brightness-105 active:scale-90 disabled:opacity-40"
           style={{ transform: `scale(${1 + likeStamp * 0.12})` }}
         >
           <svg className="h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -54,7 +54,7 @@ export function SwipeActions({ disabled, skipStamp, likeStamp, onSkip, onDetails
           </svg>
         </button>
       </div>
-      <p className="mt-3 hidden text-center text-xs text-[#888] md:block">
+      <p className="mt-3 hidden text-center text-xs text-ink-muted md:block">
         ← Passer · → J'adore · Espace : ma destination
       </p>
     </>

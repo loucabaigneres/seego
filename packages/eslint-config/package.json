@@ -1,12 +1,10 @@
 {
   "name": "@seego/eslint-config",
   "version": "1.0.0",
-  "description": "",
+  "description": "Shared ESLint flat configs: base (all workspaces), react and architecture (front-ends).",
   "main": "index.js",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,7 +13,14 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.13.0",
     "typescript-eslint": "^8.59.1"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./react": "./react.js",
+    "./architecture": "./architecture.js"
   }
 }

@@ -6,7 +6,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { cn } from '@/ui';
 import { HeartIcon, InfoIcon, XIcon } from '@/ui/icons';
 

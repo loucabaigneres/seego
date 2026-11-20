@@ -1,3 +1,4 @@
+import { categoryColors, colors } from '@seego/ui'
 import { Document, Image, Link, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { env } from '@/config/env'
 
@@ -66,18 +67,18 @@ function proxiedImage(url: string): string {
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string; tint: string; text: string }> = {
-  hotel:      { label: 'Hébergement', color: '#FF4D4D', tint: 'rgba(255,77,77,.12)',   text: '#c0392b' },
-  'activité': { label: 'Activité',    color: '#2ecc71', tint: 'rgba(46,204,113,.14)',  text: '#1e8449' },
-  restaurant: { label: 'Restaurant',  color: '#f39c12', tint: 'rgba(243,156,18,.16)',  text: '#b9770e' },
+  hotel:      { label: 'Hébergement', color: categoryColors.hotel.fill,      tint: colors.surface, text: colors.ink.DEFAULT },
+  'activité': { label: 'Activité',    color: categoryColors.activity.fill,   tint: colors.surface, text: colors.ink.DEFAULT },
+  restaurant: { label: 'Restaurant',  color: categoryColors.restaurant.fill, tint: colors.surface, text: colors.ink.DEFAULT },
 }
 
 function categoryInfo(cat: string | null) {
   return (
     CATEGORY_LABELS[cat ?? ''] ?? {
       label: cat ?? 'Lieu',
-      color: '#888888',
-      tint: 'rgba(0,0,0,.06)',
-      text: '#555555',
+      color: colors.ink.muted,
+      tint: colors.surface,
+      text: colors.ink.secondary,
     }
   )
 }
@@ -103,13 +104,13 @@ const SCRIM_BANDS = Array.from({ length: 12 }, (_, i) => ({
 }))
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-// Same vocabulary as the app: beige surface, white rounded cards, #FF4D4D accent.
+// Same vocabulary as the app: crema surface, raised rounded cards, vino accent.
 
 const s = StyleSheet.create({
   page: {
-    backgroundColor: '#F2EDE8',
+    backgroundColor: colors.background,
     fontFamily: 'Helvetica',
-    color: '#1a1a1a',
+    color: colors.ink.DEFAULT,
     paddingTop: 32,
     paddingBottom: 56,
     paddingHorizontal: 32,
@@ -120,7 +121,7 @@ const s = StyleSheet.create({
     height: 210,
     marginBottom: 22,
     borderRadius: 18,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: colors.ink.DEFAULT,
     position: 'relative',
   },
   heroImage: {
@@ -157,13 +158,13 @@ const s = StyleSheet.create({
   heroDestination: {
     fontSize: 10,
     fontFamily: 'Helvetica-Bold',
-    color: '#FF4D4D',
+    color: colors.brand,
     marginBottom: 3,
   },
   heroTitle: {
     fontSize: 24,
     fontFamily: 'Helvetica-Bold',
-    color: '#ffffff',
+    color: colors.ink.inverse,
   },
   heroPills: {
     flexDirection: 'row',
@@ -171,7 +172,7 @@ const s = StyleSheet.create({
   },
   heroPill: {
     fontSize: 8,
-    color: '#ffffff',
+    color: colors.ink.inverse,
     backgroundColor: 'rgba(255,255,255,.22)',
     borderRadius: 999,
     paddingVertical: 3,
@@ -183,17 +184,17 @@ const s = StyleSheet.create({
   sectionTitle: {
     fontSize: 8,
     fontFamily: 'Helvetica-Bold',
-    color: '#888888',
+    color: colors.ink.muted,
     letterSpacing: 1.2,
     marginBottom: 8,
   },
 
   // ── Day card ──
   dayCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.background,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#eeeeee',
+    borderColor: colors.surface,
     marginBottom: 14,
   },
   dayHeader: {
@@ -203,7 +204,7 @@ const s = StyleSheet.create({
     paddingVertical: 9,
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0eae3',
+    borderBottomColor: colors.surface,
   },
   dayHeaderLeft: {
     flexDirection: 'row',
@@ -212,8 +213,8 @@ const s = StyleSheet.create({
   dayPill: {
     fontSize: 9,
     fontFamily: 'Helvetica-Bold',
-    color: '#ffffff',
-    backgroundColor: '#FF4D4D',
+    color: colors.ink.inverse,
+    backgroundColor: colors.brand,
     borderRadius: 999,
     paddingVertical: 3,
     paddingHorizontal: 9,
@@ -221,14 +222,14 @@ const s = StyleSheet.create({
   },
   dayDate: {
     fontSize: 9,
-    color: '#888888',
+    color: colors.ink.muted,
   },
   daySummary: {
     fontSize: 8,
-    color: '#aaaaaa',
+    color: colors.ink.muted,
   },
   dayBody: {
-    backgroundColor: '#FBF8F5',
+    backgroundColor: colors.background,
     padding: 8,
     borderBottomLeftRadius: 16,
     borderBottomRightRadius: 16,
@@ -237,10 +238,10 @@ const s = StyleSheet.create({
   // ── Activity card ──
   activityCard: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.background,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#eeeeee',
+    borderColor: colors.surface,
     padding: 8,
   },
   indexBadge: {
@@ -256,7 +257,7 @@ const s = StyleSheet.create({
   indexBadgeText: {
     fontSize: 7,
     fontFamily: 'Helvetica-Bold',
-    color: '#FF4D4D',
+    color: colors.brand,
   },
   thumbnail: {
     width: 52,
@@ -284,7 +285,7 @@ const s = StyleSheet.create({
   activityTitle: {
     fontSize: 10.5,
     fontFamily: 'Helvetica-Bold',
-    color: '#1a1a1a',
+    color: colors.ink.DEFAULT,
     flex: 1,
     marginRight: 8,
   },
@@ -297,23 +298,23 @@ const s = StyleSheet.create({
   },
   locationName: {
     fontSize: 8.5,
-    color: '#888888',
+    color: colors.ink.muted,
     marginBottom: 2,
   },
   coords: {
     fontSize: 7.5,
-    color: '#aaaaaa',
+    color: colors.ink.muted,
     marginBottom: 3,
   },
   description: {
     fontSize: 8.5,
-    color: '#999999',
+    color: colors.ink.muted,
     lineHeight: 1.5,
   },
   link: {
     fontSize: 8,
     fontFamily: 'Helvetica-Bold',
-    color: '#FF4D4D',
+    color: colors.brand,
     marginTop: 4,
     textDecoration: 'none',
   },
@@ -334,12 +335,12 @@ const s = StyleSheet.create({
   },
   footerText: {
     fontSize: 8,
-    color: '#aaaaaa',
+    color: colors.ink.muted,
   },
   footerBrand: {
     fontSize: 8,
     fontFamily: 'Helvetica-Bold',
-    color: '#888888',
+    color: colors.ink.muted,
   },
 })
 
@@ -478,7 +479,7 @@ export function TripPdfDocument({ trip, days }: TripPdfProps) {
         {/* Footer */}
         <View style={s.footer} fixed>
           <Text style={s.footerBrand}>
-            Seego<Text style={{ color: '#FF4D4D' }}>.</Text>
+            Seego<Text style={{ color: colors.cta }}>.</Text>
           </Text>
           <Text style={s.footerText} render={({ pageNumber, totalPages }) =>
             `${pageNumber} / ${totalPages}`

@@ -1,0 +1,25 @@
+/* Seego web fonts, self-hosted (no Google CDN). Files live in packages/ui/fonts/web, see fonts/README.md. */
+
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/web/Fraunces-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/web/Fraunces-Italic-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Hanken Grotesk';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../fonts/web/HankenGrotesk-Variable.woff2') format('woff2');
+}

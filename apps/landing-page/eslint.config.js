@@ -1,30 +1,10 @@
 import { baseConfig } from '@seego/eslint-config';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
-import globals from 'globals';
+import { reactConfig } from '@seego/eslint-config/react';
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
   ...baseConfig,
-
-  // React specific rules
-  {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-    },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-    },
-  },
-
+  ...reactConfig({ reactRefresh: true }),
   {
     ignores: ['dist/**'],
   },

@@ -61,6 +61,7 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
                     ? 'Création du voyage…'
                     : `Planifier mon voyage à ${destination.city}`
                 }
+                variant="cta"
                 icon={ArrowRightIcon}
                 loading={result.isSaving}
                 onPress={result.save}

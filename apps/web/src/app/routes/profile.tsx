@@ -9,8 +9,10 @@ import { ProfileStats } from '@/features/profile/components/ProfileStats';
 import { ProfileTabs } from '@/features/profile/components/ProfileTabs';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import type { ProfileTab } from '@/features/profile/types';
+import { seo } from '@/lib/seo';
 
 export const Route = createFileRoute('/profile')({
+  head: () => seo({ title: 'Mon espace', path: '/profile' }),
   component: ProfilePage,
 });
 
@@ -36,7 +38,7 @@ function ProfilePage() {
             <InspirationList enabled={isSignedIn} />
             <Link
               to="/importVideo"
-              className="mt-4 flex w-full items-center justify-center rounded-2xl bg-[#FF4D4D] py-3.5 text-sm font-bold text-white shadow-lg shadow-red-500/25 transition hover:brightness-105 active:scale-95"
+              className="mt-4 flex w-full items-center justify-center rounded-2xl bg-brand py-3.5 text-sm font-bold text-accent shadow-lg shadow-brand/25 transition hover:brightness-105 active:scale-95"
             >
               Ajouter une inspiration
             </Link>

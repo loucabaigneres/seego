@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { trackEvent } from './analytics';
+import { track } from './analytics';
 import { trpc } from './trpc';
 
 // sessionStorage (not localStorage): the "already joined" hint should only last
@@ -62,7 +62,7 @@ export async function submitWaitlist(email: string, position: string): Promise<v
 
   storeEmail(normalized);
   // Conversion event; the e-mail address is deliberately not sent to analytics.
-  trackEvent('waitlist_joined', { position });
+  track('waitlist_joined', { position });
 }
 
 /** Tracks whether this visitor has already joined the waitlist (persisted for the session). */

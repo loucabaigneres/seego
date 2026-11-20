@@ -1,6 +1,6 @@
 import type { TRPCRouterRecord } from '@trpc/server';
 import { TRPCError } from '@trpc/server';
-import { and, asc, eq, gt, inArray, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Context } from '../context.js';
 
@@ -91,6 +91,53 @@ async function fetchCityItems(
   });
 }
 
+/**
+ * Lieux importés par l'utilisateur depuis ses inspirations (toute sa bibliothèque), pour
+ * une catégorie donnée. Ils n'ont pas de coordonnées : le ranking leur applique une
+ * pénalité fixe et les place après les lieux géolocalisés, mais ils restent proposables.
+ */
+async function fetchImportedPlaces(
+  db: Context['db'],
+  ownerUserId: string,
+  category: string,
+): Promise<ItinItem[]> {
+  const rows = await db
+    .select({
+      id: discoveryContent.id,
+      locationName: discoveryContent.locationName,
+      title: discoveryContent.title,
+      description: discoveryContent.description,
+      mainMediaUrl: discoveryContent.mainMediaUrl,
+      coordinates: discoveryContent.coordinates,
+    })
+    .from(discoveryContent)
+    .where(
+      and(
+        eq(discoveryContent.ownerUserId, ownerUserId),
+        sql`${discoveryContent.tags}->>'category' = ${category}`,
+      ),
+    );
+
+  return rows.map((r) => {
+    const coords = parseWkt(r.coordinates);
+    return {
+      activityId: `import:${r.id}`,
+      discoveryContentId: r.id,
+      title: r.locationName ?? r.title ?? 'Lieu',
+      locationName: r.locationName,
+      description: r.description,
+      coordinates: r.coordinates,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
+      mainMediaUrl: r.mainMediaUrl || null,
+      category,
+      price: null,
+      subcategory: null,
+      liked: false,
+    };
+  });
+}
+
 // ─── Planning edits ───────────────────────────────────────────────────────────
 
 /**
@@ -132,7 +179,10 @@ async function loadPlanningActivity(db: Context['db'], tripId: string, activityI
 }
 
 async function getTripOrThrow(db: Context['db'], tripId: string) {
-  const [tripRow] = await db.select().from(trip).where(eq(trip.id, tripId));
+  const [tripRow] = await db
+    .select()
+    .from(trip)
+    .where(and(eq(trip.id, tripId), isNull(trip.deletedAt)));
   if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
   return tripRow;
 }
@@ -159,7 +209,10 @@ export const itineraryRouter = {
   getTrip: publicProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      const [tripRow] = await ctx.db.select().from(trip).where(eq(trip.id, input.tripId));
+      const [tripRow] = await ctx.db
+        .select()
+        .from(trip)
+        .where(and(eq(trip.id, input.tripId), isNull(trip.deletedAt)));
       if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
 
       const rows = await ctx.db
@@ -242,7 +295,10 @@ export const itineraryRouter = {
   generateItinerary: publicProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [tripRow] = await ctx.db.select().from(trip).where(eq(trip.id, input.tripId));
+      const [tripRow] = await ctx.db
+        .select()
+        .from(trip)
+        .where(and(eq(trip.id, input.tripId), isNull(trip.deletedAt)));
       if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
 
       // Only day 0 holds the places the user actually liked while swiping. Days
@@ -477,8 +533,10 @@ export const itineraryRouter = {
       const tripRow = await getTripOrThrow(ctx.db, input.tripId);
       const current = await loadPlanningActivity(ctx.db, input.tripId, input.activityId);
 
-      const [pool, planned] = await Promise.all([
+      const [catalogPool, importedPool, planned] = await Promise.all([
         fetchCityItems(ctx.db, current.category, tripRow.destination ?? ''),
+        // Toute la bibliothèque de lieux importés de l'utilisateur, même catégorie.
+        fetchImportedPlaces(ctx.db, tripRow.userId, current.category),
         ctx.db
           .select({
             discoveryContentId: activity.discoveryContentId,
@@ -489,6 +547,8 @@ export const itineraryRouter = {
           .innerJoin(tripDay, eq(activity.tripDayId, tripDay.id))
           .where(and(eq(tripDay.tripId, input.tripId), ne(tripDay.dayIndex, LIKED_DAY_INDEX))),
       ]);
+
+      const importedIds = new Set(importedPool.map((i) => i.discoveryContentId));
 
       const contentIds = (rows: typeof planned) =>
         new Set(rows.map((r) => r.discoveryContentId).filter((id): id is string => id != null));
@@ -522,16 +582,32 @@ export const itineraryRouter = {
         liked: false,
       };
 
-      const ranked = rankReplacements(
-        currentItem,
-        pool
+      const opts = {
+        averagePrice: (tripRow.averagePrice as AveragePrice | null) ?? null,
+        interests: Array.isArray(tripRow.interests) ? (tripRow.interests as string[]) : [],
+      };
+
+      const prepare = (items: ItinItem[]) =>
+        items
           .filter((i) => !excluded.has(i.discoveryContentId ?? ''))
-          .map((i) => ({ ...i, liked: alternatives.has(i.discoveryContentId ?? '') })),
-        {
-          averagePrice: (tripRow.averagePrice as AveragePrice | null) ?? null,
-          interests: Array.isArray(tripRow.interests) ? (tripRow.interests as string[]) : [],
-        },
-      );
+          .map((i) => ({ ...i, liked: alternatives.has(i.discoveryContentId ?? '') }));
+
+      // Les lieux importés sont des choix explicites : on les présente tous (ils n'ont pas
+      // de coordonnées, donc le classement par distance les reléguerait sinon), avant les
+      // propositions du catalogue classées par pertinence.
+      const importedRanked = rankReplacements(currentItem, prepare(importedPool), {
+        ...opts,
+        limit: 50,
+      });
+      const catalogRanked = rankReplacements(currentItem, prepare(catalogPool), opts);
+
+      const seen = new Set<string>();
+      const ranked = [...importedRanked, ...catalogRanked].filter((i) => {
+        const id = i.discoveryContentId ?? i.activityId;
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      });
 
       return ranked.map((i) => ({
         id: i.discoveryContentId!,
@@ -544,6 +620,8 @@ export const itineraryRouter = {
         distanceKm: i.distanceKm,
         /** One of the hotel alternatives proposed at generation time. */
         suggested: i.liked,
+        /** Place the user imported from an inspiration (vs the catalog). */
+        imported: importedIds.has(i.discoveryContentId),
       }));
     }),
 
@@ -574,18 +652,24 @@ export const itineraryRouter = {
           description: discoveryContent.description,
           coordinates: discoveryContent.coordinates,
           city: discoveryContent.city,
+          isActive: discoveryContent.isActive,
+          ownerUserId: discoveryContent.ownerUserId,
           category: sql<string | null>`${discoveryContent.tags}->>'category'`,
         })
         .from(discoveryContent)
-        .where(
-          and(
-            eq(discoveryContent.id, input.discoveryContentId),
-            eq(discoveryContent.isActive, true),
-          ),
-        );
+        .where(eq(discoveryContent.id, input.discoveryContentId));
 
+      // Un lieu importé par l'utilisateur (sa bibliothèque) est utilisable quelle que
+      // soit sa ville et bien qu'il soit `isActive=false` ; un lieu du catalogue doit
+      // être actif et situé dans la ville du voyage.
+      const isImported = !!content && content.ownerUserId === tripRow.userId;
       const sameCity = content?.city?.toLowerCase() === (tripRow.destination ?? '').toLowerCase();
-      if (!content || content.category !== current.category || !sameCity) {
+      const usable =
+        !!content &&
+        content.category === current.category &&
+        (isImported || (content.isActive === true && sameCity));
+
+      if (!usable) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
           message: 'Ce lieu ne peut pas remplacer celui de ton itinéraire.',

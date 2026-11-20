@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { categoryMeta, cleanDescription, offerHost } from '@/domain/place';
-import { colors } from '@/theme/tokens';
+import { colors } from '@seego/ui';
 import { Badge, Tag, Text } from '@/ui';
 import { ArrowSquareOutIcon, MapPinIcon } from '@/ui/icons';
 
@@ -34,8 +34,8 @@ export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
       <View className="gap-1.5">
         {location ? (
           <View className="flex-row items-center gap-1.5">
-            <MapPinIcon size={16} weight="fill" color={colors.primary.text} />
-            <Text variant="caption" tone="primary" className="flex-1">
+            <MapPinIcon size={16} weight="fill" color={colors.brand} />
+            <Text variant="caption" tone="brand" className="flex-1">
               {location}
             </Text>
           </View>
@@ -50,7 +50,7 @@ export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
               <View className="rounded-full bg-surface px-3 py-1">
                 <Text variant="caption" tone="default">
                   Budget{' '}
-                  <Text variant="caption" tone="primary">
+                  <Text variant="caption" tone="brand">
                     {price}
                   </Text>
                 </Text>
@@ -100,7 +100,7 @@ export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
         <Pressable
           role="link"
           onPress={() => place.url && WebBrowser.openBrowserAsync(place.url)}
-          className="min-h-14 flex-row items-center gap-3 rounded-field bg-surface-raised px-4 py-3 active:opacity-80"
+          className="min-h-14 flex-row items-center gap-3 rounded-field bg-background px-4 py-3 active:opacity-80"
         >
           <View className="flex-1">
             <Text variant="label">Voir l’offre</Text>

@@ -16,8 +16,8 @@ export function ProfileTabs({ active, onChange }: { active: ProfileTab; onChange
           onClick={() => onChange(tab.id)}
           className={`rounded-full px-5 py-2.5 text-sm font-semibold transition active:scale-95 cursor-pointer ${
             active === tab.id
-              ? 'bg-[#FF4D4D] text-white shadow-lg shadow-red-500/20'
-              : 'bg-white text-[#555] border border-[#ddd] hover:bg-[#faf8f6]'
+              ? 'bg-brand text-accent shadow-lg shadow-brand/20'
+              : 'bg-background text-ink-secondary border border-line-strong hover:bg-background'
           }`}
         >
           {tab.label}

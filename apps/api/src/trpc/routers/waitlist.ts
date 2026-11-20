@@ -1,4 +1,5 @@
 import { waitlistLeads } from '@seego/database';
+import { isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { sendWaitlistConfirmation } from '../../lib/email.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';
@@ -19,7 +20,10 @@ const joinInput = z.object({
 export const waitlistRouter = createTRPCRouter({
   /**
    * Registers a waitlist lead. Public (visitors are not authenticated).
-   * The e-mail is unique, so re-submitting the same address is a no-op.
+   * The e-mail is unique, so re-submitting the same address is a no-op, except for
+   * someone who previously unsubscribed: signing up again clears `unsubscribed_at`
+   * (we keep the row as a soft opt-out rather than deleting it) and re-sends the
+   * confirmation e-mail.
    */
   join: publicProcedure.input(joinInput).mutation(async ({ ctx, input }) => {
     const email = input.email.trim().toLowerCase();
@@ -36,7 +40,12 @@ export const waitlistRouter = createTRPCRouter({
         referrer: input.referrer,
         landingPageUrl: input.landingPageUrl,
       })
-      .onConflictDoNothing({ target: waitlistLeads.email })
+      .onConflictDoUpdate({
+        target: waitlistLeads.email,
+        set: { unsubscribedAt: null },
+        // Only touch rows that opted out; an active lead stays untouched (no row returned).
+        setWhere: isNotNull(waitlistLeads.unsubscribedAt),
+      })
       .returning({ id: waitlistLeads.id });
 
     if (inserted.length > 0) {

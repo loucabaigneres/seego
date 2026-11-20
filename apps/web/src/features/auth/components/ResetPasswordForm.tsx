@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
@@ -35,6 +36,7 @@ export function ResetPasswordForm({ token, linkError }: ResetPasswordFormProps) 
       return;
     }
 
+    track('password_reset_completed');
     navigate({ to: '/login' });
   };
 
@@ -43,12 +45,12 @@ export function ResetPasswordForm({ token, linkError }: ResetPasswordFormProps) 
       <AuthCard
         title="Nouveau mot de passe"
         footer={
-          <Link to="/forgot-password" className="font-bold text-[#FF4D4D] hover:underline">
+          <Link to="/forgot-password" className="font-bold text-brand hover:underline">
             Refaire une demande
           </Link>
         }
       >
-        <p className="mt-4 text-sm text-[#555]">
+        <p className="mt-4 text-sm text-ink-secondary">
           Ce lien est invalide ou a expiré. Fais une nouvelle demande de réinitialisation.
         </p>
       </AuthCard>

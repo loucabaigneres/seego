@@ -10,10 +10,10 @@ export function ConsentBanner() {
     <div
       role="dialog"
       aria-label="Mesure d'audience"
-      className="fixed inset-x-4 bottom-4 z-50 rounded-2xl border border-line bg-white p-4 shadow-xl shadow-black/10 sm:right-auto sm:max-w-sm"
+      className="fixed inset-x-4 bottom-4 z-50 rounded-2xl border border-line bg-surface p-4 shadow-xl shadow-ink/10 sm:right-auto sm:max-w-sm"
     >
       <p className="text-sm font-bold text-ink">On mesure l'audience, mais seulement si tu veux</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted">
+      <p className="mt-1 text-xs leading-relaxed text-ink-muted">
         Seego utilise PostHog pour comprendre comment cette page est utilisée et l'améliorer.
         Rien n'est enregistré sans ton accord, et tu peux changer d'avis à tout moment.
       </p>
@@ -21,14 +21,14 @@ export function ConsentBanner() {
         <button
           type="button"
           onClick={refuseAnalytics}
-          className="h-10 cursor-pointer rounded-xl border border-line bg-white text-xs font-bold text-ink transition hover:bg-sand focus-visible:ring-4 focus-visible:ring-accent/30 focus-visible:outline-none active:scale-95"
+          className="h-10 cursor-pointer rounded-xl border border-line bg-surface text-xs font-bold text-ink transition hover:bg-surface focus-visible:ring-4 focus-visible:ring-cta/30 focus-visible:outline-none active:scale-95"
         >
           Refuser
         </button>
         <button
           type="button"
           onClick={acceptAnalytics}
-          className="h-10 cursor-pointer rounded-xl bg-accent text-xs font-bold text-white transition hover:brightness-105 focus-visible:ring-4 focus-visible:ring-accent/30 focus-visible:outline-none active:scale-95"
+          className="h-10 cursor-pointer rounded-xl bg-cta text-xs font-bold text-ink transition hover:brightness-105 focus-visible:ring-4 focus-visible:ring-cta/30 focus-visible:outline-none active:scale-95"
         >
           Accepter
         </button>
