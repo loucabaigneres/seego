@@ -1,4 +1,13 @@
-import { boolean, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  jsonb,
+  pgTable,
+  pgView,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import { platformEnum, processingStatus, swipeDirectionEnum } from '../enums.js';
 import { places } from './catalogue.js';
 
@@ -43,9 +52,35 @@ export const importedInspiration = pgTable('imported_inspiration', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-export const discoveryContent = pgTable('discovery_content', {
+/**
+ * Ancienne table du catalogue, renommée par la migration 0008 et gardée en lecture seule
+ * (un trigger refuse toute écriture) jusqu'à son archivage. On écrit dans `places` /
+ * `place_details` (voir catalogue.ts et catalogue/write.ts).
+ */
+export const legacyDiscoveryContent = pgTable('legacy_discovery_content', {
   id: uuid('id').primaryKey().defaultRandom(),
   url: text('url').notNull().unique(),
+  ownerUserId: text('owner_user_id'),
+  mainMediaUrl: text('main_media_url').notNull(),
+  carousselUrls: text('caroussel_urls').array(),
+  locationName: text('location_name'),
+  title: text('title'),
+  description: text('description'),
+  country: text('country'),
+  city: text('city'),
+  coordinates: text('coordinates'),
+  tags: jsonb('tags').$type<DiscoveryTags>(),
+  isActive: boolean('is_active').default(true),
+});
+
+/**
+ * Vue en lecture seule : le catalogue (`places`, `cities`, `place_details`) présenté au
+ * format de l'ancienne table, pour que les lectures de l'app ne changent pas.
+ * Définie dans la migration 0008 (`.existing()` : drizzle-kit ne la gère pas).
+ */
+export const discoveryContent = pgView('discovery_content', {
+  id: uuid('id').notNull(),
+  url: text('url').notNull(),
   // Lieu importé depuis une inspiration : rattaché à un utilisateur. `null` = catalogue
   // global. Les lignes importées restent `isActive=false` pour rester hors du feed de
   // découverte et de la génération d'itinéraire ; elles ne servent qu'au remplacement.
@@ -59,8 +94,8 @@ export const discoveryContent = pgTable('discovery_content', {
   city: text('city'),
   coordinates: text('coordinates'),
   tags: jsonb('tags').$type<DiscoveryTags>(),
-  isActive: boolean('is_active').default(true),
-});
+  isActive: boolean('is_active'),
+}).existing();
 
 export const swipes = pgTable(
   'swipe',
