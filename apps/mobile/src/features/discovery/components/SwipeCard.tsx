@@ -57,8 +57,6 @@ const SETTLE_TIMING = { duration: 320, easing: Easing.out(Easing.cubic) };
 const OVERLAY_FADE_END = 0.4;
 /** While the details are dragged, the card grows by this much to stand out, then settles back. */
 const LIFT_SCALE = 0.04;
-/** Notte veil over the travertino back of the second card behind. */
-const BACK_SHADE = 0.06;
 
 const ACCESSIBILITY_ACTIONS = [
   { name: 'like', label: 'J’adore' },
@@ -253,13 +251,6 @@ export function SwipeCard({
     opacity: interpolate(expansion.get(), [0, OVERLAY_FADE_END], [1, 0], Extrapolation.CLAMP),
   }));
   const closeStyle = useAnimatedStyle(() => ({ opacity: expansion.get() }));
-  // The cards behind show as plain travertino backs, a shade darker each step; the photo shows on the way up.
-  const backStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(stackPosition.get(), [0, 1], [0, 1], Extrapolation.CLAMP),
-  }));
-  const backShadeStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(stackPosition.get(), [1, 2], [0, BACK_SHADE], Extrapolation.CLAMP),
-  }));
 
   return (
     <Animated.View
@@ -392,14 +383,6 @@ export function SwipeCard({
             icon={XIcon}
             onPress={() => settleDetails(false)}
           />
-        </Animated.View>
-
-        <Animated.View style={[StyleSheet.absoluteFill, backStyle]} pointerEvents="none">
-          <View className="flex-1 bg-surface">
-            <Animated.View style={[StyleSheet.absoluteFill, backShadeStyle]}>
-              <View className="flex-1 bg-ink" />
-            </Animated.View>
-          </View>
         </Animated.View>
       </View>
     </Animated.View>
