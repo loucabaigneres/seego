@@ -101,7 +101,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Écrit un lieu de l'ancien format dans le catalogue, avec les mêmes règles que la
- * migration 0006 : rien n'est perdu, la ligne d'origine est gardée dans
+ * migration 0007 : rien n'est perdu, la ligne d'origine est gardée dans
  * `place_details.details.legacy`. Ne fait rien si l'URL existe déjà. Renvoie l'id créé.
  */
 export async function insertLegacyPlace(
