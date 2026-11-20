@@ -75,15 +75,17 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
               <View className="flex-row gap-2">
                 <Button
                   label="Continuer à swiper"
+                  variant="text"
                   size="sm"
                   onPress={result.close}
-                  className="flex-1 bg-transparent"
+                  className="flex-1 bg-accent"
                 />
                 <Button
                   label="Recommencer"
+                  variant="text"
                   size="sm"
                   onPress={onRestart}
-                  className="flex-1 bg-transparent"
+                  className="flex-1 bg-accent"
                 />
               </View>
             </View>

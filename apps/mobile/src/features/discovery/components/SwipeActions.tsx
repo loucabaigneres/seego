@@ -97,11 +97,11 @@ export function SwipeActions({
           disabled={disabled}
           onPress={onLike}
           className={cn(
-            'size-20 items-center justify-center rounded-full bg-brand active:opacity-80',
+            'size-16 items-center justify-center rounded-full bg-brand active:opacity-80',
             disabled && 'opacity-50',
           )}
         >
-          <HeartIcon size={34} weight="fill" color={colors.accent} />
+          <HeartIcon size={28} weight="fill" color={colors.accent} />
         </Pressable>
       </Animated.View>
     </View>
