@@ -1,25 +1,24 @@
 import { ScrollView, View } from 'react-native';
 
+import { pluralize } from '@/domain/date';
 import { AnalyzingView } from '@/features/onboarding/components/AnalyzingView';
 import { QuestionStep } from '@/features/onboarding/components/QuestionStep';
+import { QuizHeader } from '@/features/onboarding/components/QuizHeader';
 import { useOnboardingQuiz } from '@/features/onboarding/hooks/useOnboardingQuiz';
-import { Button, Notice, Screen, StepHeader } from '@/ui';
+import { answerLabels } from '@/features/onboarding/questions';
+import { Button, Notice, Screen, Text } from '@/ui';
 
 export default function OnboardingScreen() {
   const quiz = useOnboardingQuiz();
 
   if (quiz.isSubmitting) {
-    return (
-      <Screen>
-        <AnalyzingView />
-      </Screen>
-    );
+    return <AnalyzingView answers={answerLabels(quiz.answers)} />;
   }
 
   return (
-    <Screen contentClassName="gap-6 px-0 pb-2">
-      <View className="px-6">
-        <StepHeader
+    <Screen contentClassName="gap-6 px-0 pb-2 pt-2">
+      <View className="px-4">
+        <QuizHeader
           label={`Question ${quiz.step.current} sur ${quiz.step.total}`}
           backLabel="Revenir à la question précédente"
           progress={quiz.step.progress}
@@ -45,6 +44,9 @@ export default function OnboardingScreen() {
         {quiz.hasFailed && (
           <Notice message="Impossible d’enregistrer tes réponses pour le moment. Vérifie ta connexion et réessaie." />
         )}
+        <Text variant="caption" className="text-center text-[13px] leading-[18px]">
+          {`Plusieurs choix possibles · ${pluralize(quiz.selected.length, 'sélectionné')}`}
+        </Text>
         <Button
           label={quiz.isLastStep ? 'Découvrir mes destinations' : 'Continuer'}
           variant={quiz.isLastStep ? 'cta' : 'primary'}

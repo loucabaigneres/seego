@@ -18,7 +18,7 @@ import {
   type AppIcon,
 } from '@/ui/icons';
 
-import type { QuizOption, QuizQuestion } from './lib/quiz';
+import { QUIZ_QUESTIONS, type QuizAnswers, type QuizOption, type QuizQuestion } from './lib/quiz';
 
 export interface QuestionOption<Q extends QuizQuestion> {
   value: QuizOption<Q>;
@@ -155,3 +155,12 @@ export const QUESTIONS: { [Q in QuizQuestion]: QuestionCopy<Q> } = {
     ],
   },
 };
+
+/** Short labels of the chosen options, in quiz order: "Cité vibrante & histoire" → "Cité vibrante". */
+export function answerLabels(answers: QuizAnswers): string[] {
+  return QUIZ_QUESTIONS.flatMap((question) =>
+    (QUESTIONS[question].options as QuestionOption<QuizQuestion>[])
+      .filter((option) => (answers[question] as string[]).includes(option.value))
+      .map((option) => option.title.split(' & ')[0]),
+  );
+}

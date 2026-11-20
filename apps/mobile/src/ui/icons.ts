@@ -54,6 +54,7 @@ export { SparkleIcon } from 'phosphor-react-native/src/icons/Sparkle';
 export { SuitcaseRollingIcon } from 'phosphor-react-native/src/icons/SuitcaseRolling';
 export { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 export { TrashIcon } from 'phosphor-react-native/src/icons/Trash';
+export { UserCircleIcon } from 'phosphor-react-native/src/icons/UserCircle';
 export { UserIcon } from 'phosphor-react-native/src/icons/User';
 export { UsersFourIcon } from 'phosphor-react-native/src/icons/UsersFour';
 export { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';

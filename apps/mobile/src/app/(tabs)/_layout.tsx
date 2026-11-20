@@ -1,7 +1,7 @@
 import { Tabs } from 'expo-router';
 
 import { colors, fonts } from '@seego/ui';
-import { HouseIcon, SuitcaseRollingIcon, UserIcon, type AppIcon } from '@/ui/icons';
+import { CompassIcon, SuitcaseRollingIcon, UserCircleIcon, type AppIcon } from '@/ui/icons';
 
 const ACTIVE_COLOR = colors.brand;
 const INACTIVE_COLOR = colors.ink.muted;
@@ -27,16 +27,16 @@ export default function TabsLayout() {
         tabBarActiveTintColor: ACTIVE_COLOR,
         tabBarInactiveTintColor: INACTIVE_COLOR,
         tabBarStyle: { backgroundColor: colors.background, borderTopColor: colors.line.DEFAULT },
-        tabBarLabelStyle: { fontFamily: fonts['sans-medium'] },
+        tabBarLabelStyle: { fontFamily: fonts['sans-medium'], fontSize: 12 },
         sceneStyle: { backgroundColor: colors.background },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Découvrir', tabBarIcon: tabIcon(HouseIcon) }} />
+      <Tabs.Screen name="index" options={{ title: 'Découvrir', tabBarIcon: tabIcon(CompassIcon) }} />
       <Tabs.Screen
         name="trips"
         options={{ title: 'Voyages', tabBarIcon: tabIcon(SuitcaseRollingIcon) }}
       />
-      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: tabIcon(UserIcon) }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: tabIcon(UserCircleIcon) }} />
     </Tabs>
   );
 }

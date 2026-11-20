@@ -66,6 +66,7 @@ export function useOnboardingQuiz() {
   return {
     question,
     selected: state.answers[question] as string[],
+    answers: state.answers,
     toggle: (option: string) => dispatch({ type: 'toggle', question, option }),
     step: {
       current: state.stepIndex + 1,
