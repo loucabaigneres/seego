@@ -1,11 +1,12 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import { categoryMeta, formatDistance } from '@/domain/place';
+import { colors } from '@seego/ui';
 import {
-  Badge,
   Button,
+  cn,
   EmptyState,
   ErrorState,
   LoadingState,
@@ -16,106 +17,136 @@ import {
   Text,
   type Segment,
 } from '@/ui';
-import { CompassIcon, HeartIcon, MagnifyingGlassIcon, MapPinIcon } from '@/ui/icons';
+import { CheckCircleIcon, CompassIcon, HeartIcon, MagnifyingGlassIcon } from '@/ui/icons';
 
 import type { CandidateSource, ReplacementCandidate, ReplacePlace } from '../hooks/useReplacePlace';
+import { stepLabel } from '../lib/steps';
+import { CategoryIcon } from './category-icons';
 
-const SOURCE_SEGMENTS: readonly Segment<CandidateSource>[] = [
+const SOURCES: readonly Segment<CandidateSource>[] = [
   { value: 'catalog', label: 'Sélection Seego' },
   { value: 'mine', label: 'Mes adresses' },
 ];
 
-/** Places that can replace one of the planning; picking one saves it at once. */
+/** Places that can replace one of the planning: pick one, then confirm. */
 export function ReplacePlaceSheet({ replace }: { replace: ReplacePlace }) {
   // Keeps the title while the closing animation plays.
   const [place, setPlace] = useState(replace.place);
   if (replace.place && replace.place !== place) setPlace(replace.place);
-  const meta = categoryMeta(place?.category);
-  const { candidates } = replace;
+  const { candidates, selected } = replace;
 
   return (
     // Fixed height: the sheet keeps its size from the spinner to the list instead of jumping.
     <Sheet visible={replace.place !== null} onClose={replace.close} className="h-[85%] px-0">
-      <View className="gap-1 border-b border-line px-6 pb-3">
-        <Text variant="overline">Choisir {meta.another}</Text>
-        <Text variant="section" numberOfLines={1}>
-          Remplacer « {place?.title} »
-        </Text>
-        <SegmentedControl
-          segments={SOURCE_SEGMENTS}
-          value={replace.source}
-          onChange={replace.setSource}
-          className="mt-2"
-        />
+      <View className="gap-4 px-6 pb-3">
+        <View className="gap-1">
+          <Text variant="overline" tone="brand">
+            Remplacer l’étape {stepLabel(replace.step)}
+          </Text>
+          <Text variant="title" role="heading">
+            Une autre idée ?
+          </Text>
+          <Text variant="caption" numberOfLines={1}>
+            À la place de {place?.title}
+          </Text>
+        </View>
         <SearchField
           value={replace.query}
           onChangeText={replace.setQuery}
           placeholder="Rechercher par nom"
-          className="mt-2"
+          className="rounded-field border-0 bg-surface"
         />
+        <SegmentedControl segments={SOURCES} value={replace.source} onChange={replace.setSource} />
       </View>
 
-      {candidates.isLoading ? (
-        <LoadingState label="Recherche de propositions…" />
-      ) : candidates.isError ? (
-        <ErrorState title="Impossible de charger les propositions" onRetry={candidates.retry} />
-      ) : !candidates.data?.length ? (
-        replace.query.trim() ? (
-          <EmptyState
-            icon={MagnifyingGlassIcon}
-            title="Aucun résultat"
-            description={`Aucun lieu ne correspond à « ${replace.query.trim()} ».`}
-          />
-        ) : replace.source === 'mine' ? (
-          <EmptyState
-            icon={HeartIcon}
-            title="Aucune adresse à toi"
-            description="Les lieux que tu importes depuis tes inspirations apparaîtront ici."
-          />
-        ) : (
-          <EmptyState
-            icon={CompassIcon}
-            title="Aucune autre proposition"
-            description="On n’a pas d’autre lieu de ce type pour cette destination."
-          />
-        )
-      ) : (
-        <ScrollView contentContainerClassName="gap-3 px-6 py-4" keyboardShouldPersistTaps="handled">
-          {candidates.data.map((candidate) => (
-            <CandidateRow
-              key={candidate.id}
-              candidate={candidate}
-              isPicking={replace.pickingId === candidate.id}
-              disabled={replace.pickingId !== undefined}
-              onPick={() => replace.pick(candidate.id)}
+      <View className="flex-1">
+        {candidates.isLoading ? (
+          <LoadingState label="Recherche de propositions…" />
+        ) : candidates.isError ? (
+          <ErrorState title="Impossible de charger les propositions" onRetry={candidates.retry} />
+        ) : !candidates.data?.length ? (
+          replace.query.trim() ? (
+            <EmptyState
+              icon={MagnifyingGlassIcon}
+              title="Aucun résultat"
+              description={`Aucun lieu ne correspond à « ${replace.query.trim()} ».`}
             />
-          ))}
-        </ScrollView>
-      )}
+          ) : replace.source === 'mine' ? (
+            <EmptyState
+              icon={HeartIcon}
+              title="Aucune adresse à toi"
+              description="Les lieux que tu importes depuis tes inspirations apparaîtront ici."
+            />
+          ) : (
+            <EmptyState
+              icon={CompassIcon}
+              title="Aucune autre proposition"
+              description="On n’a pas d’autre lieu de ce type pour cette destination."
+            />
+          )
+        ) : (
+          <ScrollView
+            role="radiogroup"
+            aria-label="Propositions"
+            contentContainerClassName="gap-2 px-6 py-2"
+            keyboardShouldPersistTaps="handled"
+          >
+            {candidates.data.map((candidate) => (
+              <CandidateOption
+                key={candidate.id}
+                candidate={candidate}
+                selected={candidate.id === selected?.id}
+                disabled={replace.isReplacing}
+                onPress={() => replace.select(candidate.id)}
+              />
+            ))}
+          </ScrollView>
+        )}
+      </View>
 
-      {replace.errorMessage && <Notice message={replace.errorMessage} className="mx-6 mt-2" />}
+      <View className="gap-2 px-6 pt-3">
+        {replace.errorMessage && <Notice message={replace.errorMessage} />}
+        <Button
+          label={selected ? `Remplacer par ${selected.title}` : 'Choisis un lieu'}
+          loading={replace.isReplacing}
+          disabled={!selected}
+          onPress={replace.confirm}
+        />
+      </View>
     </Sheet>
   );
 }
 
-interface CandidateRowProps {
+interface CandidateOptionProps {
   candidate: ReplacementCandidate;
-  isPicking: boolean;
+  selected: boolean;
   disabled: boolean;
-  onPick: () => void;
+  onPress: () => void;
 }
 
-function CandidateRow({ candidate, isPicking, disabled, onPick }: CandidateRowProps) {
+function CandidateOption({ candidate, selected, disabled, onPress }: CandidateOptionProps) {
   const meta = categoryMeta(candidate.category);
   const details = [
+    candidate.suggested && 'Suggéré',
+    meta.label,
     candidate.price,
     candidate.distanceKm != null && `à ${formatDistance(candidate.distanceKm)} du lieu actuel`,
   ].filter(Boolean);
 
   return (
-    <View className="flex-row gap-3 rounded-field bg-surface p-3">
+    <Pressable
+      role="radio"
+      aria-checked={selected}
+      disabled={disabled}
+      onPress={onPress}
+      className={cn(
+        // The border is always there, so selecting does not shift the content.
+        'flex-row items-center gap-3 rounded-field border-[1.5px] p-2.5 active:opacity-80',
+        selected ? 'border-brand bg-background' : 'border-transparent bg-surface',
+      )}
+    >
       <View
-        className="size-[68px] items-center justify-center overflow-hidden rounded-xl"
+        className="size-14 items-center justify-center overflow-hidden rounded-xl"
         style={{ backgroundColor: meta.colors.fill }}
       >
         {candidate.mainMediaUrl ? (
@@ -125,24 +156,20 @@ function CandidateRow({ candidate, isPicking, disabled, onPick }: CandidateRowPr
             contentFit="cover"
           />
         ) : (
-          <MapPinIcon size={24} color={meta.colors.ink} />
+          <CategoryIcon category={candidate.category} size={24} color={meta.colors.ink} />
         )}
       </View>
 
-      <View className="flex-1 gap-1">
+      <View className="flex-1">
         <Text variant="label">{candidate.title}</Text>
-        {candidate.suggested && <Badge label="Suggéré" />}
-        {details.length > 0 && <Text variant="caption">{details.join(' · ')}</Text>}
-        <Button
-          label={isPicking ? 'Remplacement…' : 'Choisir'}
-          variant="outline"
-          size="sm"
-          loading={isPicking}
-          disabled={disabled}
-          onPress={onPick}
-          className="mt-1 self-start"
-        />
+        <Text variant="caption">{details.join(' · ')}</Text>
       </View>
-    </View>
+
+      {selected ? (
+        <CheckCircleIcon size={24} weight="fill" color={colors.brand} />
+      ) : (
+        <View className="size-[22px] rounded-full border-[1.5px] border-line-strong" />
+      )}
+    </Pressable>
   );
 }

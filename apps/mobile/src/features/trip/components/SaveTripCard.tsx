@@ -1,5 +1,6 @@
 import { View } from 'react-native';
 
+import { colors } from '@seego/ui';
 import { Button, Notice } from '@/ui';
 import { BookmarkSimpleIcon, LockSimpleIcon } from '@/ui/icons';
 
@@ -15,11 +16,13 @@ export function SaveTripCard({ save }: { save: ReturnType<typeof useTripSave> })
   }
 
   const isGuest = save.state === 'sign-in';
+  const Icon = isGuest ? LockSimpleIcon : BookmarkSimpleIcon;
   return (
     <View className="gap-2">
       <Button
         label={isGuest ? 'Se connecter pour enregistrer' : 'Enregistrer dans mon profil'}
-        icon={isGuest ? LockSimpleIcon : BookmarkSimpleIcon}
+        variant="outline"
+        leading={<Icon size={20} color={colors.brand} />}
         loading={save.isPending}
         onPress={save.run}
       />
