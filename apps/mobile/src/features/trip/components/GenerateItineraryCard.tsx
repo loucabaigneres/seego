@@ -2,7 +2,7 @@ import { View } from 'react-native';
 
 import { pluralize } from '@/domain/date';
 import { Button, Card, Notice, Tag, Text } from '@/ui';
-import { CompassIcon } from '@/ui/icons';
+import { CompassIcon, HeartIcon } from '@/ui/icons';
 
 import type { TripActivity } from '../hooks/useTrip';
 
@@ -11,6 +11,8 @@ export interface GenerateItineraryCardProps {
   isPending: boolean;
   failed: boolean;
   onGenerate: () => void;
+  /** With no liked place yet (a new group trip), there is nothing to plan: swipe first. */
+  onPickPlaces: () => void;
 }
 
 /** Shown until the trip has an itinerary: the liked places, and the button that plans them. */
@@ -19,7 +21,23 @@ export function GenerateItineraryCard({
   isPending,
   failed,
   onGenerate,
+  onPickPlaces,
 }: GenerateItineraryCardProps) {
+  if (likedPlaces.length === 0) {
+    return (
+      <Card className="gap-4">
+        <View className="gap-1.5">
+          <Text variant="overline">Ton planning</Text>
+          <Text tone="secondary">
+            Swipe des destinations pour choisir les lieux de ce voyage, puis on les organise jour par
+            jour.
+          </Text>
+        </View>
+        <Button label="Choisir mes lieux" icon={HeartIcon} onPress={onPickPlaces} />
+      </Card>
+    );
+  }
+
   return (
     <Card className="gap-4">
       <View className="gap-1.5">
@@ -27,16 +45,14 @@ export function GenerateItineraryCard({
         <Text tone="secondary">Organise tes lieux likés en un planning cohérent jour par jour.</Text>
       </View>
 
-      {likedPlaces.length > 0 && (
-        <View className="gap-2.5">
-          <Text variant="overline">{pluralize(likedPlaces.length, 'lieu liké', 'lieux likés')}</Text>
-          <View className="flex-row flex-wrap gap-2">
-            {likedPlaces.map((place) => (
-              <Tag key={place.id} label={place.title} capitalize={false} className="bg-background" />
-            ))}
-          </View>
+      <View className="gap-2.5">
+        <Text variant="overline">{pluralize(likedPlaces.length, 'lieu liké', 'lieux likés')}</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {likedPlaces.map((place) => (
+            <Tag key={place.id} label={place.title} capitalize={false} className="bg-background" />
+          ))}
         </View>
-      )}
+      </View>
 
       <Button
         label={isPending ? 'Génération en cours…' : 'Générer mon itinéraire'}

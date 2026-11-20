@@ -43,6 +43,13 @@
       "when": 1794504447304,
       "tag": "0005_tense_nightshade",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795108655731,
+      "tag": "0006_elite_sphinx",
+      "breakpoints": true
     }
   ]
 }

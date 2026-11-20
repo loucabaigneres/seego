@@ -99,7 +99,7 @@ export function WaitlistForm({
                 setError(null);
               }
             }}
-            className="h-13 w-full rounded-2xl border border-line bg-background/90 pl-11 pr-4 text-sm font-medium text-ink shadow-sm outline-none transition placeholder:text-ink-muted focus:border-cta focus:ring-4 focus:ring-cta/15"
+            className="h-13 w-full rounded-2xl border border-line bg-background/90 pl-11 pr-4 text-base font-medium text-ink sm:text-sm shadow-sm outline-none transition placeholder:text-ink-muted focus:border-cta focus:ring-4 focus:ring-cta/15"
           />
         </div>
         <button

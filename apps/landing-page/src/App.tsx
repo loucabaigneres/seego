@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/react';
+import { ArrowRight } from 'lucide-react';
 import { MotionConfig } from 'motion/react';
 import { BoardingPass } from './components/BoardingPass';
 import { ConsentBanner } from './components/ConsentBanner';
@@ -9,6 +10,7 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { SectionNav } from './components/SectionNav';
 import { useWaitlistStatus } from './lib/waitlist';
 import { FeatureRail } from './sections/FeatureRail';
+import { IntroHero } from './sections/IntroHero';
 import { JourneyHero } from './sections/JourneyHero';
 import { Manifesto } from './sections/Manifesto';
 import { SurveySection } from './sections/SurveySection';
@@ -16,8 +18,9 @@ import { TakeoffReel } from './sections/TakeoffReel';
 import { useSmoothScroll } from './sections/useSmoothScroll';
 
 const SECTIONS = [
-  { id: 'top', label: 'Le voyage' },
+  { id: 'top', label: 'Accueil' },
   { id: 'manifeste', label: 'Manifeste' },
+  { id: 'voyage', label: 'Le voyage' },
   { id: 'escales', label: 'L’app' },
   { id: 'departs', label: 'Départs' },
   { id: 'avis', label: 'Ton avis' },
@@ -33,12 +36,23 @@ function Header() {
         <span className="text-xl font-extrabold tracking-tight text-ink">Seego</span>
         <span className="h-2 w-2 rounded-full bg-cta transition group-hover:scale-125" />
       </a>
+      {/* The logo stays centred; the call to action sits on the right */}
+      <a
+        href="#embarquement"
+        className="group absolute right-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-xs font-bold text-ink-inverse transition hover:bg-cta hover:text-ink sm:right-8 sm:px-4 sm:py-2.5"
+      >
+        Me prévenir
+        <ArrowRight
+          className="hidden h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 sm:block"
+          aria-hidden="true"
+        />
+      </a>
     </header>
   );
 }
 
 /**
- * Seego landing page: smooth scroll, a pinned 3D journey, scroll-lit manifesto,
+ * Seego landing page: smooth scroll, opening promise, scroll-lit manifesto, a pinned 3D journey,
  * sideways rail, departures board, survey, plane window and boarding pass.
  */
 export default function App() {
@@ -50,8 +64,9 @@ export default function App() {
       <div className="min-h-screen overflow-x-clip bg-background">
         <Header />
         <main>
-          <JourneyHero joinedEmail={joinedEmail} onJoined={markJoined} />
+          <IntroHero joinedEmail={joinedEmail} onJoined={markJoined} />
           <Manifesto />
+          <JourneyHero />
           <FeatureRail />
           <DeparturesBoard />
           <SurveySection />

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { matchesSearch } from '@/domain/search';
 import { trpc, type RouterOutputs } from '@/lib/trpc';
 
 import type { TripActivity } from './useTrip';
@@ -15,6 +16,7 @@ export function useReplacePlace(tripId: string) {
   const queryClient = useQueryClient();
   const [place, setPlace] = useState<TripActivity | null>(null);
   const [source, setSource] = useState<CandidateSource>('catalog');
+  const [query, setQuery] = useState('');
 
   const candidates = useQuery({
     ...trpc.discovery.getReplacementCandidates.queryOptions({
@@ -41,6 +43,7 @@ export function useReplacePlace(tripId: string) {
     open: (activity: TripActivity) => {
       mutation.reset();
       setSource('catalog');
+      setQuery('');
       setPlace(activity);
     },
     close: () => {
@@ -48,9 +51,14 @@ export function useReplacePlace(tripId: string) {
     },
     source,
     setSource,
+    /** Filters both sources by name. */
+    query,
+    setQuery,
     candidates: {
-      /** The candidates of the selected source, best first. */
-      data: candidates.data?.filter((c) => c.imported === (source === 'mine')),
+      /** The candidates of the selected source matching the search, best first. */
+      data: candidates.data?.filter(
+        (c) => c.imported === (source === 'mine') && matchesSearch(query, [c.title]),
+      ),
       isLoading: candidates.isPending,
       isError: candidates.isError,
       retry: () => candidates.refetch(),

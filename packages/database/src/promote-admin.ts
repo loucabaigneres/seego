@@ -2,10 +2,13 @@
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { createClient } from './index.js';
+import { adminRoleEvents } from './schemas/admin.js';
 import { user } from './schemas/auth.js';
 
 // Grants (or revokes with --revoke) the Better Auth 'admin' role, which opens the back-office (apps/admin).
 // Usage: pnpm --filter @seego/database db:promote-admin <email> [--revoke]
+// Fallback only: day-to-day, admins are managed from the back-office (Administrateurs page),
+// which asks for a confirmation and the admin's password. Both paths write to `admin_role_events`.
 // The account must already exist (sign up on apps/web and verify the e-mail first).
 
 const args = process.argv.slice(2);
@@ -38,6 +41,13 @@ if (updated.length === 0) {
   console.error(`No user found with e-mail ${email}.`);
   process.exit(1);
 }
+
+// No actor: the change comes from someone with direct database access.
+await db.insert(adminRoleEvents).values({
+  action: revoke ? 'revoke' : 'grant',
+  targetUserId: updated[0].id,
+  targetEmail: email,
+});
 
 // No session cookie cache is configured, so the new role applies on the very next request.
 console.log(`${email} now has the '${role}' role.`);

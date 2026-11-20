@@ -21,6 +21,8 @@ const VARIANTS = {
     spinner: 'brand',
   },
   ghost: { container: '', text: 'text-brand underline', icon: colors.brand, spinner: 'brand' },
+  // Secondary actions listed in a sheet: no underline, they don't read as links.
+  text: { container: '', text: 'text-brand', icon: colors.brand, spinner: 'brand' },
 } as const;
 
 const SIZES = {

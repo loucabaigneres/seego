@@ -26,3 +26,24 @@ export function formatHashtags(tags: readonly string[]): string[] {
 export function shortUrl(url: string): string {
   return url.replace(/^https?:\/\//i, '').replace(/^www\./i, '');
 }
+
+/** The place's address, else "city, country", else an empty string. */
+export function placeLocation(place: {
+  address: string | null;
+  city: string | null;
+  country: string | null;
+}): string {
+  if (place.address) return place.address;
+  return [place.city, place.country].filter(Boolean).join(', ');
+}
+
+/** "1 lieu ajouté", "3 lieux ajoutés", "Aucun lieu ajouté". */
+export function addedPlacesLabel(count: number): string {
+  if (count === 0) return 'Aucun lieu ajouté';
+  return count === 1 ? '1 lieu ajouté' : `${count} lieux ajoutés`;
+}
+
+/** A trip's name in a picker: its title, else its destination. */
+export function tripLabel(trip: { title: string | null; destination: string | null }): string {
+  return trip.title?.trim() || trip.destination?.trim() || 'Voyage sans titre';
+}
