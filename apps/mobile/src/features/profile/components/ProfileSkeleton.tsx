@@ -6,7 +6,7 @@ export function ProfileSkeleton() {
   return (
     <View className="gap-8" aria-busy>
       <View className="flex-row items-center gap-4">
-        <Skeleton className="size-[72px] rounded-full" />
+        <Skeleton className="size-[76px] rounded-full" />
         <View className="flex-1 gap-2">
           <Skeleton className="h-7 w-2/3" />
           <Skeleton className="h-5 w-4/5" />

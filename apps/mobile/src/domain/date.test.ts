@@ -2,6 +2,7 @@ import {
   addDays,
   formatDate,
   formatDayMonth,
+  formatMonthYear,
   parseIsoDate,
   pluralize,
   toIsoDate,
@@ -16,6 +17,13 @@ describe('formatDayMonth', () => {
   it('returns an empty string for missing or invalid dates', () => {
     expect(formatDayMonth(null)).toBe('');
     expect(formatDayMonth('not a date')).toBe('');
+  });
+});
+
+describe('formatMonthYear', () => {
+  it('formats the month and year in French', () => {
+    expect(formatMonthYear('2026-10-15T10:00:00Z')).toBe('octobre 2026');
+    expect(formatMonthYear(undefined)).toBe('');
   });
 });
 
