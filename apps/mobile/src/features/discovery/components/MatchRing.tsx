@@ -8,12 +8,12 @@ import { Text } from '@/ui';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-const SIZE = 64;
-const STROKE = 6;
-const RADIUS = 26;
+const SIZE = 56;
+const STROKE = 4;
+const RADIUS = 24;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-/** Confidence ring: fills up to `percent` when it appears, like the web's `MatchSummary`. */
+/** Confidence ring on vino: fills up to `percent` when it appears, like the web's `MatchSummary`. */
 export function MatchRing({ percent }: { percent: number }) {
   const progress = useSharedValue(0);
 
@@ -29,7 +29,7 @@ export function MatchRing({ percent }: { percent: number }) {
     <View
       role="img"
       aria-label={`Fiabilité ${percent} %`}
-      className="size-16 items-center justify-center"
+      className="size-14 items-center justify-center"
     >
       <Svg
         width={SIZE}
@@ -42,7 +42,8 @@ export function MatchRing({ percent }: { percent: number }) {
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke={colors.background}
+          stroke={colors.accent}
+          strokeOpacity={0.22}
           strokeWidth={STROKE}
         />
         <AnimatedCircle
@@ -50,14 +51,16 @@ export function MatchRing({ percent }: { percent: number }) {
           cy={SIZE / 2}
           r={RADIUS}
           fill="none"
-          stroke={colors.cta}
+          stroke={colors.accent}
           strokeWidth={STROKE}
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}
           animatedProps={animatedProps}
         />
       </Svg>
-      <Text variant="label">{percent}%</Text>
+      <Text tone="inverse" className="font-display text-xl">
+        {percent}%
+      </Text>
     </View>
   );
 }

@@ -1,11 +1,10 @@
-import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { categoryMeta, cleanDescription, offerHost } from '@/domain/place';
+import { categoryMeta, cleanDescription } from '@/domain/place';
 import { colors } from '@seego/ui';
-import { Badge, Tag, Text } from '@/ui';
-import { ArrowSquareOutIcon, MapPinIcon } from '@/ui/icons';
+import { Tag, Text } from '@/ui';
+import { MapPinIcon } from '@/ui/icons';
 
 import {
   placeCategory,
@@ -22,37 +21,50 @@ const FOLDED_LINES = 5;
 export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const category = placeCategory(place);
+  const categoryInfo = category ? categoryMeta(category) : null;
   const price = placePrice(place);
   const tags = placeSubcategories(place);
   const description = cleanDescription(place.description);
   const isLong = description.length > LONG_DESCRIPTION;
   const location = [place.city, place.country].filter(Boolean).join(', ');
-  const host = offerHost(place.url);
 
   return (
-    <View className="gap-6">
+    <View className="gap-5">
       <View className="gap-1.5">
         {location ? (
           <View className="flex-row items-center gap-1.5">
             <MapPinIcon size={16} weight="fill" color={colors.brand} />
-            <Text variant="caption" tone="brand" className="flex-1">
+            <Text variant="caption" tone="brand" className="flex-1 font-sans-medium">
               {location}
             </Text>
           </View>
         ) : null}
-        <Text variant="title" role="heading">
+        <Text variant="title" role="heading" className="text-[32px] leading-[34px]">
           {place.locationName}
         </Text>
-        {(category || price) && (
+        {(categoryInfo || price) && (
           <View className="mt-1.5 flex-row flex-wrap gap-2">
-            {category && <Badge label={categoryMeta(category).label} />}
+            {categoryInfo && (
+              <View
+                className="h-7 justify-center rounded-full px-3"
+                style={{ backgroundColor: categoryInfo.colors.fill }}
+              >
+                <Text
+                  variant="caption"
+                  className="font-sans-semibold"
+                  style={{ color: categoryInfo.colors.ink }}
+                >
+                  {categoryInfo.label}
+                </Text>
+              </View>
+            )}
             {price && (
-              <View className="rounded-full bg-surface px-3 py-1">
-                <Text variant="caption" tone="default">
-                  Budget{' '}
-                  <Text variant="caption" tone="brand">
-                    {price}
-                  </Text>
+              <View className="h-7 flex-row items-center gap-1 rounded-full bg-surface px-3">
+                <Text variant="caption" tone="default" className="font-sans-medium">
+                  Budget
+                </Text>
+                <Text tone="brand" className="font-display text-[17px] leading-5">
+                  {price}
                 </Text>
               </View>
             )}
@@ -65,6 +77,7 @@ export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
           <Text variant="overline">À propos</Text>
           <Text
             tone="secondary"
+            className="text-control leading-[22px]"
             numberOfLines={isLong && !isDescriptionOpen ? FOLDED_LINES : undefined}
           >
             {description}
@@ -96,23 +109,6 @@ export function PlaceDetails({ place }: { place: DiscoveryPlace }) {
         </View>
       )}
 
-      {place.url ? (
-        <Pressable
-          role="link"
-          onPress={() => place.url && WebBrowser.openBrowserAsync(place.url)}
-          className="min-h-14 flex-row items-center gap-3 rounded-field bg-background px-4 py-3 active:opacity-80"
-        >
-          <View className="flex-1">
-            <Text variant="label">Voir l’offre</Text>
-            {host && (
-              <Text variant="caption" numberOfLines={1}>
-                {host}
-              </Text>
-            )}
-          </View>
-          <ArrowSquareOutIcon size={20} color={colors.brand} />
-        </Pressable>
-      ) : null}
     </View>
   );
 }

@@ -19,7 +19,7 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { categoryMeta, cleanDescription, placePhotos } from '@/domain/place';
 import { useHardwareBack } from '@/hooks/useHardwareBack';
 import { colors } from '@seego/ui';
-import { Badge, cn, IconButton, PhotoScrim, Tag, Text } from '@/ui';
+import { cn, IconButton, PhotoScrim, Tag, Text } from '@/ui';
 import { ImageIcon, MapPinIcon, XIcon } from '@/ui/icons';
 
 import { placeCategory, placeSubcategories, type DiscoveryPlace } from '../lib/discovery-place';
@@ -57,6 +57,8 @@ const SETTLE_TIMING = { duration: 320, easing: Easing.out(Easing.cubic) };
 const OVERLAY_FADE_END = 0.4;
 /** While the details are dragged, the card grows by this much to stand out, then settles back. */
 const LIFT_SCALE = 0.04;
+/** Notte veil over the travertino back of the second card behind. */
+const BACK_SHADE = 0.06;
 
 const ACCESSIBILITY_ACTIONS = [
   { name: 'like', label: 'J’adore' },
@@ -73,10 +75,20 @@ export interface SwipeCardProps {
   /** Horizontal drag of the top card, shared with the action buttons. */
   dragX: SharedValue<number>;
   onDecide: (liked: boolean) => void;
+  /** Told when the details open or close. */
+  onExpandedChange?: (expanded: boolean) => void;
   ref?: Ref<SwipeCardHandle>;
 }
 
-export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: SwipeCardProps) {
+export function SwipeCard({
+  place,
+  position,
+  isLeaving,
+  dragX,
+  onDecide,
+  onExpandedChange,
+  ref,
+}: SwipeCardProps) {
   const { width: screenWidth } = useWindowDimensions();
   const [cardWidth, setCardWidth] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -118,9 +130,14 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
     if (isTop && otherPhotos.length > 0) Image.prefetch(otherPhotos);
   }, [isTop, place]);
 
+  const markExpanded = (expanded: boolean) => {
+    setIsExpanded(expanded);
+    onExpandedChange?.(expanded);
+  };
+
   const settleDetails = (expanded: boolean) => {
     expansion.set(withTiming(expanded ? 1 : 0, SETTLE_TIMING));
-    setIsExpanded(expanded);
+    markExpanded(expanded);
   };
 
   useHardwareBack(() => {
@@ -175,7 +192,7 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
           const expanded = settlesExpanded(expansion.get(), event.velocityY);
           expansion.set(withTiming(expanded ? 1 : 0, SETTLE_TIMING));
           lift.set(withSpring(0));
-          scheduleOnRN(setIsExpanded, expanded);
+          scheduleOnRN(markExpanded, expanded);
           return;
         }
         const outcome = swipeOutcome(event.translationX, event.velocityX);
@@ -236,6 +253,13 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
     opacity: interpolate(expansion.get(), [0, OVERLAY_FADE_END], [1, 0], Extrapolation.CLAMP),
   }));
   const closeStyle = useAnimatedStyle(() => ({ opacity: expansion.get() }));
+  // The cards behind show as plain travertino backs, a shade darker each step; the photo shows on the way up.
+  const backStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(stackPosition.get(), [0, 1], [0, 1], Extrapolation.CLAMP),
+  }));
+  const backShadeStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(stackPosition.get(), [1, 2], [0, BACK_SHADE], Extrapolation.CLAMP),
+  }));
 
   return (
     <Animated.View
@@ -287,39 +311,50 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
                     </Text>
                   </View>
                 ) : null}
-                <Text variant="section" tone="inverse" numberOfLines={2}>
+                <Text variant="title" tone="inverse" numberOfLines={2}>
                   {place.locationName}
                 </Text>
                 {description ? (
-                  <Text tone="inverse" numberOfLines={2} className="opacity-80">
+                  <Text tone="inverse" numberOfLines={2} className="text-control opacity-80">
                     {description}
                   </Text>
                 ) : null}
                 {tags.length > 0 && (
                   <View className="flex-row flex-wrap gap-1.5 pt-1">
                     {tags.map((tag) => (
-                      <Tag key={tag} label={tag} tone="photo" />
+                      <Tag
+                        key={tag}
+                        label={tag}
+                        tone="photo"
+                        className="border border-ink-inverse/35 bg-ink-inverse/15"
+                      />
                     ))}
                   </View>
                 )}
               </View>
             </Animated.View>
 
-            <View className="absolute inset-x-0 top-0 gap-2.5 p-3">
+            <View className="absolute inset-x-0 top-0 gap-3 p-3">
               {photos.length > 1 && (
                 <View className="flex-row gap-1">
                   {photos.map((url, index) => (
                     <View
                       key={url}
                       className={cn(
-                        'h-1 flex-1 rounded-full',
+                        'h-[3px] flex-1 rounded-full',
                         index === photoIndex ? 'bg-ink-inverse' : 'bg-ink-inverse/35',
                       )}
                     />
                   ))}
                 </View>
               )}
-              {category && <Badge label={categoryMeta(category).label} tone="accent" />}
+              {category && (
+                <View className="self-start rounded-full bg-accent px-3 py-1">
+                  <Text variant="caption" tone="brand" className="font-sans-semibold">
+                    {categoryMeta(category).label}
+                  </Text>
+                </View>
+              )}
             </View>
           </Animated.View>
         </GestureDetector>
@@ -357,6 +392,14 @@ export function SwipeCard({ place, position, isLeaving, dragX, onDecide, ref }: 
             icon={XIcon}
             onPress={() => settleDetails(false)}
           />
+        </Animated.View>
+
+        <Animated.View style={[StyleSheet.absoluteFill, backStyle]} pointerEvents="none">
+          <View className="flex-1 bg-surface">
+            <Animated.View style={[StyleSheet.absoluteFill, backShadeStyle]}>
+              <View className="flex-1 bg-ink" />
+            </Animated.View>
+          </View>
         </Animated.View>
       </View>
     </Animated.View>

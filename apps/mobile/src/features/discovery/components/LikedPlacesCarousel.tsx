@@ -1,47 +1,42 @@
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Text } from '@/ui';
 
 import type { Destination } from '../lib/recommendation';
 
-const TILE_WIDTH = 144;
-const GAP = 12;
+/** Thumbnails shown before the rest is summed up in a "+N" tile. */
+const MAX_THUMBNAILS = 4;
 
-/** The places the user liked in the recommended city; each one opens its offer. */
+/** The places the user liked in the recommended city, as thumbnails; each one opens its offer. */
 export function LikedPlacesCarousel({ places }: { places: Destination['likedHere'] }) {
+  const shown = places.slice(0, MAX_THUMBNAILS);
+  const rest = places.length - shown.length;
+
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      snapToInterval={TILE_WIDTH + GAP}
-      decelerationRate="fast"
-      className="-mx-6"
-      contentContainerClassName="gap-3 px-6"
-    >
-      {places.map((place) => (
+    <View className="flex-row gap-2">
+      {shown.map((place) => (
         <Pressable
           key={place.id}
           role="link"
           aria-label={place.locationName ?? undefined}
           onPress={() => WebBrowser.openBrowserAsync(place.url)}
-          style={{ width: TILE_WIDTH }}
-          className="overflow-hidden rounded-field border border-brand/15 bg-surface active:opacity-80"
+          className="size-[58px] overflow-hidden rounded-xl bg-ink active:opacity-80"
         >
-          <View className="h-24 bg-surface">
-            <Image source={place.mainMediaUrl} style={{ flex: 1 }} contentFit="cover" />
-          </View>
-          <Text
-            variant="caption"
-            tone="default"
-            numberOfLines={2}
-            className="h-12 px-2.5 py-1.5 font-sans-semibold"
-          >
-            {place.locationName}
-          </Text>
+          <Image source={place.mainMediaUrl} style={{ flex: 1 }} contentFit="cover" />
         </Pressable>
       ))}
-    </ScrollView>
+      {rest > 0 && (
+        <View
+          aria-label={`Et ${rest} de plus`}
+          className="size-[58px] items-center justify-center rounded-xl bg-accent/15"
+        >
+          <Text tone="accent" className="font-display text-[22px] leading-7">
+            +{rest}
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
