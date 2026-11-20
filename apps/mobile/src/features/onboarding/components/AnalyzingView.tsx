@@ -129,19 +129,18 @@ interface DrumRowProps {
   lat: string;
 }
 
+/** Angle of a row from the front, in degrees: negative above, positive below. */
+function drumAngle(index: number, roll: number): number {
+  'worklet';
+  const count = SLOTS.length;
+  const offset = ((((index - roll) % count) + count + count / 2) % count) - count / 2;
+  return offset * STEP_DEG;
+}
+
 /** One name printed on the drum: its place on the circle comes from `roll`, on the UI thread. */
 function DrumRow({ index, roll, name, lat }: DrumRowProps) {
-  /** Angle from the front, in degrees: negative above, positive below. */
-  const angle = () => {
-    'worklet';
-    const half = SLOTS.length / 2;
-    const offset =
-      ((((index - roll.get()) % SLOTS.length) + SLOTS.length + half) % SLOTS.length) - half;
-    return offset * STEP_DEG;
-  };
-
   const rowStyle = useAnimatedStyle(() => {
-    const deg = angle();
+    const deg = drumAngle(index, roll.get());
     const rad = (deg * Math.PI) / 180;
     return {
       // The back of the drum is hidden.
@@ -155,7 +154,12 @@ function DrumRow({ index, roll, name, lat }: DrumRowProps) {
   });
   // The pesca copy fades in over the crema one as the row reaches the front.
   const focusStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(Math.abs(angle()), [0, STEP_DEG * 0.6], [1, 0], Extrapolation.CLAMP),
+    opacity: interpolate(
+      Math.abs(drumAngle(index, roll.get())),
+      [0, STEP_DEG * 0.6],
+      [1, 0],
+      Extrapolation.CLAMP,
+    ),
   }));
 
   return (
