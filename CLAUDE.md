@@ -37,7 +37,7 @@ pnpm --filter @seego/database db:generate   # drizzle-kit: SQL migration from sc
 pnpm --filter @seego/database db:migrate    # apply migrations
 pnpm --filter @seego/database db:seed       # seeds; discovery seed uses gitignored data.json if present
 pnpm --filter @seego/database db:studio
-pnpm --filter @seego/database db:promote-admin <email> [--revoke]   # grant/revoke the Better Auth 'admin' role
+pnpm --filter @seego/database db:promote-admin <email> [--revoke]   # fallback: grant/revoke the 'admin' role (normally done from the admin app's Administrateurs page)
 ```
 
 After changing a design token in `packages/ui`: `pnpm --filter @seego/ui generate:css` (a test fails if `theme.css` is stale).

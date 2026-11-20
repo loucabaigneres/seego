@@ -22,15 +22,23 @@ pnpm turbo run dev --filter=@seego/admin     # http://localhost:5175
 
 ## Créer un administrateur
 
-1. Crée un compte depuis `apps/web` (`/register`) et vérifie l'e-mail avec le code OTP.
-2. Donne-lui le rôle admin (en utilisant le `.env` de `packages/database`) :
+La personne crée d'abord son compte depuis `apps/web` (`/register`) et vérifie son e-mail avec le code OTP. Ensuite :
+
+**Depuis le back-office (normal)** — page **Administrateurs** (`/admins`), bouton « Ajouter un administrateur » :
+
+1. Recherche par e-mail **exact** (pas de recherche partielle) : on voit le nom, la date de création, les méthodes de connexion et si l'e-mail est vérifié.
+2. Confirmation : l'e-mail est **retapé à la main** (coller est désactivé) et l'admin redonne **son mot de passe**.
+
+Côté API (`admin.admins.grant` / `revoke`, règles dans `apps/api/src/lib/adminRoles.ts`), tout est revérifié : mot de passe de l'admin (`auth.api.verifyPassword`), e-mail de confirmation identique à celui du compte, e-mail vérifié, compte non banni et pas déjà admin. Un retrait est refusé sur soi-même et ne peut jamais laisser zéro admin (lignes admin verrouillées dans la transaction). Chaque changement est inscrit dans `admin_role_events` (historique affiché sur la page) et notifié par e-mail au compte concerné et à tous les admins.
+
+**Script (secours, si plus aucun admin ne peut se connecter)** — avec le `.env` de `packages/database` :
 
 ```bash
 pnpm --filter @seego/database db:promote-admin prenom@seego.fr
 pnpm --filter @seego/database db:promote-admin prenom@seego.fr --revoke   # retour à 'traveler'
 ```
 
-Le changement s'applique dès la requête suivante, car il n'y a pas de cache de session.
+Le script écrit aussi dans `admin_role_events` (sans auteur), mais n'envoie pas d'e-mail. Dans les deux cas, le changement s'applique dès la requête suivante, car il n'y a pas de cache de session.
 
 ## Sécurité
 
@@ -51,7 +59,7 @@ Le changement s'applique dès la requête suivante, car il n'y a pas de cache de
 - `vercel.json` gère le rewrite de la SPA et les en-têtes de sécurité (`noindex`, CSP `'self'`, `X-Frame-Options: DENY`…). Si l'admin doit appeler un domaine externe, il faut l'ajouter à la CSP.
 - DNS (GoDaddy) : CNAME `admin` et `admin-staging` vers la valeur affichée par Vercel.
 - Domaines admin déclarés côté API : `trustedOrigins` (`apps/api/src/lib/auth.ts`) et CORS (`apps/api/src/index.ts`).
-- Créer un admin en staging ou en prod : `DATABASE_URL=<url de la base> pnpm --filter @seego/database db:promote-admin <email>`.
+- Créer un admin en staging ou en prod : page Administrateurs du back-office ; en secours `DATABASE_URL=<url de la base> pnpm --filter @seego/database db:promote-admin <email>`.
 
 ## À venir
 
