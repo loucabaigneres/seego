@@ -3,14 +3,7 @@ import { SignInForm } from '@/features/auth/components/SignInForm';
 
 export default function SignInScreen() {
   return (
-    <AuthLayout
-      overline="Content de te revoir"
-      title="Reprends ton voyage"
-      subtitle="Connecte-toi pour retrouver et enregistrer tes itinéraires."
-      switchPrompt="Pas encore de compte ?"
-      switchCta="Créer un compte"
-      switchHref="/auth/sign-up"
-    >
+    <AuthLayout tab="sign-in" title="Bon retour, voyageur.">
       <SignInForm />
     </AuthLayout>
   );
