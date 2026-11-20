@@ -5,8 +5,7 @@ import { authClient } from '@/lib/auth-client';
 
 import { authCallbackURL } from '../lib/callback-url';
 import { authErrorMessage } from '../lib/errors';
-import { closeAuth } from '../lib/navigation';
-import { syncQueriesWithSession } from '../lib/query-cache';
+import { finishSignIn } from '../lib/navigation';
 
 const CALLBACK_PATH = '/profile';
 
@@ -43,8 +42,7 @@ export function useGoogleSignIn() {
       const { data: session } = await authClient.getSession();
       setIsPending(false);
       if (!session?.user) return;
-      await syncQueriesWithSession('signed-in');
-      closeAuth();
+      await finishSignIn();
     } catch {
       setError(authErrorMessage(null));
       setIsPending(false);

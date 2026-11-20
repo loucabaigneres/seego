@@ -1,5 +1,5 @@
-import { useEffect, useRef, type ReactNode } from 'react';
 import { motion, useMotionValue, useScroll, useTransform } from 'motion/react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { PHOTOS, unsplash } from '../lib/photos';
 import { useScrub } from '../lib/useScrub';
 
@@ -113,7 +113,7 @@ export function TakeoffReel({ children }: TakeoffReelProps) {
           />
           <motion.div
             style={{ top: frameTop, left: frameLeft, width: frameWidth, height: shadeHeight }}
-            className="absolute flex items-end justify-center bg-gradient-to-b from-background to-surface shadow-[0_6px_14px_rgb(0_0_0/0.18)]"
+            className="absolute flex items-end justify-center bg-linear-to-b from-background to-surface shadow-[0_6px_14px_rgb(0_0_0/0.18)]"
             aria-hidden="true"
           >
             {/* Pull handle */}
@@ -138,10 +138,10 @@ export function TakeoffReel({ children }: TakeoffReelProps) {
         {/* Difference blend keeps the words readable on cream and on the photo */}
         <motion.h2
           style={{ opacity: wordsOpacity }}
-          className="pointer-events-none relative mt-[4.5rem] flex w-full justify-center gap-[3vw] text-[clamp(2.8rem,10vw,10rem)] font-extrabold leading-none tracking-tight text-ink-inverse mix-blend-difference"
+          className="pointer-events-none relative mt-18 flex w-full justify-center gap-[3vw] text-[clamp(2.8rem,10vw,10rem)] font-extrabold leading-none tracking-tight text-ink-inverse mix-blend-difference"
         >
-          <motion.span style={{ x: leftX }}>Prêt</motion.span>
-          <motion.span style={{ x: rightX }}>à partir ?</motion.span>
+          <motion.span style={{ x: leftX }}>Prêt à</motion.span>
+          <motion.span style={{ x: rightX }}>partir ?</motion.span>
         </motion.h2>
       </div>
 

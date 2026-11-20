@@ -16,6 +16,19 @@ pnpm --filter @seego/web dev
 | `typecheck` | `tsc --noEmit`                                          |
 | `lint`      | ESLint (shared config, React Hooks, architecture rules) |
 
+## Proxy API (Safari / cookies first-party)
+
+Safari bloque le cookie de session cross-site (front et API sur des sites différents). En prod,
+le front appelle donc `/api/*` sur son propre domaine, et `api/[...path].ts` (fonction edge Vercel)
+relaie vers l'API : le cookie est posé par le domaine du front.
+
+- Vercel (projet web) : `API_PROXY_TARGET=https://<url-de-l-api>` et `VITE_USE_API_PROXY=true`
+  (+ `VITE_API_URL` reste requis, il n'est simplement plus utilisé en mode proxy).
+- API : `BETTER_AUTH_URL` = URL du front (ex. `https://app.seego.fr`), et le redirect URI Google
+  devient `https://app.seego.fr/api/auth/callback/google`, sinon le cookie `state` OAuth est
+  posé sur le domaine de l'API et le callback échoue.
+- En local, ne rien définir : le front appelle directement `VITE_API_URL`.
+
 ## Where things go
 
 ```

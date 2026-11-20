@@ -1,8 +1,9 @@
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
-import { PinIcon } from './PinIcon'
-import { StatusBadge } from './StatusBadge'
 import { formatDate } from '../lib/tripUtils'
 import type { Trip } from '../types'
+import { PinIcon } from './PinIcon'
+import { StatusBadge } from './StatusBadge'
 
 const TITLE_MAX_LENGTH = 80
 
@@ -17,11 +18,14 @@ export function TripHero({
   trip,
   heroImage,
   plannedCount,
+  canEditConfiguration = false,
   rename,
 }: {
   trip: Trip
   heroImage: string | null
   plannedCount: number
+  /** The viewer created this trip (signed in or not): they can go back to its form. */
+  canEditConfiguration?: boolean
   rename?: RenameControls
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false)
@@ -66,16 +70,26 @@ export function TripHero({
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-linear-to-t from-ink/85 via-ink/40 to-transparent" />
 
         <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-3 p-3.5">
-          <button
-            type="button"
-            onClick={() => window.history.back()}
-            className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-ink/55 px-3.5 text-xs font-semibold text-ink-inverse backdrop-blur-md transition hover:bg-ink/70 active:scale-95"
-          >
+          {canEditConfiguration ? (
+            // The creator comes from the form: send them back to its last step, answers prefilled.
+            <Link
+              to="/trip/configure"
+              search={{ tripId: trip.id, step: 3 }}
+              className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-ink/55 px-3.5 text-xs font-semibold text-ink-inverse backdrop-blur-md transition hover:bg-ink/70 active:scale-95"
+            >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
-            Retour
-          </button>
+              Retourner sur le formulaire
+            </Link>
+          ) : (
+            <button type="button" onClick={() => window.history.back()} className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-ink/55 px-3.5 text-xs font-semibold text-ink-inverse backdrop-blur-md transition hover:bg-ink/70 active:scale-95">
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+              Retour
+            </button>
+          )}
           <StatusBadge status={trip.status} />
         </div>
 

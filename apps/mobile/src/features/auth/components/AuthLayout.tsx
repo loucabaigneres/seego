@@ -17,6 +17,8 @@ export interface AuthLayoutProps {
   switchPrompt: string;
   switchCta: string;
   switchHref: Href;
+  /** `false` on screens that are not a sign-in, such as the password reset request. */
+  showGoogle?: boolean;
   children: ReactNode;
 }
 
@@ -27,6 +29,7 @@ export function AuthLayout({
   switchPrompt,
   switchCta,
   switchHref,
+  showGoogle = true,
   children,
 }: AuthLayoutProps) {
   return (
@@ -55,7 +58,7 @@ export function AuthLayout({
 
         {children}
 
-        <GoogleSignIn />
+        {showGoogle && <GoogleSignIn />}
 
         <View className="mt-auto flex-row flex-wrap items-center justify-center">
           <Text tone="muted">{switchPrompt}</Text>
@@ -65,7 +68,8 @@ export function AuthLayout({
             size="sm"
             // Tight padding keeps prompt and link on one line on small phones.
             className="px-2"
-            onPress={() => router.replace(switchHref)}
+            // Back to that screen when it is under this one (forgot password → sign-in), else swap.
+            onPress={() => router.dismissTo(switchHref)}
           />
         </View>
       </Screen>

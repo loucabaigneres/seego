@@ -3,7 +3,7 @@ import { PHOTOS, unsplash } from '../lib/photos';
 
 export function PhoneMockup() {
   return (
-    <div className="relative mx-auto w-full max-w-[290px] select-none">
+    <div className="relative mx-auto w-full max-w-72.5 select-none">
       {/* Soft glow behind the device */}
       <div
         className="absolute -inset-8 -z-10 rounded-full bg-cta/15 blur-3xl"
@@ -18,7 +18,7 @@ export function PhoneMockup() {
           </span>
           <div className="leading-tight">
             <p className="text-[0.7rem] font-bold text-ink">Ajouté au voyage</p>
-            <p className="text-[0.6rem] text-ink-muted">Alfama · Lisbonne</p>
+            <p className="text-[0.6rem] text-ink-muted">Oia · Santorin</p>
           </div>
         </div>
       </div>
@@ -31,7 +31,7 @@ export function PhoneMockup() {
 
       {/* Device */}
       <div className="relative rotate-2 rounded-[3rem] border border-ink/10 bg-ink p-3 shadow-2xl shadow-ink/20">
-        <div className="relative flex aspect-[9/19.5] flex-col overflow-hidden rounded-[2.4rem] bg-surface">
+        <div className="relative flex aspect-9/19.5 flex-col overflow-hidden rounded-[2.4rem] bg-surface">
           {/* Dynamic Island */}
           <div className="absolute left-1/2 top-3 z-20 h-6 w-24 -translate-x-1/2 rounded-full bg-ink" />
 
@@ -49,7 +49,7 @@ export function PhoneMockup() {
           {/* Swipe deck — fills the tall screen */}
           <div className="relative mx-3 flex-1">
             {/* Peeking card behind */}
-            <div className="absolute inset-x-2 top-2 bottom-0 -rotate-[5deg] overflow-hidden rounded-3xl bg-success/60 shadow-md">
+            <div className="absolute inset-x-2 top-2 bottom-0 rotate-[-5deg] overflow-hidden rounded-3xl bg-success/60 shadow-md">
               <img
                 src={unsplash(PHOTOS.rome, 480)}
                 alt=""
@@ -62,14 +62,14 @@ export function PhoneMockup() {
             {/* Front card */}
             <div className="absolute inset-0 overflow-hidden rounded-3xl bg-accent shadow-xl">
               <img
-                src={unsplash(PHOTOS.lisbon, 480)}
-                srcSet={`${unsplash(PHOTOS.lisbon, 480)} 1x, ${unsplash(PHOTOS.lisbon, 900)} 2x`}
-                alt="Deux tramways jaunes dans une rue en pente de Lisbonne"
+                src={unsplash(PHOTOS.santorini, 480)}
+                srcSet={`${unsplash(PHOTOS.santorini, 480)} 1x, ${unsplash(PHOTOS.santorini, 900)} 2x`}
+                alt="Maisons blanches et bleues de Santorin au crépuscule"
                 className="absolute inset-0 h-full w-full object-cover"
                 fetchPriority="high"
                 draggable={false}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/5 to-ink/20" />
+              <div className="absolute inset-0 bg-linear-to-t from-ink/70 via-ink/5 to-ink/20" />
 
               {/* Rating chip */}
               <div className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-ink/35 px-2.5 py-1 backdrop-blur-sm">
@@ -88,11 +88,11 @@ export function PhoneMockup() {
               <div className="absolute bottom-0 left-0 right-0 p-4 text-ink-inverse">
                 <div className="flex items-center gap-1 text-[0.65rem] font-semibold uppercase tracking-wide text-ink-inverse/80">
                   <MapPin className="h-3 w-3" />
-                  Portugal
+                  Grèce
                 </div>
-                <h3 className="mt-0.5 text-2xl font-extrabold leading-none">Lisbonne</h3>
+                <h3 className="mt-0.5 text-2xl font-extrabold leading-none">Santorin</h3>
                 <p className="mt-1 text-[0.7rem] text-ink-inverse/85">
-                  Tramway 28, miradouros et pastéis de nata.
+                  Coucher de soleil sur Oia, ruelles blanches et caldeira.
                 </p>
               </div>
             </div>

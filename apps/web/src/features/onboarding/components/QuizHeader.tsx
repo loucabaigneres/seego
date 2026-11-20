@@ -1,3 +1,5 @@
+import { ProgressBar } from '@/components/ProgressBar';
+
 interface QuizHeaderProps {
   current: number;
   total: number;
@@ -16,12 +18,7 @@ export function QuizHeader({ current, total, progress }: QuizHeaderProps) {
         </span>
         <span>{percent} %</span>
       </div>
-      <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden">
-        <div
-          className="h-full bg-cta transition-all duration-300 rounded-full"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
+      <ProgressBar value={progress} />
     </div>
   );
 }

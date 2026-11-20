@@ -21,7 +21,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F0E8"
+          "backgroundColor": "#F7F0E8",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
         }
       ],
       [
@@ -38,7 +40,22 @@
         }
       ],
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "expo-image",
+      "expo-sharing",
+      "expo-status-bar",
+      "expo-web-browser",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsText": true
+          },
+          "androidIntentFilters": ["text/*"],
+          "iosAppGroupIdentifier": "group.com.seego.app"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

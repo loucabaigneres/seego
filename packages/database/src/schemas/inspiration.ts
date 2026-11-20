@@ -1,5 +1,6 @@
 import { boolean, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import { platformEnum, processingStatus, swipeDirectionEnum } from '../enums.js';
+import { places } from './catalogue.js';
 
 export type DiscoveryTags = {
   category?: string;
@@ -66,8 +67,9 @@ export const swipes = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     userId: text('user_id').notNull(),
+    // Pointe sur `places` (même id que l'ancien discovery_content)
     discoveryContentId: uuid('discovery_content_id')
-      .references(() => discoveryContent.id)
+      .references(() => places.id)
       .notNull(),
     direction: swipeDirectionEnum('direction').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

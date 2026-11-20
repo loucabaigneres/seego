@@ -1,13 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
 import { SelectField } from '@/components/SelectField';
-import { useEffect, useRef, useState } from 'react'
-import { ConfirmOverlay } from './ConfirmOverlay'
-import { InviteLinkSection } from './InviteLinkSection'
-import { JoinWithCodeForm } from './JoinWithCodeForm'
-import { MembersList } from './MembersList'
-import { useGroupTripMutations } from '../hooks/useGroupTripMutations'
-import { authClient } from '@/lib/auth-client'
-import { trpc } from '@/lib/trpc'
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
+import { trpc } from '@/lib/trpc';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+import { useGroupTripMutations } from '../hooks/useGroupTripMutations';
+import { ConfirmOverlay } from './ConfirmOverlay';
+import { InviteLinkSection } from './InviteLinkSection';
+import { JoinWithCodeForm } from './JoinWithCodeForm';
+import { MembersList } from './MembersList';
 
 export function GroupTripPopover() {
   const { data: session } = authClient.useSession()
@@ -87,6 +88,7 @@ export function GroupTripPopover() {
   const handleCopy = () => {
     if (!inviteUrl || isExpired) return
     navigator.clipboard.writeText(inviteUrl)
+    track('group_invite_copied', { source: 'popover' })
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }

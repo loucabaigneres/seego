@@ -1,5 +1,5 @@
 import { useState, type Ref } from 'react';
-import { Pressable, TextInput, View, type TextInputProps } from 'react-native';
+import { Pressable, TextInput, View, type TextInputInstance, type TextInputProps } from 'react-native';
 
 import { colors } from '@seego/ui';
 
@@ -11,7 +11,7 @@ export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
   label: string;
   error?: string;
   className?: string;
-  ref?: Ref<TextInput>;
+  ref?: Ref<TextInputInstance>;
 }
 
 export function TextField({

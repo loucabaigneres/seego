@@ -1,6 +1,7 @@
-import { trpc, type RouterOutputs } from '@/lib/trpc';
 import { FIELD_CLASS, LABEL_CLASS } from '@/components/formStyles';
 import { SelectField } from '@/components/SelectField';
+import { socialPlatform, track } from '@/lib/analytics';
+import { trpc, type RouterOutputs } from '@/lib/trpc';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -52,7 +53,8 @@ export function ImportInspirationForm({
 
   const analyzeMutation = useMutation(
     trpc.inspiration.analyzeFromUrl.mutationOptions({
-      onSuccess: (data) => {
+      onSuccess: (data, variables) => {
+        track('inspiration_imported', { platform: socialPlatform(variables.url) });
         setResult(data);
         setErrorMessage(null);
         setShowCaptionField(false);
@@ -60,7 +62,11 @@ export function ImportInspirationForm({
         reset({ url: '', caption: '' });
         onSuccess?.(data);
       },
-      onError: (error) => {
+      onError: (error, variables) => {
+        track('inspiration_import_failed', {
+          platform: socialPlatform(variables.url),
+          message: error.message,
+        });
         setResult(null);
 
         if (error.message === CAPTION_UNAVAILABLE) {
@@ -86,6 +92,7 @@ export function ImportInspirationForm({
 
   const onSubmit = (values: ImportInspirationValues) => {
     const caption = values.caption?.trim();
+    track('inspiration_import_submitted', { platform: socialPlatform(values.url) });
     analyzeMutation.mutate({ url: values.url, caption: caption || undefined });
   };
 

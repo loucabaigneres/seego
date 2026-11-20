@@ -1,6 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { z } from 'zod'
 import { GroupTripInviteCard } from '@/features/group-trip/components/GroupTripInviteCard'
 import { DayCard } from '@/features/trip/components/DayCard'
 import { EditActionBar } from '@/features/trip/components/EditActionBar'
@@ -8,13 +5,16 @@ import { GenerateItineraryCard } from '@/features/trip/components/GenerateItiner
 import { ItineraryHeader } from '@/features/trip/components/ItineraryHeader'
 import { ReplacePlaceModal } from '@/features/trip/components/ReplacePlaceModal'
 import { SaveTripSection } from '@/features/trip/components/SaveTripSection'
-import { TripHero } from '@/features/trip/components/TripHero'
 import { TripFilters } from '@/features/trip/components/TripFilters'
+import { TripHero } from '@/features/trip/components/TripHero'
 import { TripMap } from '@/features/trip/components/TripMap'
 import { GeneratingCard, TripLoading, TripNotFound } from '@/features/trip/components/TripStatusCard'
 import { useTrip } from '@/features/trip/hooks/useTrip'
 import { filterDays } from '@/features/trip/lib/filterDays'
 import { heroImageOf, plannedCount, splitTripDays } from '@/features/trip/lib/tripDays'
+import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
+import { z } from 'zod'
 
 const tripSearchSchema = z.object({
   // Set when "Sauvegarder" sent a guest to the login page: the save is replayed once back here
@@ -29,7 +29,7 @@ export const Route = createFileRoute('/trip/$tripId')({
 function TripPage() {
   const { tripId } = Route.useParams()
   const { save: pendingSave } = Route.useSearch()
-  const { query, isLoggedIn, isOwner, save, rename, generate, replace, edit } = useTrip(
+  const { query, isLoggedIn, isOwner, canEditConfiguration, save, rename, generate, replace, edit } = useTrip(
     tripId,
     pendingSave,
   )
@@ -67,6 +67,7 @@ function TripPage() {
             trip={trip}
             heroImage={heroImageOf(itineraryDays, likedDay)}
             plannedCount={plannedCount(itineraryDays)}
+            canEditConfiguration={canEditConfiguration}
             rename={isOwner ? { isPending: rename.isPending, onSubmit: rename.run } : undefined}
           />
 

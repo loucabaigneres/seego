@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { useAuthSubmit } from '../hooks/useAuthSubmit';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
@@ -23,6 +24,7 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
       {
         // The account exists but must confirm its e-mail with a code before signing in.
         onSuccess: () => {
+          track('signup_completed', { method: 'email' });
           stopLoading();
           setShowVerify(true);
         },
@@ -74,6 +76,13 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
             label="Créer mon compte"
             loadingLabel="Création en cours…"
           />
+          <p className="text-center text-xs text-ink-muted">
+            En créant un compte, tu confirmes avoir lu notre{' '}
+            <Link to="/confidentialite" className="font-bold text-brand hover:underline">
+              politique de confidentialité
+            </Link>
+            .
+          </p>
         </form>
       </AuthCard>
 

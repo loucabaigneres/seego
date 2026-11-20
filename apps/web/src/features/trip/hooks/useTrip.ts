@@ -1,8 +1,10 @@
+import { useGuestId } from '@/hooks/useGuestId';
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
+import { trpc } from '@/lib/trpc';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useCallback, useEffect, useState } from 'react';
-import { authClient } from '@/lib/auth-client';
-import { trpc } from '@/lib/trpc';
 import { moveToDay, moveWithinDay, removeFromDay } from '../lib/draftPlanning';
 import { splitTripDays, toDraft } from '../lib/tripDays';
 import type { Activity, Day } from '../types';
@@ -15,6 +17,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
+  const guestId = useGuestId();
 
   const [showSavedBanner, setShowSavedBanner] = useState(false);
 
@@ -22,7 +25,10 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
 
   const generateMutation = useMutation(
     trpc.discovery.generateItinerary.mutationOptions({
-      onSuccess: () => query.refetch(),
+      onSuccess: () => {
+        track('itinerary_generated', { source: 'trip_page' });
+        query.refetch();
+      },
     }),
   );
 
@@ -31,6 +37,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const closeReplace = useCallback(() => setReplacing(null), []);
   const { refetch: refetchTrip } = query;
   const handleReplaced = useCallback(() => {
+    track('activity_replaced');
     setReplacing(null);
     refetchTrip();
   }, [refetchTrip]);
@@ -41,6 +48,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const updatePlanningMutation = useMutation(
     trpc.discovery.updatePlanning.mutationOptions({
       onSuccess: async () => {
+        track('itinerary_edited');
         await query.refetch();
         setDraft(null);
       },
@@ -50,6 +58,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const { mutate: saveToProfile, isPending: isSavingTrip } = useMutation(
     trpc.user.saveTripToAccount.mutationOptions({
       onSuccess: () => {
+        track('trip_saved_to_account');
         query.refetch();
         queryClient.invalidateQueries(trpc.user.getProfile.queryFilter());
         queryClient.invalidateQueries(trpc.user.getTrips.queryFilter());
@@ -63,6 +72,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
     trpc.user.renameTrip.mutationOptions({
       // Awaited so the editor closes on the new title, not the stale one.
       onSuccess: async () => {
+        track('trip_renamed');
         queryClient.invalidateQueries(trpc.user.getTrips.queryFilter());
         await query.refetch();
       },
@@ -80,8 +90,11 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
   const trip = query.data?.trip;
   const isLoggedIn = Boolean(session?.user);
   const isOwner = Boolean(session?.user && trip && trip.userId === session.user.id);
+  // A trip created before signing in belongs to this browser's guest id: it can still go back to its form.
+  const canEditConfiguration = isOwner || Boolean(trip && trip.userId === guestId);
 
   const saveTrip = () => {
+    track('trip_save_clicked', { is_logged_in: Boolean(session?.user) });
     if (!session?.user) {
       navigate({
         to: '/login',
@@ -118,6 +131,7 @@ export function useTrip(tripId: string, pendingSave?: boolean) {
     query,
     isLoggedIn,
     isOwner,
+    canEditConfiguration,
     save: {
       run: saveTrip,
       isPending: isSavingTrip,
