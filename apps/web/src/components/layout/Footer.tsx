@@ -1,3 +1,4 @@
+import { analyticsEnabled, resetConsent } from '@/lib/analytics';
 import { Link } from '@tanstack/react-router';
 
 /** Site footer. */
@@ -11,7 +12,18 @@ export function Footer() {
           <span className="text-lg font-extrabold tracking-tight text-ink">Seego</span>
           <span className="h-1.5 w-1.5 rounded-full bg-cta transition group-hover:scale-125" />
         </Link>
-        <p className="text-xs text-ink-muted">© {year} Seego. Fait pour les voyageurs.</p>
+        <div className="flex flex-col items-center gap-1 sm:items-end">
+          <p className="text-xs text-ink-muted">© {year} Seego. Fait pour les voyageurs.</p>
+          {analyticsEnabled && (
+            <button
+              type="button"
+              onClick={resetConsent}
+              className="cursor-pointer text-xs text-ink-muted underline-offset-2 transition hover:text-ink hover:underline"
+            >
+              Gérer mes cookies
+            </button>
+          )}
+        </div>
       </div>
     </footer>
   );

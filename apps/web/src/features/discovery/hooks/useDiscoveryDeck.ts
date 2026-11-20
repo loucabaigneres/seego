@@ -1,3 +1,4 @@
+import { track } from '@/lib/analytics';
 import { trpc } from '@/lib/trpc';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -73,6 +74,7 @@ export function useDiscoveryDeck(tripId: string | undefined) {
   const saveTrip = useMutation(
     trpc.discovery.saveTrip.mutationOptions({
       onSuccess: (data) => {
+        track('discovery_trip_saved', { likes, skips });
         queryClient.invalidateQueries({
           queryKey: trpc.group.getMyGroupTrips.queryKey(),
         });
@@ -89,7 +91,17 @@ export function useDiscoveryDeck(tripId: string | undefined) {
   const topItem = effectiveFeed.at(cursor);
   const stack = useMemo(() => effectiveFeed.slice(cursor, cursor + 3), [effectiveFeed, cursor]);
 
-  const triggerResult = useCallback(() => setShowResult(true), []);
+  const showResultFrom = useCallback(
+    (trigger: 'goal' | 'manual', likeCount: number, skipCount: number) => {
+      track('discovery_result_viewed', { likes: likeCount, skips: skipCount, trigger });
+      setShowResult(true);
+    },
+    [],
+  );
+  const triggerResult = useCallback(
+    () => showResultFrom('manual', likes, skips),
+    [showResultFrom, likes, skips],
+  );
 
   const commitSwipe = useCallback(
     (liked: boolean) => {
@@ -99,6 +111,7 @@ export function useDiscoveryDeck(tripId: string | undefined) {
       setHistory((h) => [...h, { id: topItem.id, liked, viewDurationMs }]);
 
       const nextLikes = liked ? likes + 1 : likes;
+      track('discovery_card_swiped', { liked, position: cursor + 1, likes: nextLikes });
       if (liked) setLikes(nextLikes);
       else setSkips((s) => s + 1);
 
@@ -109,11 +122,11 @@ export function useDiscoveryDeck(tripId: string | undefined) {
         setPhotoIndex(0);
         setCursor((c) => c + 1);
         if (liked && nextLikes === LIKE_GOAL) {
-          window.setTimeout(triggerResult, 250);
+          window.setTimeout(() => showResultFrom('goal', nextLikes, skips), 250);
         }
       }, 300);
     },
-    [topItem, leaving, likes, triggerResult],
+    [topItem, leaving, likes, skips, cursor, showResultFrom],
   );
 
   // ── Keyboard ──
@@ -167,7 +180,10 @@ export function useDiscoveryDeck(tripId: string | undefined) {
       const photoCount = photosOf(topItem).length;
       if (photoCount > 1 && ratio < 0.3) setPhotoIndex((i) => Math.max(0, i - 1));
       else if (photoCount > 1 && ratio > 0.7) setPhotoIndex((i) => Math.min(photoCount - 1, i + 1));
-      else setDetail(topItem);
+      else {
+        track('discovery_card_detail_opened', { position: cursor + 1 });
+        setDetail(topItem);
+      }
       return;
     }
 
@@ -181,6 +197,7 @@ export function useDiscoveryDeck(tripId: string | undefined) {
   }
 
   function restart() {
+    track('discovery_restarted', { swipes: history.length });
     setCursor(0);
     setLikes(0);
     setSkips(0);

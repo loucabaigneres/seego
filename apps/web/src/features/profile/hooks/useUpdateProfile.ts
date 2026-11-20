@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { trpc } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
 
 /** Updates the display name and flags the success for a few seconds. */
 export function useUpdateProfile() {
@@ -10,6 +11,7 @@ export function useUpdateProfile() {
   const mutation = useMutation(
     trpc.user.updateProfile.mutationOptions({
       onSuccess: () => {
+        track('profile_updated');
         setUpdateSuccess(true);
         queryClient.invalidateQueries(trpc.user.getProfile.queryFilter());
         setTimeout(() => setUpdateSuccess(false), 3000);

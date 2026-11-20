@@ -16,7 +16,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      // @react-pdf/renderer's typings import 'react' without declaring @types/react, so with
+      // pnpm they cannot see it and every react-pdf component fails as a JSX element type.
+      // Pin 'react' to this app's own React types so the library resolves them too.
+      "react": ["./node_modules/@types/react"]
     },
 
     /* Linting */

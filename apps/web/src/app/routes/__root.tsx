@@ -1,9 +1,11 @@
-import { createRootRoute, HeadContent, Outlet, useLocation } from '@tanstack/react-router';
+import { ConsentBanner } from '@/components/layout/ConsentBanner';
 import { Footer } from '@/components/layout/Footer';
 import { Navbar } from '@/components/layout/Navbar';
 import { GroupTripPopover } from '@/features/group-trip/components/GroupTripPopover';
-import { DEFAULT_DESCRIPTION, seo } from '@/lib/seo';
+import { useAnalyticsIdentity } from '@/hooks/useAnalyticsIdentity';
 import { useClaimGuestTrips } from '@/hooks/useClaimGuestTrips';
+import { DEFAULT_DESCRIPTION, seo } from '@/lib/seo';
+import { createRootRoute, HeadContent, Outlet, useLocation } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
   // Defaults for every page; each route overrides what it needs.
@@ -19,6 +21,7 @@ export const Route = createRootRoute({
 
 function RootLayout() {
   useClaimGuestTrips();
+  useAnalyticsIdentity();
   // The swipe deck fills the viewport exactly, a footer would only add a useless scroll.
   const showFooter = useLocation().pathname !== '/discovery';
 
@@ -31,6 +34,7 @@ function RootLayout() {
         <Outlet />
       </main>
       {showFooter && <Footer />}
+      <ConsentBanner />
     </div>
   );
 }

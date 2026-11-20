@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
 import { Plane } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { track } from '../lib/analytics';
 
 type Section = { id: string; label: string };
 
@@ -13,6 +14,8 @@ export function SectionNav({ sections }: { sections: Section[] }) {
     // the screen. Reading positions on scroll never skips a section, even a short one crossed
     // in a single frame, and nested blocks (the FAQ inside the take-off section) work too.
     const order = ids.split(',');
+    // Each section is reported once per visit, the first time it becomes the current one.
+    const seen = new Set<string>();
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -23,6 +26,10 @@ export function SectionNav({ sections }: { sections: Section[] }) {
         if (el && el.getBoundingClientRect().top <= middle) current = id;
       }
       setActive(current);
+      if (!seen.has(current)) {
+        seen.add(current);
+        track('section_viewed', { section: current, index: order.indexOf(current) + 1 });
+      }
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
