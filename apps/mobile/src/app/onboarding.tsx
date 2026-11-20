@@ -23,7 +23,6 @@ export default function OnboardingScreen() {
           label={`Question ${quiz.step.current} sur ${quiz.step.total}`}
           backLabel="Revenir à la question précédente"
           progress={quiz.step.progress}
-          segments={quiz.step.total}
           onBack={quiz.goBack}
         />
       </View>

@@ -35,3 +35,20 @@ export function parseIsoDate(value: string): Date {
 export function pluralize(count: number, singular: string, pluralForm = `${singular}s`): string {
   return `${count} ${count > 1 ? pluralForm : singular}`;
 }
+
+const DAY_MS = 86_400_000;
+/** UTC midnight of a `YYYY-MM-DD` day: day arithmetic without daylight-saving shifts. */
+const utcDay = (iso: string) => {
+  const [year, month, day] = iso.split('-').map(Number);
+  return Date.UTC(year, month - 1, day);
+};
+
+/** Adds `days` to a `YYYY-MM-DD` day. */
+export function addDays(iso: string, days: number): string {
+  return new Date(utcDay(iso) + days * DAY_MS).toISOString().slice(0, 10);
+}
+
+/** Days of a trip from `startDate` to `endDate` (`YYYY-MM-DD`), both included. */
+export function tripDurationDays(startDate: string, endDate: string): number {
+  return Math.round((utcDay(endDate) - utcDay(startDate)) / DAY_MS) + 1;
+}

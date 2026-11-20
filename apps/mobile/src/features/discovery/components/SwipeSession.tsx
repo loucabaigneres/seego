@@ -23,7 +23,7 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
 
   return (
     <>
-      <DeckHeader likeCount={deck.likeCount} onShowResult={result.open} />
+      <DeckHeader likeCount={deck.progressCount} onShowResult={result.open} />
 
       {deck.isFinished ? (
         <EmptyState
