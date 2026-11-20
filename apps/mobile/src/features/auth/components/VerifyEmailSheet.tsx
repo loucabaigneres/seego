@@ -1,7 +1,7 @@
 import { colors } from '@seego/ui';
 import { TextInput, View } from 'react-native';
 
-import { Button, cn, Notice, Sheet, Spinner, Text } from '@/ui';
+import { Button, cn, Notice, Sheet, Text } from '@/ui';
 
 import type { EmailVerification } from '../hooks/useEmailVerification';
 import { OTP_LENGTH } from '../lib/otp';
@@ -12,29 +12,44 @@ export function VerifyEmailSheet({ verification }: { verification: EmailVerifica
   const { code, error, info, isVerifying, cooldown } = verification;
 
   return (
-    <Sheet visible={verification.isOpen} onClose={verification.close} title="Vérifie ton email">
+    <Sheet visible={verification.isOpen} onClose={verification.close}>
       <View className="gap-5">
-        <Text tone="muted">
-          Entre le code à {OTP_LENGTH} chiffres envoyé à{' '}
-          <Text className="font-sans-semibold">{verification.email}</Text>.
-        </Text>
+        <View className="gap-2">
+          <Text variant="overline" tone="brand">
+            Dernière étape
+          </Text>
+          <Text variant="title" role="heading">
+            Vérifie ton email
+          </Text>
+          <Text tone="muted">
+            On a envoyé un code à {OTP_LENGTH} chiffres à{' '}
+            <Text className="font-sans-semibold">{verification.email}</Text>.
+          </Text>
+        </View>
 
         <View className="flex-row gap-2">
-          {BOXES.map((index) => (
-            <View
-              key={index}
-              className={cn(
-                'h-14 flex-1 items-center justify-center rounded-field border bg-surface-raised',
-                error
-                  ? 'border-primary-text'
-                  : index === code.length
-                    ? 'border-brand'
-                    : 'border-line-strong',
-              )}
-            >
-              <Text variant="section">{code[index] ?? ''}</Text>
-            </View>
-          ))}
+          {BOXES.map((index) => {
+            const isCurrent = index === code.length;
+            return (
+              <View
+                key={index}
+                className={cn(
+                  'h-16 flex-1 items-center justify-center rounded-field border',
+                  error
+                    ? 'border-brand bg-surface'
+                    : isCurrent
+                      ? 'border-brand bg-background'
+                      : 'border-transparent bg-surface',
+                )}
+              >
+                {code[index] ? (
+                  <Text variant="section">{code[index]}</Text>
+                ) : (
+                  isCurrent && !error && <View className="h-7 w-0.5 bg-brand" />
+                )}
+              </View>
+            );
+          })}
           {/* One invisible input over the boxes: typing, pasting and SMS/mail autofill all land here. */}
           <TextInput
             value={code}
@@ -52,31 +67,27 @@ export function VerifyEmailSheet({ verification }: { verification: EmailVerifica
           />
         </View>
 
-        {isVerifying && <Spinner />}
         {error && <Notice message={error} />}
         {info && <Notice message={info} tone="success" />}
 
-        <Text variant="caption">
-          Pas reçu ? Regarde dans tes spams. Si tu as déjà un compte, connecte-toi.
-        </Text>
-
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row flex-wrap items-center">
+          <Text variant="caption">Pas reçu ? Regarde dans tes spams, ou</Text>
           <Button
-            label="Retour"
-            variant="ghost"
+            label={cooldown > 0 ? `renvoie le code dans ${cooldown} s` : 'renvoie le code'}
+            variant="text"
             size="sm"
-            className="px-0"
-            onPress={verification.close}
-          />
-          <Button
-            label={cooldown > 0 ? `Renvoyer le code (${cooldown} s)` : 'Renvoyer le code'}
-            variant="ghost"
-            size="sm"
-            className="px-0"
+            className="px-1"
             disabled={cooldown > 0 || isVerifying}
             onPress={verification.resend}
           />
         </View>
+
+        <Button
+          label="Valider"
+          loading={isVerifying}
+          disabled={code.length < OTP_LENGTH}
+          onPress={verification.submit}
+        />
       </View>
     </Sheet>
   );

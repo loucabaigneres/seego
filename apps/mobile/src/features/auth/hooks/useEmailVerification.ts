@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { authClient } from '@/lib/auth-client';
 
 import { authErrorMessage } from '../lib/errors';
 import { finishSignIn } from '../lib/navigation';
 import { OTP_LENGTH, sanitizeOtp } from '../lib/otp';
+import { useCooldown } from './useCooldown';
 
 const RESEND_DELAY_S = 30;
 
@@ -28,13 +29,7 @@ export function useEmailVerification({
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [cooldown, setCooldown] = useState(0);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = setTimeout(() => setCooldown((seconds) => seconds - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [cooldown]);
+  const { seconds: cooldown, start: startCooldown } = useCooldown(RESEND_DELAY_S);
 
   /** Opens the code step; the API has just sent a code. */
   const open = (next: Credentials) => {
@@ -42,7 +37,7 @@ export function useEmailVerification({
     setCode('');
     setError(null);
     setInfo(null);
-    setCooldown(RESEND_DELAY_S);
+    startCooldown();
   };
 
   const close = () => setCredentials(null);
@@ -99,7 +94,7 @@ export function useEmailVerification({
       return;
     }
     setInfo('Un nouveau code vient de t’être envoyé.');
-    setCooldown(RESEND_DELAY_S);
+    startCooldown();
   };
 
   return {
@@ -107,6 +102,10 @@ export function useEmailVerification({
     email: credentials?.email ?? '',
     code,
     changeCode,
+    /** Submits a complete code again, e.g. from the button (typing the last digit already does). */
+    submit: () => {
+      if (code.length === OTP_LENGTH) void verify(code);
+    },
     error,
     info,
     isVerifying,
