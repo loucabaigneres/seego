@@ -18,6 +18,7 @@ import { JourneyHero } from './sections/JourneyHero';
 import { Manifesto } from './sections/Manifesto';
 import { SurveySection } from './sections/SurveySection';
 import { TakeoffReel } from './sections/TakeoffReel';
+import { WebAppSection } from './sections/WebAppSection';
 import { useSmoothScroll } from './sections/useSmoothScroll';
 
 const SECTIONS = [
@@ -25,6 +26,7 @@ const SECTIONS = [
   { id: 'manifeste', label: 'Manifeste' },
   { id: 'voyage', label: 'Le voyage' },
   { id: 'escales', label: 'L’app' },
+  { id: 'webapp', label: 'La webapp' },
   { id: 'departs', label: 'Départs' },
   { id: 'avis', label: 'Ton avis' },
   { id: 'decollage', label: 'Décollage' },
@@ -63,7 +65,7 @@ function Header() {
 
 /**
  * Seego landing page: smooth scroll, opening promise, scroll-lit manifesto, a pinned 3D journey,
- * sideways rail, departures board, survey, plane window and boarding pass.
+ * sideways rail, web app, departures board, survey, plane window and boarding pass.
  */
 function Home() {
   const { joinedEmail, markJoined } = useWaitlistStatus();
@@ -76,6 +78,7 @@ function Home() {
         <Manifesto />
         <JourneyHero />
         <FeatureRail />
+        <WebAppSection />
         <DeparturesBoard />
         <SurveySection />
         <TakeoffReel>
