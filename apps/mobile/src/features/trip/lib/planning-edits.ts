@@ -79,6 +79,19 @@ export function isDraftDirty<Day extends DraftDay<{ id: string; orderIndex: numb
   return key(draft) !== key(toDraft(itinerary));
 }
 
+/** Places of the draft whose day or rank differs from the saved itinerary. */
+export function changedIds<Day extends DraftDay<{ id: string; orderIndex: number }>>(
+  draft: DraftDay<{ id: string }>[],
+  itinerary: Day[],
+): Set<string> {
+  const slots = (days: DraftDay<{ id: string }>[]) =>
+    new Map(days.flatMap((day) => day.activities.map((a, i) => [a.id, `${day.id}:${i}`] as const)));
+  const saved = slots(toDraft(itinerary));
+  return new Set(
+    [...slots(draft)].filter(([id, slot]) => saved.get(id) !== slot).map(([id]) => id),
+  );
+}
+
 /** The hotel is shared by the whole stay: it can be reordered or replaced, not moved or removed. */
 export function canRelocate(activity: { category: string | null }): boolean {
   return activity.category !== 'hotel';

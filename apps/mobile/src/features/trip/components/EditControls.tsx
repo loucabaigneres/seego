@@ -2,13 +2,7 @@ import { Pressable, View } from 'react-native';
 
 import { colors } from '@seego/ui';
 import { cn, Text } from '@/ui';
-import {
-  ArrowsLeftRightIcon,
-  CaretDownIcon,
-  CaretUpIcon,
-  TrashIcon,
-  type AppIcon,
-} from '@/ui/icons';
+import { ArrowDownIcon, ArrowUpIcon, TrashIcon, type AppIcon } from '@/ui/icons';
 
 import type { DayEdit } from '../hooks/usePlanningDraft';
 import type { TripActivity } from '../hooks/useTrip';
@@ -29,13 +23,13 @@ export function EditControls({ activity, isFirst, isLast, canChangeDay, edit }: 
   return (
     <View className="flex-row flex-wrap items-center gap-2">
       <IconButton
-        icon={CaretUpIcon}
+        icon={ArrowUpIcon}
         label="Monter"
         disabled={isFirst}
         onPress={() => edit.moveUp(activity.id)}
       />
       <IconButton
-        icon={CaretDownIcon}
+        icon={ArrowDownIcon}
         label="Descendre"
         disabled={isLast}
         onPress={() => edit.moveDown(activity.id)}
@@ -46,11 +40,16 @@ export function EditControls({ activity, isFirst, isLast, canChangeDay, edit }: 
           {canChangeDay && (
             <PillButton
               label="Déplacer vers…"
-              icon={ArrowsLeftRightIcon}
               onPress={() => edit.openMoveToDay(activity.id)}
+              className="min-h-10 bg-background px-3.5"
             />
           )}
-          <IconButton icon={TrashIcon} label="Supprimer" onPress={() => edit.remove(activity.id)} />
+          <IconButton
+            icon={TrashIcon}
+            label="Supprimer"
+            onPress={() => edit.remove(activity.id)}
+            className="ml-auto"
+          />
         </>
       ) : (
         <Text variant="caption">Commun à tout le séjour</Text>
@@ -64,9 +63,10 @@ interface IconButtonProps {
   label: string;
   onPress: () => void;
   disabled?: boolean;
+  className?: string;
 }
 
-function IconButton({ icon: Icon, label, onPress, disabled }: IconButtonProps) {
+function IconButton({ icon: Icon, label, onPress, disabled, className }: IconButtonProps) {
   return (
     <Pressable
       role="button"
@@ -76,8 +76,9 @@ function IconButton({ icon: Icon, label, onPress, disabled }: IconButtonProps) {
       onPress={onPress}
       hitSlop={4}
       className={cn(
-        'size-9 items-center justify-center rounded-full border border-line-strong active:opacity-80',
+        'size-10 items-center justify-center rounded-full border border-line-strong bg-background active:opacity-80',
         disabled && 'opacity-35',
+        className,
       )}
     >
       <Icon size={18} color={colors.brand} />

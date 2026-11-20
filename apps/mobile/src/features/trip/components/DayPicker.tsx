@@ -11,10 +11,12 @@ export interface DayPickerProps {
   /** A day id, or `ALL_DAYS`. */
   selectedId: string | undefined;
   onSelect: (id: string) => void;
+  /** While editing: each tab counts its steps instead of giving its date. */
+  stepCounts?: boolean;
 }
 
 /** Horizontal strip of day tabs, led by "Tous"; meant to stick to the top of the trip page. */
-export function DayPicker({ days, selectedId, onSelect }: DayPickerProps) {
+export function DayPicker({ days, selectedId, onSelect, stepCounts = false }: DayPickerProps) {
   return (
     // Full-bleed crema background so the timeline does not show through once stuck.
     <View className="-mx-6 bg-background py-3">
@@ -34,7 +36,11 @@ export function DayPicker({ days, selectedId, onSelect }: DayPickerProps) {
           <DayTab
             key={day.id}
             label={`Jour ${day.dayIndex}`}
-            caption={formatDayMonth(day.targetDate)}
+            caption={
+              stepCounts
+                ? pluralize(day.activities.length, 'étape')
+                : formatDayMonth(day.targetDate)
+            }
             selected={day.id === selectedId}
             onPress={() => onSelect(day.id)}
           />
@@ -58,15 +64,18 @@ function DayTab({ label, caption, selected, onPress }: DayTabProps) {
       aria-selected={selected}
       onPress={onPress}
       className={cn(
-        'min-h-11 min-w-20 items-center justify-center rounded-field border px-4 py-1.5 active:opacity-80',
-        selected ? 'border-brand bg-brand' : 'border-line-strong',
+        'min-h-[52px] justify-center rounded-field px-3.5 py-1.5 active:opacity-80',
+        selected ? 'bg-brand' : 'bg-surface',
       )}
     >
-      <Text variant="label" className={selected ? 'text-ink-inverse' : 'text-brand'}>
+      <Text
+        variant="caption"
+        className={cn('font-sans-semibold', selected ? 'text-accent' : 'text-ink')}
+      >
         {label}
       </Text>
       {caption !== '' && (
-        <Text variant="caption" className={selected ? 'text-accent' : undefined}>
+        <Text variant="caption" className={cn('text-xs', selected && 'text-ink-inverse/80')}>
           {caption}
         </Text>
       )}
