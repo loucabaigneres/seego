@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 
 import { Chip, Text, TextField } from '@/ui';
+import { CheckIcon, PlusIcon } from '@/ui/icons';
 
 import type { ConstraintList } from '../lib/trip-config';
 import { CONSTRAINT_GROUPS } from '../options';
@@ -18,14 +19,19 @@ export function StepConstraints({ values, dispatch }: StepProps) {
           <View key={list} className="gap-3">
             <Text variant="label">{group.title}</Text>
             <View className="flex-row flex-wrap gap-2">
-              {group.options.map((option) => (
-                <Chip
-                  key={option.id}
-                  label={option.label}
-                  selected={values[list].includes(option.id)}
-                  onPress={() => dispatch({ type: 'toggle', list, id: option.id })}
-                />
-              ))}
+              {group.options.map((option) => {
+                const selected = values[list].includes(option.id);
+                return (
+                  <Chip
+                    key={option.id}
+                    label={option.label}
+                    selected={selected}
+                    // Same-size icons: the chip keeps its width when toggled.
+                    icon={selected ? CheckIcon : PlusIcon}
+                    onPress={() => dispatch({ type: 'toggle', list, id: option.id })}
+                  />
+                );
+              })}
             </View>
             <TextField
               label={group.customLabel}
