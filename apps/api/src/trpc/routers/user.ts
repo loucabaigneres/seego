@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { userOnboarding } from '@seego/database';
-import { and, count, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { z } from 'zod';
 import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
@@ -136,7 +136,13 @@ export const userRouter = createTRPCRouter({
           status: 'finalized',
           updatedAt: new Date(),
         })
-        .where(eq(trip.id, input.tripId))
+        .where(
+          and(
+            eq(trip.id, input.tripId),
+            // Your own trip, or one made as a guest: never someone else's (a group's host).
+            or(eq(trip.userId, ctx.user.id), like(trip.userId, 'guest\\_%')),
+          ),
+        )
         .returning();
 
       if (!updatedTrip) {

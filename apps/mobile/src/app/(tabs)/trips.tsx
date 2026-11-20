@@ -1,5 +1,6 @@
 import { RefreshControl } from 'react-native';
 
+import { GroupTripActions } from '@/features/group-trip/components/GroupTripActions';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { GuestInvite } from '@/features/profile/components/GuestInvite';
 import { TripList } from '@/features/trips/components/TripList';
@@ -45,6 +46,7 @@ export default function TripsScreen() {
       <Text variant="title" role="heading">
         Mes voyages
       </Text>
+      <GroupTripActions />
       <TripList />
     </Screen>
   );

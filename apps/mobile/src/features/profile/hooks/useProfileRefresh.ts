@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { trpc } from '@/lib/trpc';
 
-/** Pull-to-refresh: refetches what the profile shows (account, trips, inspirations). */
+/** Pull-to-refresh: refetches what the profile shows (account, trips, group trips, inspirations). */
 export function useProfileRefresh() {
   const queryClient = useQueryClient();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -13,6 +13,7 @@ export function useProfileRefresh() {
     try {
       await Promise.all([
         queryClient.refetchQueries({ queryKey: trpc.user.pathKey(), type: 'active' }),
+        queryClient.refetchQueries({ queryKey: trpc.group.pathKey(), type: 'active' }),
         queryClient.refetchQueries({ queryKey: trpc.inspiration.pathKey(), type: 'active' }),
       ]);
     } finally {

@@ -5,7 +5,6 @@ import { View } from 'react-native';
 import { EmptyState, ErrorState, Notice, Skeleton } from '@/ui';
 import { MagnifyingGlassIcon, SparkleIcon } from '@/ui/icons';
 
-
 import { useDeleteInspiration } from '../hooks/useDeleteInspiration';
 import { useMyInspirations } from '../hooks/useMyInspirations';
 import { cityOptions, filterInspirations, hasActiveFilter, NO_FILTERS } from '../lib/filters';
@@ -22,7 +21,6 @@ export function InspirationList() {
   const [filters, setFilters] = useState(NO_FILTERS);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const shown = filterInspirations(inspirations, filters);
-
 
   if (isLoading) {
     return (
@@ -76,14 +74,12 @@ export function InspirationList() {
         />
       )}
       {shown.map((inspiration) => (
-
         <InspirationCard
           key={inspiration.id}
           inspiration={inspiration}
           onDelete={() => deletion.remove(inspiration.id)}
           isDeleting={deletion.deletingId === inspiration.id}
           onAddToTrip={() => setAddingId(inspiration.id)}
-
         />
       ))}
       <AddToTripSheet inspirationId={addingId} onClose={() => setAddingId(null)} />
