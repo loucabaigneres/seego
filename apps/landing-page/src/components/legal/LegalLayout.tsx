@@ -47,7 +47,7 @@ export function LegalSection({ title, children }: { title: string; children: Rea
 
 export function LegalList({ items }: { items: ReactNode[] }) {
   return (
-    <ul className="list-disc space-y-1.5 pl-5 marker:text-cta">
+    <ul className="list-disc space-y-1.5 pl-5 marker:text-accent">
       {items.map((item, index) => (
         <li key={index}>{item}</li>
       ))}
@@ -59,7 +59,7 @@ export function MailLink({ email }: { email: string }) {
   return (
     <a
       href={`mailto:${email}`}
-      className="font-semibold text-ink underline decoration-cta/60 underline-offset-2 hover:decoration-cta"
+      className="font-semibold text-ink underline decoration-accent/50 underline-offset-2 hover:decoration-accent"
     >
       {email}
     </a>

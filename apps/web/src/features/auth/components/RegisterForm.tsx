@@ -76,6 +76,13 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
             label="Créer mon compte"
             loadingLabel="Création en cours…"
           />
+          <p className="text-center text-xs text-ink-muted">
+            En créant un compte, tu confirmes avoir lu notre{' '}
+            <Link to="/confidentialite" className="font-bold text-brand hover:underline">
+              politique de confidentialité
+            </Link>
+            .
+          </p>
         </form>
       </AuthCard>
 

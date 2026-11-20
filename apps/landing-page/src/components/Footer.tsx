@@ -17,15 +17,12 @@ export function Footer() {
 
         <div className="flex flex-col items-center gap-1 sm:items-end">
           <p className="text-xs text-ink-muted">© {year} Seego. Fait avec ❤ pour les voyageurs.</p>
-          <nav
-            aria-label="Informations légales"
-            className="flex flex-wrap justify-center gap-x-4 gap-y-1 sm:justify-end"
-          >
+          <nav aria-label="Informations légales" className="flex flex-wrap justify-center gap-x-4 gap-y-1">
             <a href={ROUTES.legalNotice} className={linkClass}>
               Mentions légales
             </a>
             <a href={ROUTES.privacy} className={linkClass}>
-              Politique de confidentialité
+              Confidentialité
             </a>
             {analyticsEnabled && (
               <button type="button" onClick={resetConsent} className={`cursor-pointer ${linkClass}`}>

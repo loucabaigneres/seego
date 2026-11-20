@@ -7,15 +7,27 @@ export function PrivacyPolicy() {
     <LegalLayout
       title="Politique de confidentialité"
       intro={
-        <p>
-          Cette page explique quelles données {LEGAL.siteName} collecte sur{' '}
-          <a href={ROUTES.home} className="font-semibold text-ink underline underline-offset-2">
-            {LEGAL.siteUrl.replace('https://', '')}
-          </a>
-          , pourquoi, combien de temps elles sont conservées et comment exercer tes droits,
-          conformément au Règlement général sur la protection des données (RGPD) et à la loi
-          Informatique et Libertés.
-        </p>
+        <>
+          <p>
+            Cette page explique quelles données {LEGAL.siteName} collecte sur{' '}
+            <a href={ROUTES.home} className="font-semibold text-ink underline underline-offset-2">
+              {LEGAL.siteUrl.replace('https://', '')}
+            </a>
+            , pourquoi, combien de temps elles sont conservées et comment exercer tes droits,
+            conformément au Règlement général sur la protection des données (RGPD) et à la loi
+            Informatique et Libertés.
+          </p>
+          <p className="mt-3">
+            L’application web ({LEGAL.appUrl.replace('https://', '')}) dispose de sa propre{' '}
+            <a
+              href={`${LEGAL.appUrl}${ROUTES.privacy}`}
+              className="font-semibold text-ink underline underline-offset-2"
+            >
+              politique de confidentialité
+            </a>
+            , qui couvre les comptes et les voyages.
+          </p>
+        </>
       }
     >
       <LegalSection title="1. Responsable du traitement">
@@ -81,8 +93,11 @@ export function PrivacyPolicy() {
               fréquentation agrégées.
             </>,
             <>
-              <strong>{LEGAL.apiHost}</strong> : hébergement de l’API et de la base de données où
-              est enregistrée la liste d’attente.
+              <strong>Render Services, Inc.</strong> (États-Unis) : hébergement de l’API.
+            </>,
+            <>
+              <strong>Supabase, Inc.</strong> : hébergement de la base de données où est
+              enregistrée la liste d’attente.
             </>,
             <>
               <strong>Resend</strong> (États-Unis) : envoi des e-mails (confirmation
@@ -130,7 +145,7 @@ export function PrivacyPolicy() {
             <button
               type="button"
               onClick={resetConsent}
-              className="cursor-pointer font-semibold text-ink underline decoration-cta/60 underline-offset-2 hover:decoration-cta"
+              className="cursor-pointer font-semibold text-ink underline decoration-accent/50 underline-offset-2 hover:decoration-accent"
             >
               gérer mes cookies
             </button>
