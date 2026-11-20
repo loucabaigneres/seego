@@ -18,6 +18,10 @@ import {
 
 /** Time the progress bar takes to fill up to 100 % before the "analysing" screen shows. */
 const COMPLETION_ANIMATION_MS = 400;
+/** The "analysing" screen stays at least this long, even when the API answers at once. */
+const MIN_ANALYSIS_MS = 4000;
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** "Guide-moi": the 4-question quiz, then the trip it creates opens in the swipe deck. */
 export function useOnboardingQuiz() {
@@ -25,15 +29,7 @@ export function useOnboardingQuiz() {
   const guestId = useGuestId();
   const [isFinishing, setIsFinishing] = useState(false);
 
-  const submission = useMutation(
-    trpc.onboarding.submit.mutationOptions({
-      onSuccess: ({ tripId }) => {
-        // Replace: going back from the deck should not reopen a submitted quiz.
-        router.replace({ pathname: '/discovery', params: { tripId } });
-      },
-      onError: () => setIsFinishing(false),
-    }),
-  );
+  const submission = useMutation(trpc.onboarding.submit.mutationOptions());
 
   const isFirstStep = state.stepIndex === 0;
 
@@ -58,7 +54,12 @@ export function useOnboardingQuiz() {
     }
     setIsFinishing(true);
     // shortcut: the timer is not cleared on unmount; leaving is blocked meanwhile (back buttons).
-    setTimeout(() => submission.mutate({ ...state.answers, guestId }), COMPLETION_ANIMATION_MS);
+    setTimeout(() => {
+      Promise.all([submission.mutateAsync({ ...state.answers, guestId }), wait(MIN_ANALYSIS_MS)])
+        // Replace: going back from the deck should not reopen a submitted quiz.
+        .then(([{ tripId }]) => router.replace({ pathname: '/discovery', params: { tripId } }))
+        .catch(() => setIsFinishing(false));
+    }, COMPLETION_ANIMATION_MS);
   };
 
   const question = currentQuestion(state);
@@ -66,6 +67,7 @@ export function useOnboardingQuiz() {
   return {
     question,
     selected: state.answers[question] as string[],
+    answers: state.answers,
     toggle: (option: string) => dispatch({ type: 'toggle', question, option }),
     step: {
       current: state.stepIndex + 1,
@@ -76,7 +78,8 @@ export function useOnboardingQuiz() {
     isLastStep: isLastStep(state),
     goBack,
     goForward,
-    isSubmitting: submission.isPending,
+    // Success keeps the "analysing" screen until the minimum time is up and the deck opens.
+    isSubmitting: submission.isPending || submission.isSuccess,
     hasFailed: submission.isError,
   };
 }
