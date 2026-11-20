@@ -1,6 +1,9 @@
 import { ScrollView, View } from 'react-native';
 
-import { Button, Notice, Reveal, StepHeader, Text } from '@/ui';
+import { colors } from '@seego/ui';
+
+import { Button, IconButton, Notice, ProgressBar, Reveal, Text } from '@/ui';
+import { ArrowLeftIcon, SparkleIcon } from '@/ui/icons';
 
 import type { TripConfig } from '../hooks/useTripConfig';
 import { STEP_COPY } from '../options';
@@ -22,13 +25,20 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
 
   return (
     <>
-      <View className="px-6">
-        <StepHeader
-          label={`Étape ${step.current} sur ${step.total}`}
-          backLabel="Revenir à l’étape précédente"
-          progress={step.progress}
-          onBack={config.goBack}
-        />
+      {/* Back arrow and bar only, as in the mockup: the step count is read by screen readers. */}
+      <View className="flex-row items-center px-4">
+        <IconButton label="Revenir à l’étape précédente" icon={ArrowLeftIcon} onPress={config.goBack} />
+        <View
+          role="progressbar"
+          aria-label={`Étape ${step.current} sur ${step.total}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(step.progress * 100)}
+          className="mx-3 flex-1"
+        >
+          <ProgressBar value={step.progress} className="h-1.5" />
+        </View>
+        <View className="size-11" />
       </View>
 
       <ScrollView
@@ -43,7 +53,7 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
             <Text variant="overline" tone="brand">
               Ton voyage à {destination}
             </Text>
-            <Text variant="title" role="heading">
+            <Text variant="title" role="heading" className="tracking-[-0.4px]">
               {copy.title}
             </Text>
             <Text tone="muted">{copy.subtitle}</Text>
@@ -59,7 +69,17 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
         <Button
           label={submitLabel(config)}
           variant={config.isLastStep ? 'cta' : 'primary'}
-          loading={config.isSubmitting} onPress={config.goForward} />
+          leading={
+            config.isLastStep && <SparkleIcon size={20} weight="fill" color={colors.ink.DEFAULT} />
+          }
+          loading={config.isSubmitting}
+          onPress={config.goForward}
+        />
+        {config.isLastStep && (
+          <Text variant="caption" className="text-center">
+            Tu pourras tout modifier ensuite.
+          </Text>
+        )}
       </View>
     </>
   );
