@@ -1,5 +1,11 @@
-import { EmptyState } from '@/ui';
-import { MapTrifoldIcon } from '@/ui/icons';
+import * as WebBrowser from 'expo-web-browser';
+import { useState } from 'react';
+import { Pressable, View } from 'react-native';
+
+import { offerHost } from '@/domain/place';
+import { colors } from '@seego/ui';
+import { EmptyState, Text } from '@/ui';
+import { ArrowSquareOutIcon, MapTrifoldIcon } from '@/ui/icons';
 
 import { useDestinationResult } from '../hooks/useDestinationResult';
 import { useSwipeDeck } from '../hooks/useSwipeDeck';
@@ -15,6 +21,12 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
   const openResult = () => result.open();
   const deck = useSwipeDeck(places, { onLikeGoal: openResult });
   const result = useDestinationResult(tripId, deck.swipes);
+  // Keyed by card: the next card arrives closed, whatever the last one was.
+  const [openDetailsId, setOpenDetailsId] = useState<string | null>(null);
+  const topCard = deck.cards.at(0);
+  const detailsOpen = !!topCard && openDetailsId === topCard.id;
+  const offerUrl = detailsOpen ? topCard.url : null;
+  const host = offerHost(offerUrl);
 
   const restart = () => {
     deck.restart();
@@ -44,6 +56,7 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
           dragX={deck.dragX}
           isLeaving={deck.isLeaving}
           onDecide={deck.decide}
+          onDetailsChange={(open) => setOpenDetailsId(open ? (topCard?.id ?? null) : null)}
         />
       )}
 
@@ -52,8 +65,32 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
         onLike={deck.like}
         onDetails={deck.toggleDetails}
         disabled={deck.isFinished || deck.isLeaving}
+        detailsOpen={detailsOpen}
         dragX={deck.dragX}
       />
+
+      {!deck.isFinished && (
+        // Fixed height: the deck keeps its size when the hint turns into the offer link.
+        <View className="h-11 items-center justify-center">
+          {offerUrl ? (
+            <Pressable
+              role="link"
+              onPress={() => WebBrowser.openBrowserAsync(offerUrl)}
+              hitSlop={8}
+              className="flex-row items-center gap-1.5 active:opacity-80"
+            >
+              <Text variant="label" tone="brand" className="text-control" numberOfLines={1}>
+                {host ? `Voir l’offre sur ${host}` : 'Voir l’offre'}
+              </Text>
+              <ArrowSquareOutIcon size={16} color={colors.brand} />
+            </Pressable>
+          ) : (
+            !detailsOpen && (
+              <Text variant="caption">Glisse la photo vers le haut pour les détails</Text>
+            )
+          )}
+        </View>
+      )}
 
       <ResultSheet
         result={result}
