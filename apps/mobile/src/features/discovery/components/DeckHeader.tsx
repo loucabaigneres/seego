@@ -34,13 +34,17 @@ export function DeckHeader({ likeCount, onShowResult }: DeckHeaderProps) {
         className="-ml-2"
       />
 
-      <View className="flex-1 gap-2">
-        <View className="flex-row items-baseline justify-between">
-          <Text variant="label">
-            {goalReached ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
-          </Text>
-          <Text variant="caption">{Math.round((progress / LIKE_GOAL) * 100)} %</Text>
-        </View>
+      <View
+        className="flex-1 gap-2"
+        role="progressbar"
+        aria-label="Coups de cœur"
+        aria-valuemin={0}
+        aria-valuemax={LIKE_GOAL}
+        aria-valuenow={progress}
+      >
+        <Text variant="label" className="text-control">
+          {goalReached ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
+        </Text>
         <ProgressBar value={progress / LIKE_GOAL} className="h-1.5" />
       </View>
 
@@ -54,12 +58,12 @@ export function DeckHeader({ likeCount, onShowResult }: DeckHeaderProps) {
         hitSlop={4}
         className={cn(
           'size-11 items-center justify-center rounded-full active:opacity-80',
-          goalReached ? 'bg-brand' : 'border border-brand',
+          goalReached ? 'bg-brand' : 'border-[1.5px] border-brand',
           isResultDisabled && 'opacity-40',
         )}
       >
         <CompassIcon
-          size={22}
+          size={20}
           weight={goalReached ? 'fill' : 'regular'}
           color={goalReached ? colors.ink.inverse : colors.brand}
         />
