@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
 import { plannedCount, tripCoverImage } from '@/domain/trip';
+import { tripDisplayTitle } from '@/domain/trip-summary';
 import { GroupTripCard } from '@/features/group-trip/components/GroupTripCard';
 import { GroupTripSheet } from '@/features/group-trip/components/GroupTripSheet';
 import { useGroupTrip } from '@/features/group-trip/hooks/useGroupTrip';
@@ -19,7 +20,7 @@ import { SaveTripCard } from '@/features/trip/components/SaveTripCard';
 import { TripHero } from '@/features/trip/components/TripHero';
 import { TripMap } from '@/features/trip/components/TripMap';
 import { useTrip } from '@/features/trip/hooks/useTrip';
-import { EmptyState, ErrorState, LoadingState, Screen } from '@/ui';
+import { EmptyState, ErrorState, LoadingState, Notice, Screen } from '@/ui';
 import { SuitcaseRollingIcon } from '@/ui/icons';
 
 export default function TripScreen() {
@@ -84,6 +85,7 @@ function TripPage({ tripId }: { tripId: string }) {
           edit.isEditing && (
             <EditPlanningBar
               isSaving={edit.isSaving}
+              isDirty={edit.isDirty}
               errorMessage={edit.errorMessage}
               onCancel={edit.cancel}
               onSave={edit.save}
@@ -96,16 +98,25 @@ function TripPage({ tripId }: { tripId: string }) {
           coverImage={tripCoverImage(days.itinerary, days.likedPlaces)}
           plannedCount={plannedCount(days.itinerary)}
           onRename={rename.canRename && !edit.isEditing ? rename.open : undefined}
+          pdf={
+            isGenerated && !edit.isEditing
+              ? { onExport: pdf.choose, isExporting: pdf.isExporting }
+              : undefined
+          }
         />
         {/* Its bottom is where the sticky day picker starts. One child, so the toolbar stays child 2. */}
         <View onLayout={selection.onHeroLayout} className="gap-4">
-          {!edit.isEditing && <SaveTripCard save={save} />}
+          {pdf.errorMessage && <Notice message={pdf.errorMessage} />}
+          {pdf.savedMessage && <Notice tone="success" message={pdf.savedMessage} />}
+          {/* Before generation, saving comes after the planning, under "Générer". */}
+          {isGenerated && !edit.isEditing && <SaveTripCard save={save} />}
           {!edit.isEditing && <GroupTripCard group={group} />}
         </View>
 
         {isGenerated && (
           <ItineraryToolbar
-            days={days.itinerary}
+            days={edit.draft ?? days.itinerary}
+            stepCounts={edit.isEditing}
             selectedId={selection.selectedId}
             onSelect={selection.select}
             view={itineraryView.view}
@@ -114,9 +125,7 @@ function TripPage({ tripId }: { tripId: string }) {
             canSwitchView={!edit.isEditing}
           />
         )}
-        {isGenerated && !showMap && (
-          <PlanningEditHeader isEditing={edit.isEditing} onStart={edit.start} pdf={pdf} />
-        )}
+        {edit.isEditing && <PlanningEditHeader tripTitle={tripDisplayTitle(trip)} />}
         {showMap ? (
           <TripMap days={selection.shownDays} height={itineraryView.mapHeight} />
         ) : isGenerated ? (
@@ -129,28 +138,37 @@ function TripPage({ tripId }: { tripId: string }) {
               )}
               className="gap-10"
             >
-              {selection.shownDays.map((day) => (
+              {selection.shownDays.map((day, index) => (
                 <DayTimeline
                   key={day.id}
                   day={day}
                   edit={
                     edit.draft
-                      ? { day: edit.editDay(day.id), canChangeDay: edit.draft.length > 1 }
+                      ? {
+                          day: edit.editDay(day.id),
+                          canChangeDay: edit.draft.length > 1,
+                          changedIds: edit.changedIds,
+                        }
                       : undefined
                   }
                   onReplace={edit.isEditing ? undefined : replace.open}
+                  // Edits cover the whole planning: one "Modifier", on the first day shown.
+                  onEdit={!edit.isEditing && index === 0 ? edit.start : undefined}
                 />
               ))}
             </Animated.View>
           </LayoutAnimationConfig>
         ) : (
-          <GenerateItineraryCard
-            likedPlaces={days.likedPlaces?.activities ?? []}
-            isPending={generate.isPending}
-            failed={generate.failed}
-            onGenerate={generate.run}
-            onPickPlaces={() => router.push({ pathname: '/discovery', params: { tripId } })}
-          />
+          <View className="gap-2.5">
+            <GenerateItineraryCard
+              likedPlaces={days.likedPlaces?.activities ?? []}
+              isPending={generate.isPending}
+              failed={generate.failed}
+              onGenerate={generate.run}
+              onPickPlaces={() => router.push({ pathname: '/discovery', params: { tripId } })}
+            />
+            <SaveTripCard save={save} />
+          </View>
         )}
       </Screen>
 

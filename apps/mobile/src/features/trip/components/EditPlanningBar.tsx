@@ -1,9 +1,10 @@
 import { View } from 'react-native';
 
-import { Button, Notice } from '@/ui';
+import { Button, Notice, Text } from '@/ui';
 
 export interface EditPlanningBarProps {
   isSaving: boolean;
+  isDirty: boolean;
   errorMessage: string | null;
   onCancel: () => void;
   onSave: () => void;
@@ -12,13 +13,19 @@ export interface EditPlanningBarProps {
 /** Bottom bar of the planning edit, outside the scroll so it stays in reach. */
 export function EditPlanningBar({
   isSaving,
+  isDirty,
   errorMessage,
   onCancel,
   onSave,
 }: EditPlanningBarProps) {
   return (
-    <View className="gap-2 border-t border-line bg-background px-6 pt-3">
+    <View className="gap-2.5 border-t border-line bg-background px-6 pt-3.5">
       {errorMessage && <Notice message={errorMessage} />}
+      {isDirty && (
+        <Text variant="caption" className="text-center">
+          Modifications non enregistrées
+        </Text>
+      )}
       <View className="flex-row gap-2">
         <Button
           label="Annuler"

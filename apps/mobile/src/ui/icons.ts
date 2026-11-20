@@ -6,10 +6,12 @@
  */
 export type { Icon as AppIcon } from 'phosphor-react-native';
 
+export { ArrowDownIcon } from 'phosphor-react-native/src/icons/ArrowDown';
 export { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 export { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';
 export { ArrowsLeftRightIcon } from 'phosphor-react-native/src/icons/ArrowsLeftRight';
 export { ArrowSquareOutIcon } from 'phosphor-react-native/src/icons/ArrowSquareOut';
+export { ArrowUpIcon } from 'phosphor-react-native/src/icons/ArrowUp';
 export { BankIcon } from 'phosphor-react-native/src/icons/Bank';
 export { BarnIcon } from 'phosphor-react-native/src/icons/Barn';
 export { BedIcon } from 'phosphor-react-native/src/icons/Bed';
@@ -35,6 +37,7 @@ export { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
 export { HouseIcon } from 'phosphor-react-native/src/icons/House';
 export { ImageIcon } from 'phosphor-react-native/src/icons/Image';
 export { InfoIcon } from 'phosphor-react-native/src/icons/Info';
+export { ListBulletsIcon } from 'phosphor-react-native/src/icons/ListBullets';
 export { LockSimpleIcon } from 'phosphor-react-native/src/icons/LockSimple';
 export { MagnifyingGlassIcon } from 'phosphor-react-native/src/icons/MagnifyingGlass';
 export { MapPinIcon } from 'phosphor-react-native/src/icons/MapPin';

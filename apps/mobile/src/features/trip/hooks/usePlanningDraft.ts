@@ -6,6 +6,7 @@ import { trpc } from '@/lib/trpc';
 import { confirmDestructive } from '@/ui/confirm';
 
 import {
+  changedIds,
   isDraftDirty,
   moveToDay,
   moveWithinDay,
@@ -65,6 +66,9 @@ export function usePlanningDraft(tripId: string, itinerary: TripDay[]) {
   return {
     draft,
     isEditing: draft !== null,
+    isDirty,
+    /** Places moved since the last save, highlighted in the list. */
+    changedIds: draft ? changedIds(draft, itinerary) : new Set<string>(),
     start: () => {
       mutation.reset();
       setDraft(toDraft(itinerary));

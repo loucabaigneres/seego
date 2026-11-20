@@ -6,14 +6,21 @@ import type { AppIcon } from '@/ui/icons';
 
 export interface PillButtonProps {
   label: string;
-  icon: AppIcon;
+  icon?: AppIcon;
   onPress: () => void;
   /** Disables the button and says it is working ("Préparation…"). */
   loading?: boolean;
+  className?: string;
 }
 
-/** Small outlined action of a planned place ("Changer", "Déplacer vers…"). */
-export function PillButton({ label, icon: Icon, onPress, loading = false }: PillButtonProps) {
+/** Small outlined action ("Modifier", "Déplacer vers…"). */
+export function PillButton({
+  label,
+  icon: Icon,
+  onPress,
+  loading = false,
+  className,
+}: PillButtonProps) {
   return (
     <Pressable
       role="button"
@@ -22,11 +29,12 @@ export function PillButton({ label, icon: Icon, onPress, loading = false }: Pill
       aria-busy={loading}
       hitSlop={4}
       className={cn(
-        'min-h-9 flex-row items-center gap-1 self-start rounded-full border border-line-strong px-3 active:opacity-80',
+        'min-h-9 flex-row items-center gap-1.5 self-start rounded-full border border-line-strong px-3 active:opacity-80',
         loading && 'opacity-50',
+        className,
       )}
     >
-      <Icon size={16} color={colors.brand} />
+      {Icon && <Icon size={14} color={colors.brand} />}
       <Text variant="caption" tone="brand" className="font-sans-semibold">
         {loading ? 'Préparation…' : label}
       </Text>

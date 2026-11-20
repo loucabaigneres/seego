@@ -18,6 +18,10 @@ export interface TripPin<Activity> {
   id: string;
   activity: Activity;
   dayIndex: number;
+  /** Rank in its day (1-based), as numbered in the timeline. */
+  step: number;
+  /** Places in its day, located or not. */
+  stepCount: number;
   category: string | null;
   coordinate: LatLng;
 }
@@ -33,7 +37,7 @@ export function tripPins<Activity extends PinnableActivity>(
   days: PinnableDay<Activity>[],
 ): TripPin<Activity>[] {
   return days.flatMap((day) =>
-    inPlanningOrder(day.activities).flatMap((activity) => {
+    inPlanningOrder(day.activities).flatMap((activity, index) => {
       const coordinate = parseWktPoint(activity.coordinates);
       if (!coordinate) return [];
       return [
@@ -41,6 +45,8 @@ export function tripPins<Activity extends PinnableActivity>(
           id: activity.id,
           activity,
           dayIndex: day.dayIndex,
+          step: index + 1,
+          stepCount: day.activities.length,
           category: activity.category,
           coordinate,
         },
@@ -65,6 +71,14 @@ export function filterPins<Pin extends { category: string | null }>(
   category: string | null,
 ): Pin[] {
   return category === null ? pins : pins.filter((pin) => pin.category === category);
+}
+
+/** The route of each day: its pins' coordinates in planning order, for days with 2 pins or more. */
+export function dayRoutes(pins: { dayIndex: number; coordinate: LatLng }[]): LatLng[][] {
+  const routes = new Map<number, LatLng[]>();
+  for (const pin of pins)
+    routes.set(pin.dayIndex, [...(routes.get(pin.dayIndex) ?? []), pin.coordinate]);
+  return [...routes.values()].filter((route) => route.length > 1);
 }
 
 /** Room left around the outermost pins, as a factor of the span they cover. */
