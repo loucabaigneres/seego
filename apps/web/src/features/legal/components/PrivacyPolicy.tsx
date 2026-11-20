@@ -58,7 +58,17 @@ export function PrivacyPolicy() {
           nous mesurons l’utilisation de l’application avec PostHog (pages vues, étapes du
           parcours, informations techniques sur le navigateur et l’appareil). Une fois connecté,
           ces statistiques sont rattachées à l’identifiant technique de ton compte, jamais à ton
-          nom ni à ton adresse e-mail. Nous utilisons aussi Vercel Web Analytics, qui fournit des
+          nom ni à ton adresse e-mail. Nous conservons aussi la provenance de ta première visite
+          (paramètres de campagne présents dans l’URL, comme utm_source, domaine du site d’origine
+          et page d’arrivée) pour savoir quels canaux font connaître Seego.
+        </p>
+        <p>
+          Tant que tu n’as pas répondu au bandeau, ou si tu refuses, PostHog compte seulement les
+          visites de façon anonyme : pages vues, provenance et informations techniques, sans
+          cookie ni stockage sur ton appareil. Ton navigateur est reconnu le temps d’une journée à
+          partir d’une empreinte calculée par PostHog (adresse IP et navigateur, renouvelée chaque
+          jour). Cette mesure n’est jamais rattachée à ton compte et ne comprend aucun
+          enregistrement de navigation. Nous utilisons aussi Vercel Web Analytics, qui fournit des
           statistiques de fréquentation agrégées sans déposer de cookie.
         </p>
       </LegalSection>
@@ -79,6 +89,11 @@ export function PrivacyPolicy() {
             <>
               <strong>Mesurer et améliorer l’application</strong> avec PostHog : ton
               consentement, que tu peux retirer à tout moment.
+            </>,
+            <>
+              <strong>Compter les visites de façon anonyme et sans cookie</strong> (avant ou sans
+              ton consentement) : intérêt légitime à connaître la fréquentation de Seego et les
+              canaux qui le font connaître.
             </>,
           ]}
         />
@@ -112,7 +127,8 @@ export function PrivacyPolicy() {
             </>,
             <>
               <strong>PostHog</strong> : mesure d’audience, avec un hébergement des données dans
-              l’Union européenne, uniquement si tu y as consenti.
+              l’Union européenne : mesure détaillée si tu y as consenti, sinon comptage anonyme
+              des visites sans cookie.
             </>,
           ]}
         />
@@ -150,7 +166,8 @@ export function PrivacyPolicy() {
         </p>
         <p>
           Aucun cookie de mesure d’audience n’est déposé sans ton accord : tant que tu n’as pas
-          cliqué sur « Accepter », PostHog ne collecte rien. Refuser est aussi simple qu’accepter.
+          cliqué sur « Accepter », PostHog ne stocke rien sur ton appareil et se limite au comptage
+          anonyme des visites décrit plus haut. Refuser est aussi simple qu’accepter.
         </p>
         {analyticsEnabled && (
           <p>
