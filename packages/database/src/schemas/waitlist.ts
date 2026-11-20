@@ -30,6 +30,9 @@ export const waitlistLeads = pgTable(
     landingPageUrl: text('landing_page_url'), // exact landing URL
 
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+
+    // Set when the person opts out of the newsletter (null = still subscribed)
+    unsubscribedAt: timestamp('unsubscribed_at', { withTimezone: true }),
   },
   (table) => [
     index('waitlist_email_idx').on(table.email),

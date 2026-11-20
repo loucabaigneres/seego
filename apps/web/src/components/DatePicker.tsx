@@ -12,6 +12,8 @@ interface DatePickerProps {
   onChange: (value: string) => void;
   /** Earliest selectable date (ISO). Defaults to today. */
   min?: string;
+  /** Latest selectable date (ISO). No upper bound by default. */
+  max?: string;
   placeholder?: string;
   invalid?: boolean;
 }
@@ -39,6 +41,7 @@ export function DatePicker({
   value,
   onChange,
   min,
+  max,
   placeholder = 'Choisis une date',
   invalid = false,
 }: DatePickerProps) {
@@ -46,7 +49,7 @@ export function DatePicker({
   const minIso = min ?? today;
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(() => {
-    const base = value ? fromIso(value) : new Date();
+    const base = value ? fromIso(value) : min ? fromIso(min) : new Date();
     return new Date(base.getFullYear(), base.getMonth(), 1);
   });
   const rootRef = useRef<HTMLDivElement>(null);
@@ -77,6 +80,7 @@ export function DatePicker({
     ...Array.from({ length: daysInMonth }, (_, i) => toIso(new Date(year, month, i + 1))),
   ];
   const canGoBack = toIso(new Date(year, month, 0)) >= minIso;
+  const canGoForward = !max || toIso(new Date(year, month + 1, 1)) <= max;
   const shift = (delta: number) => setCursor(new Date(year, month + delta, 1));
 
   return (
@@ -121,8 +125,9 @@ export function DatePicker({
             <button
               type="button"
               aria-label="Mois suivant"
+              disabled={!canGoForward}
               onClick={() => shift(1)}
-              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-brand transition hover:bg-accent"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-brand transition hover:bg-accent disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent"
             >
               ›
             </button>
@@ -136,7 +141,7 @@ export function DatePicker({
             ))}
             {cells.map((iso, i) => {
               if (!iso) return <span key={`blank-${i}`} />;
-              const disabled = iso < minIso;
+              const disabled = iso < minIso || (!!max && iso > max);
               const selected = iso === value;
               const isToday = iso === today;
               return (

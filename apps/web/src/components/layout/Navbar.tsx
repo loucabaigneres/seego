@@ -1,6 +1,6 @@
+import { authClient } from '@/lib/auth-client'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
-import { authClient } from '@/lib/auth-client'
 
 interface NavbarProps {
   /** Extra actions shown to signed-in users, composed by the app layer (e.g. group trips). */
@@ -28,7 +28,7 @@ export function Navbar({ userActions }: NavbarProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="group flex items-center gap-1.5 transition active:scale-95">
+        <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="group flex items-center gap-1.5 transition active:scale-95">
           <span className="text-xl font-black tracking-tight text-ink">Seego</span>
           <span className="h-2 w-2 rounded-full bg-cta transition group-hover:scale-125" />
         </Link>
