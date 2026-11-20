@@ -29,6 +29,20 @@ relaie vers l'API : le cookie est posé par le domaine du front.
   posé sur le domaine de l'API et le callback échoue.
 - En local, ne rien définir : le front appelle directement `VITE_API_URL`.
 
+## Analytics (PostHog) and acquisition
+
+- `src/lib/analytics.ts` starts PostHog opted out with `cookieless_mode: 'on_reject'`: until the
+  visitor accepts the banner (or after a refusal) pageviews are still counted, but without any
+  cookie or local storage. Cookieless mode must be enabled in the PostHog project settings,
+  otherwise those events are dropped.
+- `src/lib/attribution.ts` reads the landing URL's `utm_*`, the referring domain and the landing
+  path once, in memory. On consent they are registered as `first_*` super properties (sent with
+  every later event) and copied to the person on sign-in.
+- Instagram bio link: `https://app.seego.fr/ig`, a temporary redirect in `vercel.json` to
+  `/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&utm_campaign=beta_launch`. Source,
+  medium and content match what Instagram appends to bio links, so the duplicates agree whatever
+  their order; only `utm_campaign` is ours. Change the UTMs there, not in the bio.
+
 ## Where things go
 
 ```

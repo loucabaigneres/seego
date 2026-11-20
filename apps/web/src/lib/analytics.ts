@@ -1,4 +1,5 @@
 import { env } from '@/config/env';
+import { type FirstTouch, firstTouch, firstTouchKeys } from '@/lib/attribution';
 import posthog from 'posthog-js';
 import { useSyncExternalStore } from 'react';
 
@@ -73,6 +74,10 @@ export function initAnalytics(): void {
     api_host: env.VITE_POSTHOG_HOST,
     defaults: '2026-01-30',
     opt_out_capturing_by_default: true,
+    // Before an answer to the banner and after a refusal, events are still sent but without any
+    // cookie or local storage (PostHog hashes the visitor server-side, salt rotated daily).
+    // Requires cookieless mode to be enabled in the PostHog project settings.
+    cookieless_mode: 'on_reject',
     // Anonymous visitors (guests) only get a person profile once they sign in.
     person_profiles: 'identified_only',
   });
@@ -96,7 +101,17 @@ export function track<E extends AnalyticsEventName>(
 export function identifyUser(userId: string, properties: { created_at?: string } = {}): void {
   if (!analyticsEnabled) return;
   if (posthog.get_distinct_id() === userId) return;
-  posthog.identify(userId, { is_registered: true }, properties);
+  posthog.identify(userId, { is_registered: true }, { ...storedFirstTouch(), ...properties });
+}
+
+/** The `first_*` super properties saved at consent time (survives reloads). */
+function storedFirstTouch(): Partial<FirstTouch> {
+  const stored: Partial<Record<keyof FirstTouch, string>> = {};
+  for (const key of firstTouchKeys) {
+    const value: unknown = posthog.get_property(key);
+    if (typeof value === 'string') stored[key] = value;
+  }
+  return stored;
 }
 
 /** Forgets the identity on logout, so the next person on this device starts anonymous. */
@@ -121,7 +136,9 @@ const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((listener) => listener());
 
 export function acceptAnalytics(): void {
-  posthog.opt_in_capturing();
+  posthog.opt_in_capturing({ captureProperties: firstTouch });
+  // Attached to every later event (signup, trip…), so funnels can be split by source.
+  posthog.register_once(firstTouch);
   notify();
 }
 
