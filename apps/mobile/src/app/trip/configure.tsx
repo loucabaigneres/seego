@@ -39,7 +39,10 @@ function TripConfiguration({ tripId }: { tripId: string }) {
   }
 
   return (
-    <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      className="flex-1"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <Screen contentClassName="gap-6 px-0 pb-2">
         <TripConfigForm config={config} destination={config.destination} />
       </Screen>

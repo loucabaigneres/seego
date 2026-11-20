@@ -4,8 +4,9 @@ import { Pressable, View } from 'react-native';
 import { cleanDescription } from '@/domain/place';
 import type { RouterOutputs } from '@/lib/trpc';
 import { colors } from '@seego/ui';
-import { Badge, cn, IconButton, Text } from '@/ui';
-import { ArrowSquareOutIcon, TrashIcon } from '@/ui/icons';
+import { Badge, Button, cn, IconButton, Text } from '@/ui';
+import { ArrowSquareOutIcon, PlusIcon, TrashIcon } from '@/ui/icons';
+
 
 import { formatHashtags, platformLabel, shortUrl } from '../lib/inspiration';
 
@@ -15,9 +16,17 @@ export interface InspirationCardProps {
   inspiration: InspirationItem;
   onDelete: () => void;
   isDeleting: boolean;
+  /** Shown only when the AI found places to add. */
+  onAddToTrip: () => void;
 }
 
-export function InspirationCard({ inspiration, onDelete, isDeleting }: InspirationCardProps) {
+export function InspirationCard({
+  inspiration,
+  onDelete,
+  isDeleting,
+  onAddToTrip,
+}: InspirationCardProps) {
+
   const description = cleanDescription(inspiration.description);
   const hashtags = formatHashtags(inspiration.tags);
 
@@ -53,6 +62,17 @@ export function InspirationCard({ inspiration, onDelete, isDeleting }: Inspirati
       <Text variant="caption" tone={hashtags.length ? 'brand' : 'muted'}>
         {hashtags.length ? hashtags.join('  ') : 'Aucun hashtag détecté'}
       </Text>
+
+      {inspiration.extractedPlaces.length > 0 && (
+        <Button
+          label="Ajouter à un voyage"
+          variant="outline"
+          size="sm"
+          icon={PlusIcon}
+          onPress={onAddToTrip}
+          className="self-start"
+        />
+      )}
     </Pressable>
   );
 }

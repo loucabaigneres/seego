@@ -10,7 +10,9 @@ import { SettingsLink } from '@/features/profile/components/SettingsLink';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { colors } from '@seego/ui';
-import { ErrorState, Screen, Text } from '@/ui';
+import { Button, ErrorState, Screen, Text } from '@/ui';
+import { PlusIcon } from '@/ui/icons';
+
 
 export default function ProfileScreen() {
   const { isSessionPending, isSignedIn, profile, isLoading, hasFailed, retry } = useProfile();
@@ -61,7 +63,17 @@ export default function ProfileScreen() {
       <ProfileHeader user={profile.user} />
       <ProfileStats stats={profile.stats} onPressTrips={() => router.navigate('/trips')} />
       <View className="gap-4">
-        <Text variant="section">Mes inspirations</Text>
+        <View className="flex-row items-center justify-between">
+          <Text variant="section">Mes inspirations</Text>
+          <Button
+            label="Importer"
+            variant="outline"
+            size="sm"
+            icon={PlusIcon}
+            onPress={() => router.push('/inspiration/import')}
+          />
+        </View>
+
         <InspirationList />
       </View>
       <SettingsLink />
