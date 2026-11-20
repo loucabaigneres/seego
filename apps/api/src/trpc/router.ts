@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { and, eq, notExists } from 'drizzle-orm';
 import * as z from 'zod';
 import { createTRPCRouter, protectedProcedure, publicProcedure } from './init.js';
+import { adminRouter } from './routers/admin.js';
 import { discoveryRouter } from './routers/discovery.js';
 import { groupRouter } from './routers/group.js';
 import { inspirationRouter } from './routers/inspiration.js';
@@ -165,6 +166,7 @@ export const appRouter = createTRPCRouter({
   inspiration: inspirationRouter,
   onboarding: onboardingRouter,
   waitlist: waitlistRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,6 +1,6 @@
 import type { TRPCRouterRecord } from '@trpc/server';
 import { TRPCError } from '@trpc/server';
-import { and, asc, eq, gt, inArray, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, gt, inArray, isNotNull, isNull, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Context } from '../context.js';
 
@@ -179,7 +179,10 @@ async function loadPlanningActivity(db: Context['db'], tripId: string, activityI
 }
 
 async function getTripOrThrow(db: Context['db'], tripId: string) {
-  const [tripRow] = await db.select().from(trip).where(eq(trip.id, tripId));
+  const [tripRow] = await db
+    .select()
+    .from(trip)
+    .where(and(eq(trip.id, tripId), isNull(trip.deletedAt)));
   if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
   return tripRow;
 }
@@ -206,7 +209,10 @@ export const itineraryRouter = {
   getTrip: publicProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      const [tripRow] = await ctx.db.select().from(trip).where(eq(trip.id, input.tripId));
+      const [tripRow] = await ctx.db
+        .select()
+        .from(trip)
+        .where(and(eq(trip.id, input.tripId), isNull(trip.deletedAt)));
       if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
 
       const rows = await ctx.db
@@ -289,7 +295,10 @@ export const itineraryRouter = {
   generateItinerary: publicProcedure
     .input(z.object({ tripId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [tripRow] = await ctx.db.select().from(trip).where(eq(trip.id, input.tripId));
+      const [tripRow] = await ctx.db
+        .select()
+        .from(trip)
+        .where(and(eq(trip.id, input.tripId), isNull(trip.deletedAt)));
       if (!tripRow) throw new TRPCError({ code: 'NOT_FOUND', message: 'Trip introuvable.' });
 
       // Only day 0 holds the places the user actually liked while swiping. Days

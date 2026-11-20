@@ -8,7 +8,7 @@ const DATA_FILE_PATH = path.resolve(__dirname, '../../data.json');
 
 /**
  * Importe `data.json` (ancien format `discovery_content`) dans le catalogue, avec les mêmes
- * règles que la migration 0006. Les lieux dont l'URL existe déjà sont ignorés.
+ * règles que la migration 0007. Les lieux dont l'URL existe déjà sont ignorés.
  */
 export async function seedDiscoveryContent(
   db: ReturnType<typeof import('../index.js').createClient>,

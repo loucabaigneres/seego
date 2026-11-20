@@ -53,7 +53,7 @@ export const importedInspiration = pgTable('imported_inspiration', {
 });
 
 /**
- * Ancienne table du catalogue, renommée par la migration 0007 et gardée en lecture seule
+ * Ancienne table du catalogue, renommée par la migration 0008 et gardée en lecture seule
  * (un trigger refuse toute écriture) jusqu'à son archivage. On écrit dans `places` /
  * `place_details` (voir catalogue.ts et catalogue/write.ts).
  */
@@ -76,7 +76,7 @@ export const legacyDiscoveryContent = pgTable('legacy_discovery_content', {
 /**
  * Vue en lecture seule : le catalogue (`places`, `cities`, `place_details`) présenté au
  * format de l'ancienne table, pour que les lectures de l'app ne changent pas.
- * Définie dans la migration 0007 (`.existing()` : drizzle-kit ne la gère pas).
+ * Définie dans la migration 0008 (`.existing()` : drizzle-kit ne la gère pas).
  */
 export const discoveryContent = pgView('discovery_content', {
   id: uuid('id').notNull(),

@@ -1,9 +1,110 @@
 {
-  "id": "0c4bf767-d798-4eea-a42d-d8cb430af262",
+  "id": "6e010c13-8488-49b1-9db8-ca77409e4e19",
   "prevId": "53122050-9dbc-486b-ae88-222038ba901f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.admin_role_events": {
+      "name": "admin_role_events",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "action": {
+          "name": "action",
+          "type": "admin_role_action",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_user_id": {
+          "name": "target_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_email": {
+          "name": "target_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actor_user_id": {
+          "name": "actor_user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actor_email": {
+          "name": "actor_email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "admin_role_events_created_at_idx": {
+          "name": "admin_role_events_created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "admin_role_events_target_user_id_user_id_fk": {
+          "name": "admin_role_events_target_user_id_user_id_fk",
+          "tableFrom": "admin_role_events",
+          "tableTo": "user",
+          "columnsFrom": [
+            "target_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "admin_role_events_actor_user_id_user_id_fk": {
+          "name": "admin_role_events_actor_user_id_user_id_fk",
+          "tableFrom": "admin_role_events",
+          "tableTo": "user",
+          "columnsFrom": [
+            "actor_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.account": {
       "name": "account",
       "schema": "",
@@ -336,954 +437,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.cities": {
-      "name": "cities",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "country": {
-          "name": "country",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "lat": {
-          "name": "lat",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lng": {
-          "name": "lng",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "timezone": {
-          "name": "timezone",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "cities_name_country_unique": {
-          "name": "cities_name_country_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name",
-            "country"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.place_ai_labels": {
-      "name": "place_ai_labels",
-      "schema": "",
-      "columns": {
-        "place_id": {
-          "name": "place_id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "input_hash": {
-          "name": "input_hash",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "labels": {
-          "name": "labels",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "model": {
-          "name": "model",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "place_ai_labels_place_id_places_id_fk": {
-          "name": "place_ai_labels_place_id_places_id_fk",
-          "tableFrom": "place_ai_labels",
-          "tableTo": "places",
-          "columnsFrom": [
-            "place_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.place_details": {
-      "name": "place_details",
-      "schema": "",
-      "columns": {
-        "place_id": {
-          "name": "place_id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "details": {
-          "name": "details",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sub_ratings": {
-          "name": "sub_ratings",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source_tags": {
-          "name": "source_tags",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "scraped_at": {
-          "name": "scraped_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "place_details_place_id_places_id_fk": {
-          "name": "place_details_place_id_places_id_fk",
-          "tableFrom": "place_details",
-          "tableTo": "places",
-          "columnsFrom": [
-            "place_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.place_prices": {
-      "name": "place_prices",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "bigserial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "place_id": {
-          "name": "place_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "checked_at": {
-          "name": "checked_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "price_eur": {
-          "name": "price_eur",
-          "type": "numeric(8, 2)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "basis": {
-          "name": "basis",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "params": {
-          "name": "params",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "platform": {
-          "name": "platform",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "place_prices_place": {
-          "name": "place_prices_place",
-          "columns": [
-            {
-              "expression": "place_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "checked_at",
-              "isExpression": false,
-              "asc": false,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "place_prices_place_id_places_id_fk": {
-          "name": "place_prices_place_id_places_id_fk",
-          "tableFrom": "place_prices",
-          "tableTo": "places",
-          "columnsFrom": [
-            "place_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.places": {
-      "name": "places",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "owner_user_id": {
-          "name": "owner_user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "city_id": {
-          "name": "city_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "short_description": {
-          "name": "short_description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address": {
-          "name": "address",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lat": {
-          "name": "lat",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lng": {
-          "name": "lng",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "main_photo": {
-          "name": "main_photo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "photos": {
-          "name": "photos",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "rating": {
-          "name": "rating",
-          "type": "numeric(3, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "rating_count": {
-          "name": "rating_count",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "rating_source": {
-          "name": "rating_source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "price_eur": {
-          "name": "price_eur",
-          "type": "numeric(8, 2)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "price_level": {
-          "name": "price_level",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "duration_min": {
-          "name": "duration_min",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "stars": {
-          "name": "stars",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "themes": {
-          "name": "themes",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "cuisines": {
-          "name": "cuisines",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "ambiance": {
-          "name": "ambiance",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "amenities": {
-          "name": "amenities",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "hotel_style": {
-          "name": "hotel_style",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "good_for": {
-          "name": "good_for",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "setting": {
-          "name": "setting",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "opening_hours": {
-          "name": "opening_hours",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pets_allowed": {
-          "name": "pets_allowed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "wheelchair_accessible": {
-          "name": "wheelchair_accessible",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "family_friendly": {
-          "name": "family_friendly",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "languages": {
-          "name": "languages",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "free_cancellation": {
-          "name": "free_cancellation",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pay_later": {
-          "name": "pay_later",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "min_age": {
-          "name": "min_age",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "guide_type": {
-          "name": "guide_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "small_group": {
-          "name": "small_group",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "skip_the_line": {
-          "name": "skip_the_line",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pickup_included": {
-          "name": "pickup_included",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "not_suitable_for": {
-          "name": "not_suitable_for",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "meeting_lat": {
-          "name": "meeting_lat",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "meeting_lng": {
-          "name": "meeting_lng",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "end_point": {
-          "name": "end_point",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "physical_level": {
-          "name": "physical_level",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "time_of_day": {
-          "name": "time_of_day",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "food_included": {
-          "name": "food_included",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "check_in_from": {
-          "name": "check_in_from",
-          "type": "time",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "check_out_until": {
-          "name": "check_out_until",
-          "type": "time",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "breakfast_types": {
-          "name": "breakfast_types",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "beach_distance_m": {
-          "name": "beach_distance_m",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "airport_distance_km": {
-          "name": "airport_distance_km",
-          "type": "numeric(6, 1)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "nearby_attractions": {
-          "name": "nearby_attractions",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "has_kitchen": {
-          "name": "has_kitchen",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "air_conditioning": {
-          "name": "air_conditioning",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "pool_type": {
-          "name": "pool_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "location_score": {
-          "name": "location_score",
-          "type": "numeric(3, 1)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "reservations": {
-          "name": "reservations",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "outdoor_seating": {
-          "name": "outdoor_seating",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "takeout": {
-          "name": "takeout",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "delivery": {
-          "name": "delivery",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "groups_friendly": {
-          "name": "groups_friendly",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "noise_level": {
-          "name": "noise_level",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "meals": {
-          "name": "meals",
-          "type": "text[]",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
-        },
-        "live_music": {
-          "name": "live_music",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "full_bar": {
-          "name": "full_bar",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "has_tv": {
-          "name": "has_tv",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "dress_code": {
-          "name": "dress_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source": {
-          "name": "source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "source_url": {
-          "name": "source_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "quality_score": {
-          "name": "quality_score",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "places_city_category": {
-          "name": "places_city_category",
-          "columns": [
-            {
-              "expression": "city_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "category",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "where": "\"places\".\"is_active\"",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "places_owner": {
-          "name": "places_owner",
-          "columns": [
-            {
-              "expression": "owner_user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "where": "\"places\".\"owner_user_id\" IS NOT NULL",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "places_themes": {
-          "name": "places_themes",
-          "columns": [
-            {
-              "expression": "themes",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        },
-        "places_cuisines": {
-          "name": "places_cuisines",
-          "columns": [
-            {
-              "expression": "cuisines",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        },
-        "places_amenities": {
-          "name": "places_amenities",
-          "columns": [
-            {
-              "expression": "amenities",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        },
-        "places_languages": {
-          "name": "places_languages",
-          "columns": [
-            {
-              "expression": "languages",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        },
-        "places_not_suitable": {
-          "name": "places_not_suitable",
-          "columns": [
-            {
-              "expression": "not_suitable_for",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gin",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "places_city_id_cities_id_fk": {
-          "name": "places_city_id_cities_id_fk",
-          "tableFrom": "places",
-          "tableTo": "cities",
-          "columnsFrom": [
-            "city_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "places_source_url_unique": {
-          "name": "places_source_url_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "source_url"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {
-        "places_category_check": {
-          "name": "places_category_check",
-          "value": "\"places\".\"category\" IN ('hotel', 'restaurant', 'activity', 'other')"
-        },
-        "places_rating_check": {
-          "name": "places_rating_check",
-          "value": "\"places\".\"rating\" BETWEEN 0 AND 5"
-        },
-        "places_price_eur_check": {
-          "name": "places_price_eur_check",
-          "value": "\"places\".\"price_eur\" IS NULL OR \"places\".\"category\" = 'activity'"
-        },
-        "places_price_level_check": {
-          "name": "places_price_level_check",
-          "value": "\"places\".\"price_level\" BETWEEN 1 AND 4"
-        },
-        "places_stars_check": {
-          "name": "places_stars_check",
-          "value": "\"places\".\"stars\" BETWEEN 1 AND 5"
-        },
-        "places_quality_score_check": {
-          "name": "places_quality_score_check",
-          "value": "\"places\".\"quality_score\" BETWEEN 0 AND 100"
-        },
-        "places_catalogue_complete_check": {
-          "name": "places_catalogue_complete_check",
-          "value": "\"places\".\"owner_user_id\" IS NOT NULL OR NOT \"places\".\"is_active\" OR (\"places\".\"city_id\" IS NOT NULL AND \"places\".\"main_photo\" IS NOT NULL AND \"places\".\"category\" <> 'other')"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.vocabulary": {
-      "name": "vocabulary",
-      "schema": "",
-      "columns": {
-        "kind": {
-          "name": "kind",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "label": {
-          "name": "label",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "category": {
-          "name": "category",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "position": {
-          "name": "position",
-          "type": "smallint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "vocabulary_kind_slug_pk": {
-          "name": "vocabulary_kind_slug_pk",
-          "columns": [
-            "kind",
-            "slug"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.generated_document": {
       "name": "generated_document",
       "schema": "",
@@ -1609,10 +762,10 @@
         }
       },
       "foreignKeys": {
-        "swipe_discovery_content_id_places_id_fk": {
-          "name": "swipe_discovery_content_id_places_id_fk",
+        "swipe_discovery_content_id_discovery_content_id_fk": {
+          "name": "swipe_discovery_content_id_discovery_content_id_fk",
           "tableFrom": "swipe",
-          "tableTo": "places",
+          "tableTo": "discovery_content",
           "columnsFrom": [
             "discovery_content_id"
           ],
@@ -1911,10 +1064,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "activity_discovery_content_id_places_id_fk": {
-          "name": "activity_discovery_content_id_places_id_fk",
+        "activity_discovery_content_id_discovery_content_id_fk": {
+          "name": "activity_discovery_content_id_discovery_content_id_fk",
           "tableFrom": "activity",
-          "tableTo": "places",
+          "tableTo": "discovery_content",
           "columnsFrom": [
             "discovery_content_id"
           ],
@@ -2406,6 +1559,14 @@
     }
   },
   "enums": {
+    "public.admin_role_action": {
+      "name": "admin_role_action",
+      "schema": "public",
+      "values": [
+        "grant",
+        "revoke"
+      ]
+    },
     "public.average_price": {
       "name": "average_price",
       "schema": "public",

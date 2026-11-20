@@ -30,3 +30,18 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 export const publicProcedure = t.procedure;
 // Protected route (requires authentication)
 export const protectedProcedure = t.procedure.use(isAuthed);
+
+// Middleware to check that the authenticated user is an administrator (Better Auth admin plugin)
+const isAdmin = t.middleware(({ ctx, next }) => {
+  if (ctx.user?.role !== 'admin') {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'Accès réservé aux administrateurs.',
+    });
+  }
+
+  return next();
+});
+
+// Admin route (requires an authenticated user with the 'admin' role)
+export const adminProcedure = protectedProcedure.use(isAdmin);

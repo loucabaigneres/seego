@@ -10,12 +10,13 @@ import {
   ErrorState,
   LoadingState,
   Notice,
+  SearchField,
   SegmentedControl,
   Sheet,
   Text,
   type Segment,
 } from '@/ui';
-import { CompassIcon, HeartIcon, MapPinIcon } from '@/ui/icons';
+import { CompassIcon, HeartIcon, MagnifyingGlassIcon, MapPinIcon } from '@/ui/icons';
 
 import type { CandidateSource, ReplacementCandidate, ReplacePlace } from '../hooks/useReplacePlace';
 
@@ -46,6 +47,12 @@ export function ReplacePlaceSheet({ replace }: { replace: ReplacePlace }) {
           onChange={replace.setSource}
           className="mt-2"
         />
+        <SearchField
+          value={replace.query}
+          onChangeText={replace.setQuery}
+          placeholder="Rechercher par nom"
+          className="mt-2"
+        />
       </View>
 
       {candidates.isLoading ? (
@@ -53,7 +60,13 @@ export function ReplacePlaceSheet({ replace }: { replace: ReplacePlace }) {
       ) : candidates.isError ? (
         <ErrorState title="Impossible de charger les propositions" onRetry={candidates.retry} />
       ) : !candidates.data?.length ? (
-        replace.source === 'mine' ? (
+        replace.query.trim() ? (
+          <EmptyState
+            icon={MagnifyingGlassIcon}
+            title="Aucun résultat"
+            description={`Aucun lieu ne correspond à « ${replace.query.trim()} ».`}
+          />
+        ) : replace.source === 'mine' ? (
           <EmptyState
             icon={HeartIcon}
             title="Aucune adresse à toi"
@@ -67,7 +80,7 @@ export function ReplacePlaceSheet({ replace }: { replace: ReplacePlace }) {
           />
         )
       ) : (
-        <ScrollView contentContainerClassName="gap-3 px-6 py-4">
+        <ScrollView contentContainerClassName="gap-3 px-6 py-4" keyboardShouldPersistTaps="handled">
           {candidates.data.map((candidate) => (
             <CandidateRow
               key={candidate.id}
