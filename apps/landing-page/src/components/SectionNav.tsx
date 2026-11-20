@@ -1,6 +1,6 @@
 import { Plane } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { trackEvent } from '../lib/analytics';
+import { track } from '../lib/analytics';
 
 type Section = { id: string; label: string };
 
@@ -28,7 +28,7 @@ export function SectionNav({ sections }: { sections: Section[] }) {
       setActive(current);
       if (!seen.has(current)) {
         seen.add(current);
-        trackEvent('section_viewed', { section: current, index: order.indexOf(current) + 1 });
+        track('section_viewed', { section: current, index: order.indexOf(current) + 1 });
       }
     };
     const onScroll = () => {

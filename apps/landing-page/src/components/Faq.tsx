@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { trackEvent } from '../lib/analytics';
+import { track } from '../lib/analytics';
 import { Reveal } from './Reveal';
 
 type QA = { question: string; answer: string };
@@ -60,7 +60,7 @@ export function Faq() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (!open) trackEvent('faq_opened', { question: item.question, index: index + 1 });
+                    if (!open) track('faq_opened', { question: item.question, index: index + 1 });
                     setOpenIndex(open ? null : index);
                   }}
                   aria-expanded={open}

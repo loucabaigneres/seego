@@ -47,7 +47,7 @@ export function initAnalytics(): void {
 }
 
 /** Records a custom event. A no-op when tracking is off or the visitor has not consented. */
-export function trackEvent<E extends keyof AnalyticsEvents>(
+export function track<E extends keyof AnalyticsEvents>(
   name: E,
   ...[properties]: AnalyticsEvents[E] extends Record<string, never> ? [] : [AnalyticsEvents[E]]
 ): void {

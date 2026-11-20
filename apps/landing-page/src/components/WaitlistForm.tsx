@@ -1,7 +1,7 @@
 import { ArrowRight, Loader2, Mail, PartyPopper } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
-import { trackEvent } from '../lib/analytics';
+import { track } from '../lib/analytics';
 import { isValidEmail, submitWaitlist } from '../lib/waitlist';
 
 type Status = 'idle' | 'loading' | 'error';
@@ -53,7 +53,7 @@ export function WaitlistForm({
     if (status === 'loading') return;
 
     if (!isValidEmail(email)) {
-      trackEvent('waitlist_submit_failed', { position, reason: 'invalid_email' });
+      track('waitlist_submit_failed', { position, reason: 'invalid_email' });
       setStatus('error');
       setError('Hmm, cette adresse e-mail ne semble pas valide.');
       return;
@@ -65,7 +65,7 @@ export function WaitlistForm({
       await submitWaitlist(email, position);
       onJoined(email);
     } catch {
-      trackEvent('waitlist_submit_failed', { position, reason: 'server_error' });
+      track('waitlist_submit_failed', { position, reason: 'server_error' });
       setStatus('error');
       setError('Oups, un souci est survenu. Réessaie dans un instant.');
     }
@@ -90,7 +90,7 @@ export function WaitlistForm({
             onFocus={() => {
               if (started) return;
               setStarted(true);
-              trackEvent('waitlist_form_started', { position });
+              track('waitlist_form_started', { position });
             }}
             onChange={(event) => {
               setEmail(event.target.value);

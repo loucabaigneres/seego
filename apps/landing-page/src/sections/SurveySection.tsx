@@ -1,6 +1,6 @@
 import { ArrowUpRight, Clock, QrCode } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
-import { trackEvent } from '../lib/analytics';
+import { track } from '../lib/analytics';
 import { LineReveal, SectionLabel } from './ui';
 
 const FORM_URL = 'https://tally.so/r/RWxa5d';
@@ -24,7 +24,7 @@ export function SurveySection() {
           <Reveal className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href={FORM_URL}
-              onClick={() => trackEvent('survey_clicked')}
+              onClick={() => track('survey_clicked')}
               target="_blank"
               rel="noreferrer"
               className="group inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3.5 text-sm font-bold text-ink shadow-lg shadow-cta/30 transition hover:brightness-110 active:scale-95"

@@ -2,7 +2,7 @@ import { ArrowDown, ArrowRight } from 'lucide-react';
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from 'motion/react';
 import { lazy, Suspense, useRef, useState } from 'react';
 import { WaitlistForm } from '../components/WaitlistForm';
-import { trackEvent } from '../lib/analytics';
+import { track } from '../lib/analytics';
 import { useScrub } from '../lib/useScrub';
 import { formatCoords, journeyAt, STOPS } from './journey';
 import { Cross, LineReveal, ScrambleText } from './ui';
@@ -126,7 +126,7 @@ export function JourneyHero({ joinedEmail, onJoined }: JourneyHeroProps) {
                   {isLast && (
                     <motion.a
                       href="#embarquement"
-                      onClick={() => trackEvent('hero_cta_clicked')}
+                      onClick={() => track('hero_cta_clicked')}
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.35 }}
