@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { track } from '@/lib/analytics';
 import { authClient } from '@/lib/auth-client';
+import React, { useEffect, useRef, useState } from 'react';
 
 const LENGTH = 6;
 const empty = () => Array<string>(LENGTH).fill('');
@@ -47,6 +48,7 @@ export function VerifyEmailModal({ email, onVerified, onClose }: Props) {
       return;
     }
 
+    track('email_verified');
     await onVerified();
     setLoading(false);
   };
