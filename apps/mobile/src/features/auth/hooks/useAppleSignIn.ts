@@ -5,7 +5,8 @@ import { Platform } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
 
-import { appleIdTokenPayload, isAppleCancel } from '../lib/apple';
+import { appleIdTokenPayload, appleProfileOf, isAppleCancel, withSavedProfile } from '../lib/apple';
+import { appleProfileStore } from '../lib/apple-profile-store';
 import { authErrorMessage } from '../lib/errors';
 import { finishSignIn } from '../lib/navigation';
 
@@ -49,7 +50,15 @@ export function useAppleSignIn() {
         nonce: hashedNonce,
       });
 
-      const idToken = appleIdTokenPayload(credential, nonce);
+      // Apple gives the name once: keep it until the API confirms, and reuse it on a retry.
+      const profile = appleProfileOf(credential);
+      if (profile) await appleProfileStore.save(profile);
+      const withProfile = withSavedProfile(
+        credential,
+        profile ? null : await appleProfileStore.load(),
+      );
+
+      const idToken = appleIdTokenPayload(withProfile, nonce);
       if (!idToken) {
         setError(authErrorMessage(null));
         setIsPending(false);
@@ -62,6 +71,7 @@ export function useAppleSignIn() {
         setError(authErrorMessage(result.error));
         return;
       }
+      await appleProfileStore.clear();
       await finishSignIn();
     } catch (err) {
       setIsPending(false);

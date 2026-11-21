@@ -19,13 +19,22 @@ const MESSAGES: Record<string, string> = {
   INVALID_ORIGIN: "L'app n'est pas autorisée par le serveur. Préviens l'équipe.",
   // Apple / Google identity token sign-in.
   INVALID_TOKEN: 'La connexion a échoué. Réessaie.',
-  OAUTH_LINK_ERROR: 'Un compte existe déjà avec cet email. Connecte-toi avec ton mot de passe.',
+  // Also raised when the account or session cannot be created: only `account not linked`
+  // (below) means an e-mail account already exists.
+  OAUTH_LINK_ERROR: 'La connexion a échoué. Réessaie.',
 };
+
+/** Better Auth's `OAUTH_LINK_ERROR` message when the e-mail belongs to an account it won't link. */
+const ACCOUNT_NOT_LINKED = 'account not linked';
+const ACCOUNT_EXISTS = 'Un compte existe déjà avec cet email. Connecte-toi avec ton mot de passe.';
 
 const FALLBACK = 'Impossible de te connecter pour le moment. Vérifie ta connexion et réessaie.';
 const TOO_MANY_REQUESTS = 'Trop de tentatives. Patiente une minute avant de réessayer.';
 
 export function authErrorMessage(error: AuthError | null | undefined): string {
   if (error?.status === 429) return TOO_MANY_REQUESTS;
+  if (error?.code === 'OAUTH_LINK_ERROR' && error.message === ACCOUNT_NOT_LINKED) {
+    return ACCOUNT_EXISTS;
+  }
   return (error?.code && MESSAGES[error.code]) || FALLBACK;
 }

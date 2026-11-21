@@ -1,4 +1,5 @@
 import * as AppleAuthentication from 'expo-apple-authentication';
+import { useState } from 'react';
 import { View } from 'react-native';
 
 import { radii } from '@seego/ui';
@@ -10,11 +11,20 @@ import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
 /** Same height as our `md` buttons (min-h-14). */
 const BUTTON_HEIGHT = 56;
 
+type Provider = 'apple' | 'google';
+
 export function SocialSignIn() {
   const apple = useAppleSignIn();
   const google = useGoogleSignIn();
+  // Each hook keeps its own error: show only the one of the provider tried last.
+  const [lastTried, setLastTried] = useState<Provider | null>(null);
   const isPending = apple.isPending || google.isPending;
-  const error = apple.error ?? google.error;
+  const error = lastTried ? { apple, google }[lastTried].error : null;
+
+  const signInWith = (provider: Provider) => {
+    setLastTried(provider);
+    void { apple, google }[provider].signIn();
+  };
 
   return (
     <View className="gap-5">
@@ -38,7 +48,7 @@ export function SocialSignIn() {
               buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
               cornerRadius={radii.button}
               style={{ height: BUTTON_HEIGHT, width: '100%' }}
-              onPress={apple.signIn}
+              onPress={() => signInWith('apple')}
             />
           </View>
         )}
@@ -49,7 +59,7 @@ export function SocialSignIn() {
           leading={<GoogleLogo />}
           loading={google.isPending}
           disabled={apple.isPending}
-          onPress={google.signIn}
+          onPress={() => signInWith('google')}
         />
       </View>
 

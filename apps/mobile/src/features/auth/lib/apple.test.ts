@@ -1,9 +1,16 @@
-import { appleIdTokenPayload, isAppleCancel } from './apple';
+import { appleIdTokenPayload, appleProfileOf, isAppleCancel, withSavedProfile } from './apple';
 
 const credential = {
+  user: 'apple-user-1',
   identityToken: 'id-token',
   email: null,
   fullName: null,
+};
+
+const firstAuthorization = {
+  ...credential,
+  email: 'jane@privaterelay.appleid.com',
+  fullName: { givenName: 'Jane', familyName: 'Doe' },
 };
 
 describe('appleIdTokenPayload', () => {
@@ -20,11 +27,7 @@ describe('appleIdTokenPayload', () => {
 
   it('forwards the name and e-mail Apple shares on the first authorization', () => {
     const payload = appleIdTokenPayload(
-      {
-        ...credential,
-        email: 'jane@privaterelay.appleid.com',
-        fullName: { givenName: 'Jane', familyName: null },
-      },
+      { ...firstAuthorization, fullName: { givenName: 'Jane', familyName: null } },
       'nonce',
     );
     expect(payload?.user).toEqual({
@@ -39,6 +42,51 @@ describe('appleIdTokenPayload', () => {
       'nonce',
     );
     expect(payload).not.toHaveProperty('user');
+  });
+});
+
+describe('appleProfileOf', () => {
+  it('keeps the one-time name and e-mail with the Apple user ID', () => {
+    expect(appleProfileOf(firstAuthorization)).toEqual({
+      user: 'apple-user-1',
+      givenName: 'Jane',
+      familyName: 'Doe',
+      email: 'jane@privaterelay.appleid.com',
+    });
+  });
+
+  it('returns null on later authorizations, which carry neither', () => {
+    expect(appleProfileOf(credential)).toBeNull();
+  });
+});
+
+describe('withSavedProfile', () => {
+  const saved = appleProfileOf(firstAuthorization);
+
+  it('restores the name and e-mail on a retry of the same Apple user', () => {
+    expect(withSavedProfile(credential, saved)).toMatchObject({
+      email: 'jane@privaterelay.appleid.com',
+      fullName: { givenName: 'Jane', familyName: 'Doe' },
+    });
+  });
+
+  it('ignores a profile saved for another Apple user', () => {
+    expect(withSavedProfile({ ...credential, user: 'apple-user-2' }, saved)).toEqual({
+      ...credential,
+      user: 'apple-user-2',
+    });
+  });
+
+  it('keeps what Apple sent this time over the saved profile', () => {
+    const fresh = { ...credential, fullName: { givenName: 'Janet', familyName: null } };
+    expect(withSavedProfile(fresh, saved).fullName).toEqual({
+      givenName: 'Janet',
+      familyName: null,
+    });
+  });
+
+  it('changes nothing without a saved profile', () => {
+    expect(withSavedProfile(credential, null)).toBe(credential);
   });
 });
 
