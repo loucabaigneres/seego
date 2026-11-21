@@ -17,6 +17,9 @@ const MESSAGES: Record<string, string> = {
   OTP_EXPIRED: 'Code expiré.',
   TOO_MANY_ATTEMPTS: 'Trop de tentatives. Demande un nouveau code.',
   INVALID_ORIGIN: "L'app n'est pas autorisée par le serveur. Préviens l'équipe.",
+  // Apple / Google identity token sign-in.
+  INVALID_TOKEN: 'La connexion a échoué. Réessaie.',
+  OAUTH_LINK_ERROR: 'Un compte existe déjà avec cet email. Connecte-toi avec ton mot de passe.',
 };
 
 const FALLBACK = 'Impossible de te connecter pour le moment. Vérifie ta connexion et réessaie.';

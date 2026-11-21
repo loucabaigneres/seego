@@ -16,6 +16,11 @@ describe('authErrorMessage', () => {
     expect(authErrorMessage({ code: 'TOO_MANY_ATTEMPTS' })).toMatch(/nouveau code/);
   });
 
+  it('translates social sign-in errors', () => {
+    expect(authErrorMessage({ code: 'INVALID_TOKEN' })).toMatch(/échoué/);
+    expect(authErrorMessage({ code: 'OAUTH_LINK_ERROR' })).toMatch(/mot de passe/);
+  });
+
   it('explains rate limiting whatever the code', () => {
     expect(authErrorMessage({ code: 'INVALID_EMAIL_OR_PASSWORD', status: 429 })).toMatch(
       /Trop de tentatives/,

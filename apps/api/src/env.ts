@@ -18,6 +18,9 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 
+  // Sign in with Apple (native iOS): the identity token's audience is the app's bundle ID.
+  APPLE_APP_BUNDLE_IDENTIFIER: z.string().min(1).default('fr.seego.app'),
+
   // Frontend URL configuration
   FRONTEND_URL: z.url().default('http://localhost:5173'),
 
