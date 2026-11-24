@@ -1,4 +1,4 @@
-import { filterPins, pinCategories, regionFor, tripPins } from './map-pins';
+import { dayRoutes, filterPins, pinCategories, regionFor, tripPins } from './map-pins';
 
 const activity = (
   id: string,
@@ -45,6 +45,23 @@ describe('tripPins', () => {
       },
     ]);
     expect(pins.map((pin) => pin.id)).toEqual(['c']);
+    // Numbered like the timeline: unlocated places still count.
+    expect([pins[0].step, pins[0].stepCount]).toEqual([3, 3]);
+  });
+});
+
+describe('dayRoutes', () => {
+  it('joins the pins of each day, skipping days with a single pin', () => {
+    const at = (dayIndex: number, latitude: number) => ({
+      dayIndex,
+      coordinate: { latitude, longitude: 0 },
+    });
+    expect(dayRoutes([at(1, 1), at(1, 2), at(2, 3)])).toEqual([
+      [
+        { latitude: 1, longitude: 0 },
+        { latitude: 2, longitude: 0 },
+      ],
+    ]);
   });
 });
 

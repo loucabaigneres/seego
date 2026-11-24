@@ -1,36 +1,36 @@
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
-import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { categoryMeta, cleanDescription } from '@/domain/place';
 import { colors } from '@seego/ui';
 import { Text } from '@/ui';
-import { ArrowSquareOutIcon, MapPinIcon } from '@/ui/icons';
+import { ArrowSquareOutIcon, ArrowsLeftRightIcon, MapPinIcon } from '@/ui/icons';
 
 import type { TripActivity } from '../hooks/useTrip';
+import { CategoryIcon } from './category-icons';
 
 export interface ActivityRowProps {
   activity: TripActivity;
-  /** Controls under the text: "Changer", or the edit buttons. */
-  action?: ReactNode;
-  onLongPress?: () => void;
+  /** "Changer", next to "Voir l'offre"; also on a long press. */
+  onReplace?: () => void;
 }
 
-export function ActivityRow({ activity, action, onLongPress }: ActivityRowProps) {
+/** A planned place: photo or category pictogram, category, name, address and its links. */
+export function ActivityRow({ activity, onReplace }: ActivityRowProps) {
   const meta = categoryMeta(activity.category);
   const description = cleanDescription(activity.description);
   const { sourceUrl } = activity;
 
   return (
     <Pressable
-      onLongPress={onLongPress}
-      disabled={!onLongPress}
-      accessibilityHint={onLongPress ? 'Appui long pour remplacer ce lieu' : undefined}
+      onLongPress={onReplace}
+      disabled={!onReplace}
+      accessibilityHint={onReplace ? 'Appui long pour remplacer ce lieu' : undefined}
       className="flex-row gap-3 rounded-field bg-surface p-3"
     >
       <View
-        className="size-[76px] items-center justify-center overflow-hidden rounded-xl"
+        className="size-16 items-center justify-center overflow-hidden rounded-xl"
         style={{ backgroundColor: meta.colors.fill }}
       >
         {activity.mainMediaUrl ? (
@@ -40,13 +40,13 @@ export function ActivityRow({ activity, action, onLongPress }: ActivityRowProps)
             contentFit="cover"
           />
         ) : (
-          <MapPinIcon size={28} color={meta.colors.ink} />
+          <CategoryIcon category={activity.category} size={28} color={meta.colors.ink} />
         )}
       </View>
 
       <View className="flex-1 gap-1">
         <View
-          className="self-start rounded-full px-2.5 py-0.5"
+          className="self-start rounded-full px-2 py-0.5"
           style={{ backgroundColor: meta.colors.fill }}
         >
           <Text variant="overline" style={{ color: meta.colors.ink }}>
@@ -65,26 +65,41 @@ export function ActivityRow({ activity, action, onLongPress }: ActivityRowProps)
         )}
 
         {description !== '' && (
-          <Text variant="caption" numberOfLines={2}>
+          <Text variant="caption" tone="secondary" numberOfLines={2}>
             {description}
           </Text>
         )}
 
-        {sourceUrl && (
-          <Pressable
-            role="link"
-            onPress={() => WebBrowser.openBrowserAsync(sourceUrl)}
-            hitSlop={8}
-            className="flex-row items-center gap-1 self-start py-1 active:opacity-80"
-          >
-            <Text variant="caption" tone="brand" className="font-sans-semibold">
-              Voir l’offre
-            </Text>
-            <ArrowSquareOutIcon size={14} color={colors.brand} />
-          </Pressable>
+        {(sourceUrl || onReplace) && (
+          <View className="flex-row gap-3.5">
+            {sourceUrl && (
+              <Pressable
+                role="link"
+                onPress={() => WebBrowser.openBrowserAsync(sourceUrl)}
+                hitSlop={8}
+                className="flex-row items-center gap-1 py-1 active:opacity-80"
+              >
+                <Text variant="caption" tone="brand" className="font-sans-semibold">
+                  Voir l’offre
+                </Text>
+                <ArrowSquareOutIcon size={14} color={colors.brand} />
+              </Pressable>
+            )}
+            {onReplace && (
+              <Pressable
+                role="button"
+                onPress={onReplace}
+                hitSlop={8}
+                className="flex-row items-center gap-1 py-1 active:opacity-80"
+              >
+                <ArrowsLeftRightIcon size={14} color={colors.brand} />
+                <Text variant="caption" tone="brand" className="font-sans-semibold">
+                  Changer
+                </Text>
+              </Pressable>
+            )}
+          </View>
         )}
-
-        {action && <View className="mt-1">{action}</View>}
       </View>
     </Pressable>
   );

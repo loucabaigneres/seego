@@ -12,6 +12,7 @@ import Animated, {
 import { colors } from '@seego/ui';
 
 import { cn } from './cn';
+import type { AppIcon } from './icons';
 import { Text } from './Text';
 
 // Our Text keeps its classes on web, where Animated.Text would drop them.
@@ -20,14 +21,27 @@ const AnimatedText = Animated.createAnimatedComponent(Text);
 export interface Segment<T extends string> {
   value: T;
   label: string;
+  icon?: AppIcon;
 }
 
 export interface SegmentedControlProps<T extends string> {
   segments: readonly Segment<T>[];
   value: T;
   onChange: (value: T) => void;
+  /** `brand`: vino pill on crema; `soft`: crema pill on travertino, for a view switch. */
+  variant?: keyof typeof VARIANTS;
   className?: string;
 }
+
+const VARIANTS = {
+  brand: {
+    track: 'border border-line-strong bg-background',
+    pill: 'bg-brand',
+    on: colors.accent,
+    off: colors.ink.secondary,
+  },
+  soft: { track: 'bg-surface', pill: 'bg-background', on: colors.brand, off: colors.ink.muted },
+} as const;
 
 const SLIDE_TIMING = { duration: 240, easing: Easing.out(Easing.cubic) };
 
@@ -36,8 +50,10 @@ export function SegmentedControl<T extends string>({
   segments,
   value,
   onChange,
+  variant = 'brand',
   className,
 }: SegmentedControlProps<T>) {
+  const styles = VARIANTS[variant];
   const selectedIndex = segments.findIndex((segment) => segment.value === value);
   /** Index the pill sits on, fractional while it slides. */
   const position = useSharedValue(selectedIndex);
@@ -53,7 +69,7 @@ export function SegmentedControl<T extends string>({
   }));
 
   return (
-    <View role="tablist" className={cn('rounded-full border border-line-strong bg-background p-1', className)}>
+    <View role="tablist" className={cn('rounded-full p-1', styles.track, className)}>
       <View
         className="flex-row"
         onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
@@ -61,7 +77,7 @@ export function SegmentedControl<T extends string>({
         {trackWidth > 0 && (
           // On web, Animated components drop className: the pill is drawn by a plain View inside.
           <Animated.View style={[{ position: 'absolute', top: 0, bottom: 0, width: segmentWidth }, pillStyle]}>
-            <View className="flex-1 rounded-full bg-brand" />
+            <View className={cn('flex-1 rounded-full', styles.pill)} />
           </Animated.View>
         )}
         {segments.map((segment, index) => {
@@ -73,12 +89,21 @@ export function SegmentedControl<T extends string>({
               aria-selected={selected}
               onPress={() => onChange(segment.value)}
               className={cn(
-                'min-h-11 flex-1 items-center justify-center rounded-full px-4 active:opacity-80',
+                'min-h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-full px-4 active:opacity-80',
                 // Until the track is measured, the pill can't be placed: the segment paints it.
-                selected && !trackWidth && 'bg-brand',
+                selected && !trackWidth && styles.pill,
               )}
             >
-              <SegmentLabel label={segment.label} index={index} position={position} />
+              {segment.icon && (
+                <segment.icon size={16} color={selected ? styles.on : styles.off} />
+              )}
+              <SegmentLabel
+                label={segment.label}
+                index={index}
+                position={position}
+                on={styles.on}
+                off={styles.off}
+              />
             </Pressable>
           );
         })}
@@ -91,15 +116,17 @@ interface SegmentLabelProps {
   label: string;
   index: number;
   position: SharedValue<number>;
+  on: string;
+  off: string;
 }
 
 /** Turns light as the pill slides under it, so it never reads light on the track. */
-function SegmentLabel({ label, index, position }: SegmentLabelProps) {
+function SegmentLabel({ label, index, position, on, off }: SegmentLabelProps) {
   const style = useAnimatedStyle(() => ({
     color: interpolateColor(
       Math.abs(position.get() - index),
       [0, 1],
-      [colors.accent, colors.ink.secondary],
+      [on, off],
     ),
   }));
 

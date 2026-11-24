@@ -4,6 +4,9 @@ import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { cn } from './cn';
 
+/** `px-6 py-6` below, for the full-bleed blocks that cancel it. Keep both in sync. */
+export const SCREEN_PADDING = 24;
+
 export interface ScreenProps {
   children: ReactNode;
   scroll?: boolean;

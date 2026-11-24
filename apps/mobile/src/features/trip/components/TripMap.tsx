@@ -1,8 +1,10 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { View } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 
-import { EmptyState } from '@/ui';
+import { colors } from '@seego/ui';
+
+import { EmptyState, SCREEN_PADDING } from '@/ui';
 import { MapTrifoldIcon } from '@/ui/icons';
 
 import { useTripMap } from '../hooks/useTripMap';
@@ -36,7 +38,7 @@ export function TripMap({ days, height }: TripMapProps) {
 
   if (!map.hasPins || !map.region) {
     return (
-      <View style={{ height }}>
+      <View style={{ height, marginBottom: -SCREEN_PADDING }}>
         <EmptyState
           icon={MapTrifoldIcon}
           title="Aucun lieu localisé"
@@ -49,14 +51,18 @@ export function TripMap({ days, height }: TripMapProps) {
   const { selectedPin } = map;
 
   return (
-    <View className="gap-3" style={{ height }}>
+    // Full bleed, down to the bottom of the screen.
+    <View
+      className="gap-3"
+      style={{ height, marginHorizontal: -SCREEN_PADDING, marginBottom: -SCREEN_PADDING }}
+    >
       <CategoryFilter
         categories={map.categories}
         selected={map.category}
         onToggle={map.toggleCategory}
       />
 
-      <View className="flex-1 overflow-hidden rounded-card bg-surface">
+      <View className="flex-1 overflow-hidden bg-surface">
         <MapView
           ref={mapRef}
           style={{ flex: 1 }}
@@ -67,6 +73,15 @@ export function TripMap({ days, height }: TripMapProps) {
             if (event.nativeEvent.action !== 'marker-press') map.clearSelection();
           }}
         >
+          {map.routes.map((route) => (
+            <Polyline
+              key={route.map((c) => `${c.latitude},${c.longitude}`).join(';')}
+              coordinates={route}
+              strokeColor={colors.brand}
+              strokeWidth={2}
+              lineDashPattern={[5, 6]}
+            />
+          ))}
           {map.visiblePins.map((pin) => {
             const selected = pin.id === selectedPin?.id;
             return (
@@ -76,6 +91,7 @@ export function TripMap({ days, height }: TripMapProps) {
                 coordinate={pin.coordinate}
                 title={pin.activity.locationName ?? pin.activity.title}
                 category={pin.category}
+                step={pin.step}
                 selected={selected}
                 onPress={() => map.select(pin.id)}
               />
@@ -84,11 +100,7 @@ export function TripMap({ days, height }: TripMapProps) {
         </MapView>
 
         {selectedPin && (
-          <MapPlaceCard
-            activity={selectedPin.activity}
-            dayIndex={selectedPin.dayIndex}
-            onClose={map.clearSelection}
-          />
+          <MapPlaceCard pin={selectedPin} onClose={map.clearSelection} />
         )}
       </View>
     </View>
@@ -99,11 +111,12 @@ interface PinMarkerProps {
   coordinate: { latitude: number; longitude: number };
   title: string;
   category: string | null;
+  step: number;
   selected: boolean;
   onPress: () => void;
 }
 
-function PinMarker({ coordinate, title, category, selected, onPress }: PinMarkerProps) {
+function PinMarker({ coordinate, title, category, step, selected, onPress }: PinMarkerProps) {
   // Android snapshots the custom view into a bitmap: track it until its icon has been drawn,
   // then freeze it so the map does not redraw every pin on each frame.
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
@@ -121,7 +134,7 @@ function PinMarker({ coordinate, title, category, selected, onPress }: PinMarker
         onLayout={() => requestAnimationFrame(() => setTracksViewChanges(false))}
         collapsable={false}
       >
-        <PlacePin category={category} selected={selected} />
+        <PlacePin category={category} step={step} selected={selected} />
       </View>
     </Marker>
   );

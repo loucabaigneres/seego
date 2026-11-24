@@ -18,7 +18,7 @@ export function CategoryFilter({ categories, selected, onToggle }: CategoryFilte
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="-mx-6 grow-0"
+      className="grow-0"
       contentContainerClassName="gap-2 px-6"
     >
       {categories.map((category) => (

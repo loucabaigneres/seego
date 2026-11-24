@@ -1,5 +1,6 @@
 import {
   canRelocate,
+  changedIds,
   isDraftDirty,
   moveToDay,
   moveWithinDay,
@@ -88,6 +89,19 @@ describe('isDraftDirty', () => {
     expect(isDraftDirty(moveWithinDay(saved, 'd1', 'a', 1), saved)).toBe(true);
     expect(isDraftDirty(moveToDay(saved, 'd1', 'a', 'd2'), saved)).toBe(true);
     expect(isDraftDirty(removeFromDay(saved, 'd2', 'x'), saved)).toBe(true);
+  });
+});
+
+describe('changedIds', () => {
+  const saved = [day('d1', 'a', 'b', 'c'), day('d2', 'x')];
+
+  it('is empty for a fresh draft', () => {
+    expect(changedIds(toDraft(saved), saved).size).toBe(0);
+  });
+
+  it('flags the places that changed rank or day', () => {
+    expect([...changedIds(moveWithinDay(saved, 'd1', 'a', 1), saved)].sort()).toEqual(['a', 'b']);
+    expect([...changedIds(moveToDay(saved, 'd1', 'c', 'd2'), saved)]).toEqual(['c']);
   });
 });
 
