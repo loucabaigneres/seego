@@ -3,10 +3,9 @@ import { ScrollView, View } from 'react-native';
 import { pluralize } from '@/domain/date';
 import { AnalyzingView } from '@/features/onboarding/components/AnalyzingView';
 import { QuestionStep } from '@/features/onboarding/components/QuestionStep';
-import { QuizHeader } from '@/features/onboarding/components/QuizHeader';
 import { useOnboardingQuiz } from '@/features/onboarding/hooks/useOnboardingQuiz';
 import { answerLabels } from '@/features/onboarding/questions';
-import { Button, Notice, Screen, Text } from '@/ui';
+import { Button, Notice, Screen, StepHeader, Text } from '@/ui';
 
 export default function OnboardingScreen() {
   const quiz = useOnboardingQuiz();
@@ -17,14 +16,13 @@ export default function OnboardingScreen() {
 
   return (
     <Screen contentClassName="gap-6 px-0 pb-2 pt-2">
-      <View className="px-4">
-        <QuizHeader
-          label={`Question ${quiz.step.current} sur ${quiz.step.total}`}
-          backLabel="Revenir à la question précédente"
-          progress={quiz.step.progress}
-          onBack={quiz.goBack}
-        />
-      </View>
+      <StepHeader
+        label={`Question ${quiz.step.current} sur ${quiz.step.total}`}
+        backLabel="Revenir à la question précédente"
+        progress={quiz.step.progress}
+        onBack={quiz.goBack}
+        className="px-4"
+      />
 
       <ScrollView
         className="flex-1"

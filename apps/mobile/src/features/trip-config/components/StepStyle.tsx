@@ -2,8 +2,10 @@ import { Pressable, View } from 'react-native';
 
 import { cn, Text } from '@/ui';
 
-import { BUDGET_OPTIONS, INTENSITY_OPTIONS, type ChoiceOption } from '../options';
+import { BUDGET_OPTIONS, INTENSITY_OPTIONS, type ChoiceLevel, type ChoiceOption } from '../options';
 import type { StepProps } from './StepTravelers';
+
+const LEVELS: ChoiceLevel[] = [1, 2, 3];
 
 export function StepStyle({ values, dispatch }: StepProps) {
   return (
@@ -28,7 +30,7 @@ export function StepStyle({ values, dispatch }: StepProps) {
 
 interface ChoiceProps<T extends string> {
   label: string;
-  /** Level drawn on each card from its position: ●○○ or € for the first, up to ●●● or €€€. */
+  /** How each option's `level` is drawn: ●○○ to ●●●, or € to €€€. */
   glyph: 'dots' | 'euros';
   options: ChoiceOption<T>[];
   value: T;
@@ -40,7 +42,7 @@ function Choice<T extends string>({ label, glyph, options, value, onChange }: Ch
     <View className="gap-2.5">
       <Text variant="label">{label}</Text>
       <View role="radiogroup" aria-label={label} className="flex-row gap-2">
-        {options.map((option, index) => {
+        {options.map((option) => {
           const selected = option.value === value;
           return (
             <Pressable
@@ -56,13 +58,13 @@ function Choice<T extends string>({ label, glyph, options, value, onChange }: Ch
             >
               {glyph === 'dots' ? (
                 <View aria-hidden className="h-7 flex-row items-center gap-1">
-                  {options.map((dot, dotIndex) => (
+                  {LEVELS.map((dot) => (
                     <View
-                      key={dot.value}
+                      key={dot}
                       className={cn(
                         'size-[9px] rounded-full',
                         selected ? 'bg-accent' : 'bg-brand',
-                        dotIndex > index && 'opacity-25',
+                        dot > option.level && 'opacity-25',
                       )}
                     />
                   ))}
@@ -76,7 +78,7 @@ function Choice<T extends string>({ label, glyph, options, value, onChange }: Ch
                     selected ? 'text-accent' : 'text-brand',
                   )}
                 >
-                  {'€'.repeat(index + 1)}
+                  {'€'.repeat(option.level)}
                 </Text>
               )}
               <Text

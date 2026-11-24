@@ -12,11 +12,13 @@ export interface NumberStepperProps {
   min: number;
   max: number;
   onChange: (value: number) => void;
-  /** How the value reads, e.g. "7 jours". */
+  /** How the value reads, e.g. "3 voyageurs". */
   format?: (value: number) => string;
+  icon: AppIcon;
   className?: string;
 }
 
+/** Card row with a +/- stepper: one adjustable control for screen readers. */
 export function NumberStepper({
   label,
   value,
@@ -24,6 +26,7 @@ export function NumberStepper({
   max,
   onChange,
   format = String,
+  icon: Icon,
   className,
 }: NumberStepperProps) {
   const display = format(value);
@@ -33,25 +36,44 @@ export function NumberStepper({
   };
 
   return (
-    <View className={cn('gap-2', className)}>
-      <Text aria-hidden className="font-sans-medium text-caption text-ink-secondary">
-        {label}
-      </Text>
-      {/* One adjustable control for screen readers: swipe up or down to change the value. */}
-      <View
-        accessible
-        accessibilityRole="adjustable"
-        aria-label={label}
-        accessibilityValue={{ min, max, now: value, text: display }}
-        accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
-        onAccessibilityAction={(event) =>
-          step(event.nativeEvent.actionName === 'increment' ? 1 : -1)
-        }
-        className="min-h-14 flex-row items-center justify-between rounded-field border border-line-strong bg-background px-1"
-      >
-        <StepButton icon={MinusIcon} label="Diminuer" disabled={value <= min} onPress={() => step(-1)} />
-        <Text variant="label">{display}</Text>
-        <StepButton icon={PlusIcon} label="Augmenter" disabled={value >= max} onPress={() => step(1)} />
+    <View
+      accessible
+      accessibilityRole="adjustable"
+      aria-label={label}
+      accessibilityValue={{ min, max, now: value, text: display }}
+      accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
+      onAccessibilityAction={(event) =>
+        step(event.nativeEvent.actionName === 'increment' ? 1 : -1)
+      }
+      className={cn(
+        'min-h-[72px] flex-row items-center gap-3.5 rounded-card bg-surface px-4 py-3.5',
+        className,
+      )}
+    >
+      <View className="size-10 items-center justify-center rounded-xl bg-background">
+        <Icon size={20} color={colors.brand} />
+      </View>
+      <View className="flex-1">
+        <Text variant="caption">{label}</Text>
+        <Text className="font-sans-semibold">{display}</Text>
+      </View>
+      <View className="flex-row items-center gap-1.5 rounded-full bg-background p-1">
+        <StepButton
+          icon={MinusIcon}
+          label="Diminuer"
+          disabled={value <= min}
+          onPress={() => step(-1)}
+        />
+        <Text variant="section" className="w-7 text-center text-[24px] leading-[24px]">
+          {value}
+        </Text>
+        <StepButton
+          icon={PlusIcon}
+          label="Augmenter"
+          filled
+          disabled={value >= max}
+          onPress={() => step(1)}
+        />
       </View>
     </View>
   );
@@ -60,11 +82,12 @@ export function NumberStepper({
 interface StepButtonProps {
   icon: AppIcon;
   label: string;
+  filled?: boolean;
   disabled: boolean;
   onPress: () => void;
 }
 
-function StepButton({ icon: Icon, label, disabled, onPress }: StepButtonProps) {
+function StepButton({ icon: Icon, label, filled = false, disabled, onPress }: StepButtonProps) {
   return (
     <Pressable
       role="button"
@@ -72,12 +95,15 @@ function StepButton({ icon: Icon, label, disabled, onPress }: StepButtonProps) {
       aria-disabled={disabled}
       disabled={disabled}
       onPress={onPress}
+      // 34pt disc, 44pt touch target.
+      hitSlop={5}
       className={cn(
-        'size-11 items-center justify-center rounded-full active:bg-surface',
+        'size-[34px] items-center justify-center rounded-full active:opacity-80',
+        filled ? 'bg-brand' : 'border-[1.5px] border-line-strong',
         disabled && 'opacity-30',
       )}
     >
-      <Icon size={20} color={colors.brand} />
+      <Icon size={16} color={filled ? colors.accent : colors.brand} />
     </Pressable>
   );
 }
