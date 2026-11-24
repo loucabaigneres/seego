@@ -64,12 +64,15 @@ export function useReplacePlace(tripId: string) {
     },
     source,
     setSource: (next: CandidateSource) => {
+      if (mutation.isPending) return;
       setSource(next);
       setSelectedId(null);
     },
     /** Filters both sources by name. */
     query,
-    setQuery,
+    setQuery: (next: string) => {
+      if (!mutation.isPending) setQuery(next);
+    },
     candidates: {
       data: shown,
       isLoading: candidates.isPending,

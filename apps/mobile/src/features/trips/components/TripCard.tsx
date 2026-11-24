@@ -5,7 +5,7 @@ import { formatDate } from '@/domain/date';
 import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
 import { colors } from '@seego/ui';
 import { Badge, cn, IconButton, Text } from '@/ui';
-import { DotsThreeVerticalIcon, SuitcaseRollingIcon } from '@/ui/icons';
+import { SuitcaseRollingIcon, TrashIcon } from '@/ui/icons';
 
 import type { TripListItem } from '../lib/merge-trips';
 import { tripMonogram } from '../lib/trip-list';
@@ -34,7 +34,7 @@ function tripDetails(trip: TripListItem): string {
   return [createdAt && `Créé le ${createdAt}`, role].filter(Boolean).join(' · ');
 }
 
-function OptionsButton({
+function DeleteButton({
   trip,
   title,
   onDelete,
@@ -46,8 +46,8 @@ function OptionsButton({
   return (
     <IconButton
       variant={variant}
-      label={`Options de ${title}`}
-      icon={DotsThreeVerticalIcon}
+      label={`Supprimer ${title}`}
+      icon={TrashIcon}
       onPress={onDelete}
       disabled={isDeleting}
       className={cn(isDeleting && 'opacity-50')}
@@ -80,7 +80,7 @@ export function TripFeatureCard(props: TripCardProps) {
         </View>
       </Pressable>
       <View className="absolute right-2.5 top-2.5">
-        <OptionsButton {...props} title={title} variant="scrim" />
+        <DeleteButton {...props} title={title} variant="scrim" />
       </View>
     </View>
   );
@@ -124,7 +124,7 @@ export function TripRow({ index, ...props }: TripCardProps & { index: number }) 
           </View>
         </View>
       </Pressable>
-      <OptionsButton {...props} title={title} variant="ghost" />
+      <DeleteButton {...props} title={title} variant="ghost" />
     </View>
   );
 }

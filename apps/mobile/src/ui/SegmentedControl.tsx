@@ -28,8 +28,6 @@ export interface SegmentedControlProps<T extends string> {
   segments: readonly Segment<T>[];
   value: T;
   onChange: (value: T) => void;
-  /** `tabs` switches views; `radio` picks a form value. */
-  kind?: 'tabs' | 'radio';
   /** `brand`: vino pill on crema; `soft`: crema pill on travertino, for a view switch. */
   variant?: keyof typeof VARIANTS;
   className?: string;
@@ -45,19 +43,13 @@ const VARIANTS = {
   soft: { track: 'bg-surface', pill: 'bg-background', on: colors.brand, off: colors.ink.muted },
 } as const;
 
-const ROLES = {
-  tabs: { group: 'tablist', item: 'tab' },
-  radio: { group: 'radiogroup', item: 'radio' },
-} as const;
-
 const SLIDE_TIMING = { duration: 240, easing: Easing.out(Easing.cubic) };
 
-/** Switches between sibling views of one screen (tabs, not navigation), or picks one value. */
+/** Switches between sibling views of one screen (tabs, not navigation). */
 export function SegmentedControl<T extends string>({
   segments,
   value,
   onChange,
-  kind = 'tabs',
   variant = 'brand',
   className,
 }: SegmentedControlProps<T>) {
@@ -77,7 +69,7 @@ export function SegmentedControl<T extends string>({
   }));
 
   return (
-    <View role={ROLES[kind].group} className={cn('rounded-full p-1', styles.track, className)}>
+    <View role="tablist" className={cn('rounded-full p-1', styles.track, className)}>
       <View
         className="flex-row"
         onLayout={(event) => setTrackWidth(event.nativeEvent.layout.width)}
@@ -93,9 +85,8 @@ export function SegmentedControl<T extends string>({
           return (
             <Pressable
               key={segment.value}
-              role={ROLES[kind].item}
-              aria-selected={kind === 'tabs' ? selected : undefined}
-              aria-checked={kind === 'radio' ? selected : undefined}
+              role="tab"
+              aria-selected={selected}
               onPress={() => onChange(segment.value)}
               className={cn(
                 'min-h-11 flex-1 flex-row items-center justify-center gap-1.5 rounded-full px-4 active:opacity-80',

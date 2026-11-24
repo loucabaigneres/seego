@@ -16,7 +16,7 @@ export { NumberStepper } from './NumberStepper';
 export { PhotoScrim } from './PhotoScrim';
 export { ProgressBar } from './ProgressBar';
 export { Reveal } from './Reveal';
-export { Screen } from './Screen';
+export { SCREEN_PADDING, Screen } from './Screen';
 export { SearchField } from './SearchField';
 export { SegmentedControl, type Segment } from './SegmentedControl';
 export { Sheet } from './Sheet';

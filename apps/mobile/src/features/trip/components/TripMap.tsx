@@ -4,7 +4,7 @@ import MapView, { Marker, Polyline } from 'react-native-maps';
 
 import { colors } from '@seego/ui';
 
-import { EmptyState } from '@/ui';
+import { EmptyState, SCREEN_PADDING } from '@/ui';
 import { MapTrifoldIcon } from '@/ui/icons';
 
 import { useTripMap } from '../hooks/useTripMap';
@@ -38,7 +38,7 @@ export function TripMap({ days, height }: TripMapProps) {
 
   if (!map.hasPins || !map.region) {
     return (
-      <View className="-mb-6" style={{ height }}>
+      <View style={{ height, marginBottom: -SCREEN_PADDING }}>
         <EmptyState
           icon={MapTrifoldIcon}
           title="Aucun lieu localisé"
@@ -52,7 +52,10 @@ export function TripMap({ days, height }: TripMapProps) {
 
   return (
     // Full bleed, down to the bottom of the screen.
-    <View className="-mx-6 -mb-6 gap-3" style={{ height }}>
+    <View
+      className="gap-3"
+      style={{ height, marginHorizontal: -SCREEN_PADDING, marginBottom: -SCREEN_PADDING }}
+    >
       <CategoryFilter
         categories={map.categories}
         selected={map.category}

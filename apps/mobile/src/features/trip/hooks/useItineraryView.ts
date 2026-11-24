@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type ItineraryView = 'itinerary' | 'map';
 
-/** `Screen`'s gap-4 between the toolbar and the content. The map covers the bottom padding. */
+/** `Screen`'s gap-4 between the toolbar and the content. No bottom padding: `TripMap` bleeds over it. */
 const CONTENT_GAP = 16;
 
 /**

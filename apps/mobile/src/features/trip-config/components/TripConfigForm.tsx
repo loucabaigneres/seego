@@ -2,8 +2,8 @@ import { ScrollView, View } from 'react-native';
 
 import { colors } from '@seego/ui';
 
-import { Button, IconButton, Notice, ProgressBar, Reveal, Text } from '@/ui';
-import { ArrowLeftIcon, SparkleIcon } from '@/ui/icons';
+import { Button, Notice, Reveal, StepHeader, Text } from '@/ui';
+import { SparkleIcon } from '@/ui/icons';
 
 import type { TripConfig } from '../hooks/useTripConfig';
 import { STEP_COPY } from '../options';
@@ -25,21 +25,13 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
 
   return (
     <>
-      {/* Back arrow and bar only, as in the mockup: the step count is read by screen readers. */}
-      <View className="flex-row items-center px-4">
-        <IconButton label="Revenir à l’étape précédente" icon={ArrowLeftIcon} onPress={config.goBack} />
-        <View
-          role="progressbar"
-          aria-label={`Étape ${step.current} sur ${step.total}`}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(step.progress * 100)}
-          className="mx-3 flex-1"
-        >
-          <ProgressBar value={step.progress} className="h-1.5" />
-        </View>
-        <View className="size-11" />
-      </View>
+      <StepHeader
+        label={`Étape ${step.current} sur ${step.total}`}
+        backLabel="Revenir à l’étape précédente"
+        progress={step.progress}
+        onBack={config.goBack}
+        className="px-4"
+      />
 
       <ScrollView
         className="flex-1"
