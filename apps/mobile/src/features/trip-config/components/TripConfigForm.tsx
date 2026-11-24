@@ -27,7 +27,6 @@ export function TripConfigForm({ config, destination }: { config: TripConfig; de
           label={`Étape ${step.current} sur ${step.total}`}
           backLabel="Revenir à l’étape précédente"
           progress={step.progress}
-          segments={step.total}
           onBack={config.goBack}
         />
       </View>

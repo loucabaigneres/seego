@@ -1,4 +1,12 @@
-import { formatDate, formatDayMonth, parseIsoDate, pluralize, toIsoDate } from './date';
+import {
+  addDays,
+  formatDate,
+  formatDayMonth,
+  parseIsoDate,
+  pluralize,
+  toIsoDate,
+  tripDurationDays,
+} from './date';
 
 describe('formatDayMonth', () => {
   it('drops the year', () => {
@@ -51,5 +59,17 @@ describe('plural', () => {
     expect(pluralize(1, 'jour')).toBe('1 jour');
     expect(pluralize(3, 'jour')).toBe('3 jours');
     expect(pluralize(2, 'étape')).toBe('2 étapes');
+  });
+});
+
+describe('addDays / tripDurationDays', () => {
+  it('moves across months, years and daylight-saving changes', () => {
+    expect(addDays('2026-10-24', 13)).toBe('2026-11-06');
+    expect(addDays('2026-12-30', 3)).toBe('2027-01-02');
+  });
+
+  it('counts both the departure and the return day', () => {
+    expect(tripDurationDays('2026-11-03', '2026-11-03')).toBe(1);
+    expect(tripDurationDays('2026-10-24', '2026-11-06')).toBe(14);
   });
 });

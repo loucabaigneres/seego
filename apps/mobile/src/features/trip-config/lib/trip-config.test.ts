@@ -1,6 +1,7 @@
 import {
   initialTripConfigState,
   toSubmitInput,
+  tripConfigProgress,
   tripConfigReducer,
   type TripConfigAction,
   type TripConfigState,
@@ -9,11 +10,11 @@ import {
 const reduce = (state: TripConfigState, ...actions: TripConfigAction[]) =>
   actions.reduce(tripConfigReducer, state);
 
-const withDate = reduce(initialTripConfigState, {
-  type: 'set',
-  field: 'startDate',
-  value: '2026-11-03',
-});
+const withDate = reduce(
+  initialTripConfigState,
+  { type: 'set', field: 'startDate', value: '2026-11-03' },
+  { type: 'set', field: 'endDate', value: '2026-11-09' },
+);
 
 describe('tripConfigReducer', () => {
   it('resizes the ages with the number of travellers, keeping those already typed', () => {
@@ -42,6 +43,7 @@ describe('tripConfigReducer', () => {
     );
     expect(blocked.stepIndex).toBe(0);
     expect(blocked.errors.startDate).toBe('Choisis ta date de départ.');
+    expect(blocked.errors.endDate).toBe('Choisis ta date de retour.');
     expect(blocked.errors.ages).toBe('Indique l’âge de chaque voyageur.');
   });
 
@@ -55,6 +57,46 @@ describe('tripConfigReducer', () => {
     const blocked = reduce(withDate, { type: 'setAge', index: 0, value: '130' }, { type: 'next' });
     expect(blocked.stepIndex).toBe(0);
     expect(blocked.errors.ages).toBeDefined();
+  });
+
+  it('rejects a return before the departure or more than 14 days after it', () => {
+    const before = reduce(
+      withDate,
+      { type: 'set', field: 'endDate', value: '2026-11-02' },
+      { type: 'next' },
+    );
+    expect(before.stepIndex).toBe(0);
+    expect(before.errors.endDate).toBe('Le retour doit être après le départ.');
+
+    const tooLong = reduce(
+      withDate,
+      { type: 'set', field: 'endDate', value: '2026-11-17' },
+      { type: 'next' },
+    );
+    expect(tooLong.errors.endDate).toBe('Un voyage dure 14 jours maximum.');
+
+    const longest = reduce(
+      withDate,
+      { type: 'set', field: 'endDate', value: '2026-11-16' },
+      { type: 'next' },
+    );
+    expect(longest.stepIndex).toBe(1);
+  });
+
+  it('clears the return date when the new departure leaves it out of range', () => {
+    const later = reduce(withDate, { type: 'set', field: 'startDate', value: '2026-11-05' });
+    expect(later.values.endDate).toBe('2026-11-09');
+
+    const afterReturn = reduce(withDate, { type: 'set', field: 'startDate', value: '2026-11-10' });
+    expect(afterReturn.values.endDate).toBeNull();
+
+    const tooEarly = reduce(withDate, { type: 'set', field: 'startDate', value: '2026-10-20' });
+    expect(tooEarly.values.endDate).toBeNull();
+  });
+
+  it('reports progress, counting only the steps completed', () => {
+    expect(tripConfigProgress(initialTripConfigState)).toBe(0);
+    expect(tripConfigProgress({ ...initialTripConfigState, stepIndex: 2 })).toBeCloseTo(2 / 3);
   });
 
   it('walks forward and back between the bounds', () => {

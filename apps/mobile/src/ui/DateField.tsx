@@ -18,6 +18,7 @@ export interface DateFieldProps {
   onChange: (value: string) => void;
   placeholder?: string;
   minimumDate?: Date;
+  maximumDate?: Date;
   error?: string;
   className?: string;
 }
@@ -29,6 +30,7 @@ export function DateField({
   onChange,
   placeholder = 'Choisir une date',
   minimumDate,
+  maximumDate,
   error,
   className,
 }: DateFieldProps) {
@@ -45,6 +47,7 @@ export function DateField({
       mode: 'date',
       value: current,
       minimumDate,
+      maximumDate,
       onValueChange: (_, date) => onChange(toIsoDate(date)),
     });
   };
@@ -83,6 +86,7 @@ export function DateField({
               display="inline"
               value={draft}
               minimumDate={minimumDate}
+              maximumDate={maximumDate}
               locale="fr-FR"
               themeVariant="light"
               accentColor={colors.brand}

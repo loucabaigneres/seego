@@ -39,11 +39,9 @@ export function DeckHeader({ likeCount, onShowResult }: DeckHeaderProps) {
           <Text variant="label">
             {goalReached ? 'Assez de coups de cœur !' : 'Like ce qui te fait envie'}
           </Text>
-          <Text variant="caption">
-            {progress}/{LIKE_GOAL}
-          </Text>
+          <Text variant="caption">{Math.round((progress / LIKE_GOAL) * 100)} %</Text>
         </View>
-        <ProgressBar value={progress / LIKE_GOAL} segments={LIKE_GOAL} />
+        <ProgressBar value={progress / LIKE_GOAL} className="h-1.5" />
       </View>
 
       {/* Icon only: a labelled pill squeezes the progress label onto two lines. */}

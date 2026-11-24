@@ -1,14 +1,15 @@
 import { View } from 'react-native';
 
-import { pluralize } from '@/domain/date';
+import { parseIsoDate, pluralize } from '@/domain/date';
 import { DateField, NumberStepper, Text, TextField } from '@/ui';
 
 import type { TripConfig } from '../hooks/useTripConfig';
-import { DAYS_RANGE, TRAVELERS_RANGE } from '../lib/trip-config';
+import { latestEndDate, TRAVELERS_RANGE } from '../lib/trip-config';
 
 export type StepProps = Pick<TripConfig, 'values' | 'errors' | 'dispatch'>;
 
 export function StepTravelers({ values, errors, dispatch }: StepProps) {
+  const { startDate } = values;
   return (
     <View className="gap-5">
       <DateField
@@ -18,12 +19,14 @@ export function StepTravelers({ values, errors, dispatch }: StepProps) {
         error={errors.startDate}
         onChange={(value) => dispatch({ type: 'set', field: 'startDate', value })}
       />
-      <NumberStepper
-        label="Durée"
-        value={values.durationDays}
-        {...DAYS_RANGE}
-        format={(count) => pluralize(count, 'jour')}
-        onChange={(value) => dispatch({ type: 'set', field: 'durationDays', value })}
+      <DateField
+        label="Date de retour"
+        value={values.endDate}
+        placeholder={startDate ? 'Choisir une date' : 'Choisis d’abord le départ'}
+        minimumDate={startDate ? parseIsoDate(startDate) : new Date()}
+        maximumDate={startDate ? parseIsoDate(latestEndDate(startDate)) : undefined}
+        error={errors.endDate}
+        onChange={(value) => dispatch({ type: 'set', field: 'endDate', value })}
       />
       <NumberStepper
         label="Nombre de voyageurs"
