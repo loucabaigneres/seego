@@ -19,6 +19,7 @@ export const Route = createFileRoute('/_authed')({
 
 const NAV_LINKS = [
   { to: '/waitlist', label: 'Waitlist' },
+  { to: '/emails', label: 'Emails' },
   { to: '/admins', label: 'Administrateurs' },
 ] as const;
 

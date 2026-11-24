@@ -36,6 +36,15 @@ const envSchema = z.object({
   // MISTRAL_API_KEY: z.string().min(1).optional(),
 
   RESEND_API_KEY: z.string().startsWith('re_', 'RESEND_API_KEY must start with "re_"'),
+  // Newsletter audience. Set only in production: when absent, waitlist leads are never pushed
+  // to Resend contacts (staging and local addresses must stay out of the real audience) and
+  // the admin campaign tools are disabled.
+  RESEND_WAITLIST_SEGMENT_ID: z.uuid().optional(),
+  // Signing secret of the Resend webhook pointing at POST /webhooks/resend (contact opt-outs).
+  RESEND_WEBHOOK_SECRET: z
+    .string()
+    .startsWith('whsec_', 'RESEND_WEBHOOK_SECRET must start with "whsec_"')
+    .optional(),
 });
 
 // Parse and validate environment variables
