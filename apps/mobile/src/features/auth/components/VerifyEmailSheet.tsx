@@ -88,6 +88,14 @@ export function VerifyEmailSheet({ verification }: { verification: EmailVerifica
           disabled={code.length < OTP_LENGTH}
           onPress={verification.submit}
         />
+        <Button
+          label="Modifier mon email"
+          variant="text"
+          size="sm"
+          className="self-center"
+          disabled={isVerifying}
+          onPress={verification.close}
+        />
       </View>
     </Sheet>
   );
