@@ -5,7 +5,7 @@ import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { tripDisplayTitle, tripFacts, tripStatusMeta } from '@/domain/trip-summary';
 import type { RouterOutputs } from '@/lib/trpc';
 import { colors } from '@seego/ui';
-import { Badge, IconButton, PhotoScrim, Tag, Text } from '@/ui';
+import { Badge, IconButton, PhotoScrim, SCREEN_PADDING, Tag, Text } from '@/ui';
 import {
   ArrowLeftIcon,
   FilePdfIcon,
@@ -44,8 +44,13 @@ export function TripHero({
   const facts = tripFacts(trip, plannedCount);
 
   return (
-    // Full bleed: it cancels the screen's margins and top padding.
-    <View onLayout={onLayout} className="-mx-6 -mt-6 h-[392px] overflow-hidden bg-ink">
+    // Full bleed: it cancels the screen's margins and top padding. Content in flow so a long
+    // title, wrapped tags or a large font grow the hero instead of overlapping the top bar.
+    <View
+      onLayout={onLayout}
+      className="min-h-[392px] justify-between overflow-hidden bg-ink"
+      style={{ marginHorizontal: -SCREEN_PADDING, marginTop: -SCREEN_PADDING }}
+    >
       {coverImage ? (
         <Image source={coverImage} style={StyleSheet.absoluteFill} contentFit="cover" />
       ) : (
@@ -56,7 +61,7 @@ export function TripHero({
       <PhotoScrim edge="top" className="h-28" />
       <PhotoScrim edge="bottom" className="h-[70%]" />
 
-      <View className="absolute inset-x-0 top-0 flex-row items-center justify-between p-4">
+      <View className="flex-row items-center justify-between p-4">
         <View className="flex-row gap-2">
           <IconButton variant="scrim" label="Retour" icon={ArrowLeftIcon} onPress={leaveTrip} />
           {/* At the end of the creation flow, "Retour" walks back through the form and the deck. */}
@@ -91,7 +96,7 @@ export function TripHero({
         </View>
       </View>
 
-      <View className="absolute inset-x-0 bottom-0 gap-2 px-6 pb-14">
+      <View className="gap-2 px-6 pb-14">
         {trip.destination && (
           <View className="flex-row items-center gap-1.5">
             <MapPinIcon size={16} weight="fill" color={colors.accent} />
