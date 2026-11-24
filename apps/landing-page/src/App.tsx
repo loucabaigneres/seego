@@ -8,6 +8,7 @@ import { Faq } from './components/Faq';
 import { Footer } from './components/Footer';
 import { ScrollToTop } from './components/ScrollToTop';
 import { SectionNav } from './components/SectionNav';
+import { track } from './lib/analytics';
 import { ROUTES } from './lib/legal';
 import { useWaitlistStatus } from './lib/waitlist';
 import { LegalNotice } from './pages/LegalNotice';
@@ -51,6 +52,7 @@ function Header() {
       {/* The logo stays centred; the call to action sits on the right */}
       <a
         href={anchor('embarquement')}
+        onClick={() => track('header_cta_clicked')}
         className="group absolute right-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-3.5 py-2 text-xs font-bold text-ink-inverse transition hover:bg-cta hover:text-ink sm:right-8 sm:px-4 sm:py-2.5"
       >
         Me prévenir

@@ -13,6 +13,8 @@ const posthogKey = env.VITE_POSTHOG_KEY;
 export interface AnalyticsEvents {
   section_viewed: { section: string; index: number };
   hero_cta_clicked: Record<string, never>;
+  header_cta_clicked: Record<string, never>;
+  webapp_cta_clicked: Record<string, never>;
   waitlist_form_started: { position: string };
   waitlist_submit_failed: { position: string; reason: 'invalid_email' | 'server_error' };
   waitlist_joined: { position: string };
