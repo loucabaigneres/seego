@@ -6,12 +6,11 @@ import { GuestInvite } from '@/features/profile/components/GuestInvite';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { ProfileSkeleton } from '@/features/profile/components/ProfileSkeleton';
 import { ProfileStats } from '@/features/profile/components/ProfileStats';
-import { SettingsLink } from '@/features/profile/components/SettingsLink';
 import { useProfile } from '@/features/profile/hooks/useProfile';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { colors } from '@seego/ui';
-import { Button, ErrorState, Screen, Text } from '@/ui';
-import { PlusIcon } from '@/ui/icons';
+import { Button, ErrorState, IconButton, Screen, Text } from '@/ui';
+import { GearSixIcon, PlusIcon } from '@/ui/icons';
 
 export default function ProfileScreen() {
   const { isSessionPending, isSignedIn, profile, isLoading, hasFailed, retry } = useProfile();
@@ -49,7 +48,7 @@ export default function ProfileScreen() {
     <Screen
       scroll
       edges={['top']}
-      contentClassName="gap-8"
+      contentClassName="gap-6 pt-2"
       refreshControl={
         <RefreshControl
           refreshing={isRefreshing}
@@ -59,11 +58,16 @@ export default function ProfileScreen() {
         />
       }
     >
+      <View className="-mb-2 -mr-2 flex-row justify-end">
+        <IconButton label="Réglages" icon={GearSixIcon} onPress={() => router.push('/settings')} />
+      </View>
       <ProfileHeader user={profile.user} />
       <ProfileStats stats={profile.stats} onPressTrips={() => router.navigate('/trips')} />
-      <View className="gap-4">
+      <View className="gap-3.5">
         <View className="flex-row items-center justify-between">
-          <Text variant="section">Mes inspirations</Text>
+          <Text variant="section" role="heading">
+            Mes inspirations
+          </Text>
           <Button
             label="Importer"
             variant="outline"
@@ -74,7 +78,6 @@ export default function ProfileScreen() {
         </View>
         <InspirationList />
       </View>
-      <SettingsLink />
     </Screen>
   );
 }

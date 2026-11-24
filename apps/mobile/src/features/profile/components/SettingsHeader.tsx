@@ -6,15 +6,15 @@ import { ArrowLeftIcon } from '@/ui/icons';
 
 export function SettingsHeader() {
   return (
-    <View className="flex-row items-center gap-2">
+    <View className="gap-4">
       <IconButton
         label="Retour"
         icon={ArrowLeftIcon}
         onPress={() => (router.canGoBack() ? router.back() : router.replace('/profile'))}
-        className="-ml-2"
+        className="-ml-2.5"
       />
-      <Text variant="section" role="heading">
-        Paramètres
+      <Text variant="title" role="heading" className="text-[42px] leading-[44px]">
+        Réglages
       </Text>
     </View>
   );

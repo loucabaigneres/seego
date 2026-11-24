@@ -2,13 +2,13 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { formatDate } from '@/domain/date';
+import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
 import { colors } from '@seego/ui';
 import { Badge, cn, IconButton, Text } from '@/ui';
-import { CaretRightIcon, TrashIcon } from '@/ui/icons';
-
-import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
+import { SuitcaseRollingIcon, TrashIcon } from '@/ui/icons';
 
 import type { TripListItem } from '../lib/merge-trips';
+import { tripMonogram } from '../lib/trip-list';
 
 export interface TripCardProps {
   trip: TripListItem;
@@ -16,40 +16,115 @@ export interface TripCardProps {
   isDeleting: boolean;
 }
 
-export function TripCard({ trip, onDelete, isDeleting }: TripCardProps) {
+/** Tile colours, cycled down the list like a stack of postcards. */
+const TILE_TONES = [
+  { tile: 'bg-accent', text: 'text-brand', icon: colors.brand },
+  { tile: 'bg-success', text: 'text-ink-inverse', icon: colors.ink.inverse },
+  { tile: 'bg-surface', text: 'text-brand', icon: colors.brand },
+] as const;
+
+function openTrip(tripId: string) {
+  router.push({ pathname: '/trip/[tripId]', params: { tripId } });
+}
+
+/** "Créé le 3 nov. 2026 · Hôte" */
+function tripDetails(trip: TripListItem): string {
+  const createdAt = formatDate(trip.createdAt);
+  const role = trip.groupRole && (trip.groupRole === 'owner' ? 'Hôte' : 'Membre');
+  return [createdAt && `Créé le ${createdAt}`, role].filter(Boolean).join(' · ');
+}
+
+function DeleteButton({
+  trip,
+  title,
+  onDelete,
+  isDeleting,
+  variant,
+}: TripCardProps & { title: string; variant: 'scrim' | 'ghost' }) {
+  // A group trip is deleted or left from its page: user.deleteTrip refuses it.
+  if (trip.groupRole) return null;
+  return (
+    <IconButton
+      variant={variant}
+      label={`Supprimer ${title}`}
+      icon={TrashIcon}
+      onPress={onDelete}
+      disabled={isDeleting}
+      className={cn(isDeleting && 'opacity-50')}
+    />
+  );
+}
+
+/** The latest trip, shown large at the top of the list. */
+export function TripFeatureCard(props: TripCardProps) {
+  const { trip } = props;
   const status = tripStatusMeta(trip.status);
   const title = tripDisplayTitle(trip);
-  const createdAt = formatDate(trip.createdAt);
-  const groupLabel = trip.groupRole && `Groupe · ${trip.groupRole === 'owner' ? 'Hôte' : 'Membre'}`;
 
   return (
-    <Pressable
-      role="link"
-      aria-label={`${title}, ${status.label}`}
-      onPress={() => router.push({ pathname: '/trip/[tripId]', params: { tripId: trip.id } })}
-      className="flex-row items-center gap-3 rounded-card border border-brand/15 bg-surface p-5 active:opacity-80"
-    >
-      <View className="flex-1 gap-2">
-        <Text variant="label" numberOfLines={2}>
-          {title}
-        </Text>
-        <View className="flex-row flex-wrap items-center gap-2">
-          <Badge label={status.label} tone={status.tone} />
-          {groupLabel && <Badge label={groupLabel} tone="accent" />}
-          {createdAt && <Text variant="caption">{createdAt}</Text>}
+    <View className="h-[180px] overflow-hidden rounded-card bg-brand">
+      <Pressable
+        role="link"
+        aria-label={`${title}, ${status.label}`}
+        onPress={() => openTrip(trip.id)}
+        className="flex-1 justify-between p-4 active:opacity-80"
+      >
+        <Badge label={status.label} tone={status.tone === 'success' ? 'success' : 'accent'} />
+        <View className="gap-1">
+          <Text variant="title" tone="inverse" numberOfLines={2} className="text-[34px] leading-9">
+            {title}
+          </Text>
+          <Text variant="caption" tone="accent" numberOfLines={1}>
+            {tripDetails(trip)}
+          </Text>
         </View>
+      </Pressable>
+      <View className="absolute right-2.5 top-2.5">
+        <DeleteButton {...props} title={title} variant="scrim" />
       </View>
-      {/* A group trip is deleted or left from its page: user.deleteTrip refuses it. */}
-      {!trip.groupRole && (
-        <IconButton
-          label={`Supprimer ${title}`}
-          icon={TrashIcon}
-          onPress={onDelete}
-          disabled={isDeleting}
-          className={cn('-my-2', isDeleting && 'opacity-50')}
-        />
-      )}
-      <CaretRightIcon size={20} color={colors.ink.muted} />
-    </Pressable>
+    </View>
+  );
+}
+
+/** A trip under the featured one: postcard tile, title and status. */
+export function TripRow({ index, ...props }: TripCardProps & { index: number }) {
+  const { trip } = props;
+  const status = tripStatusMeta(trip.status);
+  const title = tripDisplayTitle(trip);
+  const monogram = tripMonogram(trip);
+  const tone = TILE_TONES[index % TILE_TONES.length];
+
+  return (
+    <View className="flex-row items-center gap-3.5 border-b border-line py-3.5">
+      <Pressable
+        role="link"
+        aria-label={`${title}, ${status.label}`}
+        onPress={() => openTrip(trip.id)}
+        className="flex-1 flex-row items-center gap-3.5 active:opacity-80"
+      >
+        <View
+          aria-hidden
+          className={cn('size-[68px] items-center justify-center rounded-field', tone.tile)}
+        >
+          {monogram ? (
+            <Text variant="section" className={cn('text-[28px] leading-7', tone.text)}>
+              {monogram}
+            </Text>
+          ) : (
+            <SuitcaseRollingIcon size={28} color={tone.icon} />
+          )}
+        </View>
+        <View className="flex-1 gap-1">
+          <Text variant="label" numberOfLines={2}>
+            {title}
+          </Text>
+          <View className="flex-row flex-wrap items-center gap-2">
+            <Badge label={status.label} tone={status.tone} />
+            <Text variant="caption">{tripDetails(trip)}</Text>
+          </View>
+        </View>
+      </Pressable>
+      <DeleteButton {...props} title={title} variant="ghost" />
+    </View>
   );
 }

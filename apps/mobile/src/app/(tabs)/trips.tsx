@@ -6,7 +6,7 @@ import { GuestInvite } from '@/features/profile/components/GuestInvite';
 import { TripList } from '@/features/trips/components/TripList';
 import { useAuthSession } from '@/hooks/useAuthSession';
 import { colors } from '@seego/ui';
-import { Screen, Skeleton, Text } from '@/ui';
+import { Screen, Skeleton } from '@/ui';
 
 export default function TripsScreen() {
   const { isSignedIn, isPending } = useAuthSession();
@@ -24,7 +24,7 @@ export default function TripsScreen() {
   if (!isSignedIn) {
     return (
       <Screen edges={['top']}>
-        <GuestInvite />
+        <GuestInvite overline="Mes voyages" />
       </Screen>
     );
   }
@@ -43,11 +43,7 @@ export default function TripsScreen() {
         />
       }
     >
-      <Text variant="title" role="heading">
-        Mes voyages
-      </Text>
-      <GroupTripActions />
-      <TripList />
+      <TripList groupActions={<GroupTripActions />} />
     </Screen>
   );
 }

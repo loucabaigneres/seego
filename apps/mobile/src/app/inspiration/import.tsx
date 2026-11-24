@@ -22,17 +22,24 @@ export default function ImportInspirationScreen() {
 
   return (
     <Screen scroll contentClassName="gap-6">
-      <View className="flex-row items-center gap-2">
-        <IconButton
-          label="Retour"
-          icon={ArrowLeftIcon}
-          onPress={() => (router.canGoBack() ? router.back() : router.replace('/profile'))}
-          className="-ml-2"
-        />
-        <Text variant="section" role="heading">
-          Importer une inspiration
-        </Text>
-      </View>
+      {!form.result && (
+        <View className="gap-6">
+          <IconButton
+            label="Retour"
+            icon={ArrowLeftIcon}
+            onPress={() => (router.canGoBack() ? router.back() : router.replace('/profile'))}
+            className="-ml-2.5"
+          />
+          <View className="gap-2">
+            <Text variant="overline" tone="brand">
+              Mes inspirations
+            </Text>
+            <Text variant="title" role="heading">
+              Importer une inspiration
+            </Text>
+          </View>
+        </View>
+      )}
 
       {session.isPending ? (
         <LoadingState />
@@ -54,13 +61,7 @@ export default function ImportInspirationScreen() {
           onImportAnother={form.reset}
         />
       ) : (
-        <>
-          <Text tone="muted">
-            Colle le lien d’un TikTok ou d’un Reel, ou partage-le à Seego depuis l’app : on fait un
-            compte rendu et on repère les lieux pour tes prochains voyages.
-          </Text>
-          <ImportInspirationForm form={form} />
-        </>
+        <ImportInspirationForm form={form} />
       )}
 
       <AddToTripSheet inspirationId={addingId} onClose={() => setAddingId(null)} />
