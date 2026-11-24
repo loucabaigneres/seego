@@ -17,20 +17,24 @@ export const STEP_COPY: Record<TripConfigStep, { title: string; subtitle: string
   },
 };
 
+export type ChoiceLevel = 1 | 2 | 3;
+
 export interface ChoiceOption<T extends string> extends Segment<T> {
   hint: string;
+  /** Drawn as ●○○ / € up to ●●● / €€€. */
+  level: ChoiceLevel;
 }
 
 export const INTENSITY_OPTIONS: ChoiceOption<Intensity>[] = [
-  { value: 'chill', label: 'Relax', hint: 'Tu prends ton temps.' },
-  { value: 'balanced', label: 'Équilibré', hint: 'Un peu de tout, sans courir.' },
-  { value: 'intense', label: 'Intense', hint: 'Tu explores un max.' },
+  { value: 'chill', label: 'Relax', hint: 'Tu prends ton temps.', level: 1 },
+  { value: 'balanced', label: 'Équilibré', hint: 'Un peu de tout, sans courir.', level: 2 },
+  { value: 'intense', label: 'Intense', hint: 'Tu explores un max.', level: 3 },
 ];
 
 export const BUDGET_OPTIONS: ChoiceOption<AveragePrice>[] = [
-  { value: 'budget', label: 'Petit', hint: 'Les bons plans avant tout.' },
-  { value: 'mid', label: 'Moyen', hint: 'Un budget raisonnable.' },
-  { value: 'premium', label: 'Premium', hint: 'Tu te fais plaisir.' },
+  { value: 'budget', label: 'Petit', hint: 'Les bons plans avant tout.', level: 1 },
+  { value: 'mid', label: 'Moyen', hint: 'Un budget raisonnable.', level: 2 },
+  { value: 'premium', label: 'Premium', hint: 'Tu te fais plaisir.', level: 3 },
 ];
 
 export interface ConstraintGroup {
