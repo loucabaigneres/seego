@@ -26,9 +26,9 @@ async function sendTemplate(opts: {
       subject: opts.subject,
       template: { id: opts.template, variables: opts.variables },
     });
-    if (error) console.error('[email] Resend error (${opts.template}):', error);
+    if (error) console.error(`[email] Resend error (${opts.template}):`, error);
   } catch (err) {
-    console.error('[email] send failed (${opts.template}):', err);
+    console.error(`[email] send failed (${opts.template}):`, err);
   }
 }
 

@@ -1,6 +1,6 @@
 # @seego/admin
 
-Back-office Seego, réservé aux comptes Better Auth qui ont le rôle `admin`. Pour l'instant, il liste les inscrits de la waitlist (`waitlist_leads`), avec une recherche par e-mail, un filtre de statut et une pagination côté serveur.
+Back-office Seego, réservé aux comptes Better Auth qui ont le rôle `admin`. Il liste les inscrits de la waitlist (`waitlist_leads`), avec une recherche par e-mail, un filtre de statut et une pagination côté serveur. Il gère aussi la newsletter sur Resend (page Emails) : synchronisation de la waitlist vers le segment « Waitlist », liste des templates avec envoi de test à soi-même, création de campagnes en brouillon et envoi derrière une confirmation tapée à la main. Les campagnes ne s'activent qu'en production, quand l'API a `RESEND_WAITLIST_SEGMENT_ID`.
 
 Stack : Vite + React 19, TanStack Router (routes dans `src/app/routes`, `routeTree.gen.ts` est généré), tRPC (`@trpc/tanstack-react-query`), TanStack Table v9, [shadcn/ui](https://ui.shadcn.com) (Base UI) et Tailwind v4 avec les tokens de `@seego/ui/css`.
 

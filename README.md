@@ -78,6 +78,13 @@ GEMINI_API_KEY=your_google_ai_studio_api_key
 
 # Transactional emails via Resend (required: the server refuses to start without it, must start with "re_")
 RESEND_API_KEY=re_your_resend_api_key
+# Newsletter (production only, leave unset elsewhere): Resend "Waitlist" segment that waitlist
+# leads are synced to, and the signing secret of the webhook pointing at POST /webhooks/resend
+# (event contact.updated). Without the segment ID, no contact is ever written to Resend.
+# Each contact carries its signed link to our /unsubscribe page in the Resend contact property
+# `unsubscribe_url` (must exist on the account): newsletter templates use {{{contact.unsubscribe_url}}}.
+# RESEND_WAITLIST_SEGMENT_ID=
+# RESEND_WEBHOOK_SECRET=whsec_...
 ```
 
 Create `apps/web/.env`:

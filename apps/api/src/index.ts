@@ -8,6 +8,7 @@ import Fastify from 'fastify';
 import { auth, isApiOverHttps } from './lib/auth.js';
 import { db } from './lib/db.js';
 import { registerImageProxy } from './routes/image-proxy.js';
+import { registerResendWebhook } from './routes/resend-webhook.js';
 import { registerUnsubscribe } from './routes/unsubscribe.js';
 import { createContext } from './trpc/context.js';
 import { AppRouter, appRouter } from './trpc/router.js';
@@ -98,6 +99,9 @@ registerImageProxy(server);
 
 // Newsletter opt-out link (GET confirmation page + POST, also used for one-click unsubscribe).
 registerUnsubscribe(server);
+
+// Resend events (opt-outs made through Resend's own unsubscribe link).
+registerResendWebhook(server);
 
 // Register the tRPC plugin with the Fastify server
 await server.register(fastifyTRPCPlugin, {

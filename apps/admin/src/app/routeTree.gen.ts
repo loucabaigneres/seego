@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login';
 import { Route as AuthedRouteImport } from './routes/_authed';
 import { Route as AuthedIndexRouteImport } from './routes/_authed/index';
 import { Route as AuthedWaitlistRouteImport } from './routes/_authed/waitlist';
+import { Route as AuthedEmailsRouteImport } from './routes/_authed/emails';
 import { Route as AuthedAdminsRouteImport } from './routes/_authed/admins';
 
 const LoginRoute = LoginRouteImport.update({
@@ -34,6 +35,11 @@ const AuthedWaitlistRoute = AuthedWaitlistRouteImport.update({
   path: '/waitlist',
   getParentRoute: () => AuthedRoute,
 } as any);
+const AuthedEmailsRoute = AuthedEmailsRouteImport.update({
+  id: '/emails',
+  path: '/emails',
+  getParentRoute: () => AuthedRoute,
+} as any);
 const AuthedAdminsRoute = AuthedAdminsRouteImport.update({
   id: '/admins',
   path: '/admins',
@@ -44,11 +50,13 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthedIndexRoute;
   '/login': typeof LoginRoute;
   '/admins': typeof AuthedAdminsRoute;
+  '/emails': typeof AuthedEmailsRoute;
   '/waitlist': typeof AuthedWaitlistRoute;
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute;
   '/admins': typeof AuthedAdminsRoute;
+  '/emails': typeof AuthedEmailsRoute;
   '/waitlist': typeof AuthedWaitlistRoute;
   '/': typeof AuthedIndexRoute;
 }
@@ -57,15 +65,23 @@ export interface FileRoutesById {
   '/_authed': typeof AuthedRouteWithChildren;
   '/login': typeof LoginRoute;
   '/_authed/admins': typeof AuthedAdminsRoute;
+  '/_authed/emails': typeof AuthedEmailsRoute;
   '/_authed/waitlist': typeof AuthedWaitlistRoute;
   '/_authed/': typeof AuthedIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/' | '/login' | '/admins' | '/waitlist';
+  fullPaths: '/' | '/login' | '/admins' | '/emails' | '/waitlist';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/login' | '/admins' | '/waitlist' | '/';
-  id: '__root__' | '/_authed' | '/login' | '/_authed/admins' | '/_authed/waitlist' | '/_authed/';
+  to: '/login' | '/admins' | '/emails' | '/waitlist' | '/';
+  id:
+    | '__root__'
+    | '/_authed'
+    | '/login'
+    | '/_authed/admins'
+    | '/_authed/emails'
+    | '/_authed/waitlist'
+    | '/_authed/';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
@@ -103,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedWaitlistRouteImport;
       parentRoute: typeof AuthedRoute;
     };
+    '/_authed/emails': {
+      id: '/_authed/emails';
+      path: '/emails';
+      fullPath: '/emails';
+      preLoaderRoute: typeof AuthedEmailsRouteImport;
+      parentRoute: typeof AuthedRoute;
+    };
     '/_authed/admins': {
       id: '/_authed/admins';
       path: '/admins';
@@ -115,12 +138,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthedRouteChildren {
   AuthedAdminsRoute: typeof AuthedAdminsRoute;
+  AuthedEmailsRoute: typeof AuthedEmailsRoute;
   AuthedWaitlistRoute: typeof AuthedWaitlistRoute;
   AuthedIndexRoute: typeof AuthedIndexRoute;
 }
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedAdminsRoute: AuthedAdminsRoute,
+  AuthedEmailsRoute: AuthedEmailsRoute,
   AuthedWaitlistRoute: AuthedWaitlistRoute,
   AuthedIndexRoute: AuthedIndexRoute,
 };

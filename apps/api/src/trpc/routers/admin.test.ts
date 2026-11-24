@@ -97,3 +97,39 @@ describe('admin.admins', () => {
     });
   });
 });
+
+describe('admin.email', () => {
+  it('reserves every procedure to admins', async () => {
+    const traveler = callerAs('traveler').admin.email;
+    await expect(traveler.overview()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.sync()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.templates()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.broadcasts()).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    await expect(traveler.sendTest({ templateId: 't' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+    await expect(
+      traveler.sendBroadcast({ broadcastId: 'b', confirmation: 'ENVOYER' }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('refuses to send a broadcast without the typed confirmation word', async () => {
+    await expect(
+      callerAs('admin').admin.email.sendBroadcast({
+        broadcastId: 'b',
+        confirmation: 'envoyer' as 'ENVOYER',
+      }),
+    ).rejects.toMatchObject({ code: 'BAD_REQUEST' });
+  });
+
+  it('keeps campaigns off when no waitlist segment is configured', async () => {
+    const admin = callerAs('admin').admin.email;
+    await expect(admin.sync()).rejects.toMatchObject({ code: 'PRECONDITION_FAILED' });
+    await expect(
+      admin.createBroadcast({ templateId: 't', name: 'Bêta web' }),
+    ).rejects.toMatchObject({ code: 'PRECONDITION_FAILED' });
+    await expect(
+      admin.sendBroadcast({ broadcastId: 'b', confirmation: 'ENVOYER' }),
+    ).rejects.toMatchObject({ code: 'PRECONDITION_FAILED' });
+  });
+});

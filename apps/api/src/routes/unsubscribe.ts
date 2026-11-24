@@ -2,7 +2,7 @@ import { eq, isNull, and } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 
 import { db } from '../lib/db.js';
-import { resend } from '../lib/email.js';
+import { markNewsletterContactUnsubscribed } from '../lib/newsletter.js';
 import { waitlistLeads } from '../lib/tables.js';
 import { verifyUnsubscribeToken } from '../lib/unsubscribe.js';
 
@@ -19,14 +19,31 @@ import { verifyUnsubscribeToken } from '../lib/unsubscribe.js';
  * Resend contact so broadcasts stop targeting the address.
  */
 
+// Seego charte, same values as the e-mail templates. Copied from `packages/ui/src/colors.ts`
+// (`palette`, `colors.ink`): @seego/ui ships TypeScript sources the compiled API cannot load.
 const page = (title: string, body: string) => `<!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><meta name="robots" content="noindex">
 <title>${title} – Seego</title>
-<style>body{font-family:system-ui,sans-serif;background:#f6f7f9;color:#111;display:grid;place-items:center;min-height:100vh;margin:0}
-main{background:#fff;border-radius:16px;padding:32px;max-width:420px;box-shadow:0 2px 12px rgba(0,0,0,.06);text-align:center}
-button{background:#111;color:#fff;border:0;border-radius:999px;padding:12px 24px;font-size:16px;cursor:pointer}
-p{color:#555;line-height:1.5}</style></head>
-<body><main><h1>${title}</h1>${body}</main></body></html>`;
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px 16px;background:#F7F0E8;color:#22090F;font-family:'Hanken Grotesk',Arial,Helvetica,sans-serif}
+.logo{font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:34px;color:#5C1426;text-decoration:none}
+.logo i{font-style:italic}.logo span{color:#F08A5D}
+main{width:100%;max-width:440px;background:#5C1426;border-radius:20px;padding:40px 32px;text-align:center}
+h1{margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:34px;line-height:40px;color:#F7F0E8}
+p{margin:0 0 24px;font-size:16px;line-height:24px;color:#F5C6A8}
+p:last-child{margin-bottom:0}
+button,.cta{display:inline-block;background:#F08A5D;color:#22090F;border:0;border-radius:28px;padding:16px 28px;font:bold 16px/20px 'Hanken Grotesk',Arial,Helvetica,sans-serif;cursor:pointer;text-decoration:none}
+button:focus-visible,.cta:focus-visible{outline:3px solid #F5C6A8;outline-offset:3px}
+footer{font-size:13px;line-height:20px;color:#6A5055}
+footer a{color:#5C1426}
+</style></head>
+<body>
+<a class="logo" href="https://www.seego.fr">See<i>go</i><span>.</span></a>
+<main><h1>${title}</h1>${body}</main>
+<footer><a href="https://www.seego.fr">seego.fr</a> · Planifie tes voyages à plusieurs</footer>
+</body></html>`;
 
 async function unsubscribe(email: string) {
   await db
@@ -35,12 +52,7 @@ async function unsubscribe(email: string) {
     .where(and(eq(waitlistLeads.email, email), isNull(waitlistLeads.unsubscribedAt)));
 
   // Best effort: the DB is the source of truth, a Resend failure must not break the opt-out.
-  try {
-    const { error } = await resend.contacts.update({ email, unsubscribed: true });
-    if (error) console.error('[unsubscribe] Resend error:', error);
-  } catch (err) {
-    console.error('[unsubscribe] Resend update failed:', err);
-  }
+  await markNewsletterContactUnsubscribed(email);
 }
 
 export function registerUnsubscribe(server: FastifyInstance) {
@@ -87,7 +99,7 @@ export function registerUnsubscribe(server: FastifyInstance) {
     return reply.send(
       page(
         'Tu es désinscrit(e)',
-        '<p>Tu ne recevras plus la newsletter Seego. À bientôt peut-être !</p>',
+        '<p>Tu ne recevras plus la newsletter Seego. À bientôt peut-être !</p><a class="cta" href="https://www.seego.fr">Retour sur seego.fr</a>',
       ),
     );
   });
