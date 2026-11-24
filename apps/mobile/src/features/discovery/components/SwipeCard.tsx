@@ -73,7 +73,9 @@ export interface SwipeCardProps {
   /** Horizontal drag of the top card, shared with the action buttons. */
   dragX: SharedValue<number>;
   onDecide: (liked: boolean) => void;
-  /** Told when the details open or close. */
+  /** Whether the details are open; owned by the deck, so it is reset when the card changes. */
+  isExpanded?: boolean;
+  /** Asks to open or close the details (drag, ⓘ, back button, screen reader). */
   onExpandedChange?: (expanded: boolean) => void;
   ref?: Ref<SwipeCardHandle>;
 }
@@ -84,13 +86,13 @@ export function SwipeCard({
   isLeaving,
   dragX,
   onDecide,
+  isExpanded = false,
   onExpandedChange,
   ref,
 }: SwipeCardProps) {
   const { width: screenWidth } = useWindowDimensions();
   const [cardWidth, setCardWidth] = useState(0);
   const [photoIndex, setPhotoIndex] = useState(0);
-  const [isExpanded, setIsExpanded] = useState(false);
   // Each card owns its motion: the card that leaves is unmounted, nothing has to be reset.
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
@@ -128,14 +130,9 @@ export function SwipeCard({
     if (isTop && otherPhotos.length > 0) Image.prefetch(otherPhotos);
   }, [isTop, place]);
 
-  const markExpanded = (expanded: boolean) => {
-    setIsExpanded(expanded);
-    onExpandedChange?.(expanded);
-  };
-
   const settleDetails = (expanded: boolean) => {
     expansion.set(withTiming(expanded ? 1 : 0, SETTLE_TIMING));
-    markExpanded(expanded);
+    onExpandedChange?.(expanded);
   };
 
   useHardwareBack(() => {
@@ -190,7 +187,7 @@ export function SwipeCard({
           const expanded = settlesExpanded(expansion.get(), event.velocityY);
           expansion.set(withTiming(expanded ? 1 : 0, SETTLE_TIMING));
           lift.set(withSpring(0));
-          scheduleOnRN(markExpanded, expanded);
+          if (onExpandedChange) scheduleOnRN(onExpandedChange, expanded);
           return;
         }
         const outcome = swipeOutcome(event.translationX, event.velocityX);

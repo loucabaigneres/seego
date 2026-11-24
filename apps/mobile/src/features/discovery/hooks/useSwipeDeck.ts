@@ -35,6 +35,8 @@ export function useSwipeDeck(
   const cards = visibleCards(deck);
   const topCard = cards.at(0);
   const topCardId = topCard?.id;
+  // Keyed by card: the next card arrives closed, whatever the last one was.
+  const [openDetailsId, setOpenDetailsId] = useState<string | null>(null);
 
   // Times how long the top card stays on screen (`viewDurationMs`, used by the ranking).
   useEffect(() => {
@@ -90,6 +92,8 @@ export function useSwipeDeck(
     decide,
     like: () => decide(true),
     skip: () => decide(false),
+    detailsOpen: !!topCardId && openDetailsId === topCardId,
+    setDetailsOpen: (open: boolean) => setOpenDetailsId(open ? (topCardId ?? null) : null),
     toggleDetails: () => topCardRef.current?.toggleDetails(),
     restart,
   };

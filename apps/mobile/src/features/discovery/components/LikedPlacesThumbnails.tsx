@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import * as WebBrowser from 'expo-web-browser';
+import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { Text } from '@/ui';
@@ -9,13 +10,14 @@ import type { Destination } from '../lib/recommendation';
 /** Thumbnails shown before the rest is summed up in a "+N" tile. */
 const MAX_THUMBNAILS = 4;
 
-/** The places the user liked in the recommended city, as thumbnails; each one opens its offer. */
-export function LikedPlacesCarousel({ places }: { places: Destination['likedHere'] }) {
-  const shown = places.slice(0, MAX_THUMBNAILS);
+/** The places the user liked in the recommended city, as thumbnails; each one opens its offer. "+N" reveals the rest. */
+export function LikedPlacesThumbnails({ places }: { places: Destination['likedHere'] }) {
+  const [expanded, setExpanded] = useState(false);
+  const shown = expanded ? places : places.slice(0, MAX_THUMBNAILS);
   const rest = places.length - shown.length;
 
   return (
-    <View className="flex-row gap-2">
+    <View className="flex-row flex-wrap gap-2">
       {shown.map((place) => (
         <Pressable
           key={place.id}
@@ -28,14 +30,16 @@ export function LikedPlacesCarousel({ places }: { places: Destination['likedHere
         </Pressable>
       ))}
       {rest > 0 && (
-        <View
-          aria-label={`Et ${rest} de plus`}
-          className="size-[58px] items-center justify-center rounded-xl bg-accent/15"
+        <Pressable
+          role="button"
+          aria-label={`Voir les ${rest} autres`}
+          onPress={() => setExpanded(true)}
+          className="size-[58px] items-center justify-center rounded-xl bg-accent/15 active:opacity-80"
         >
           <Text tone="accent" className="font-display text-[22px] leading-7">
             +{rest}
           </Text>
-        </View>
+        </Pressable>
       )}
     </View>
   );

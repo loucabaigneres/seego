@@ -23,6 +23,9 @@ const VARIANTS = {
   ghost: { container: '', text: 'text-brand underline', icon: colors.brand, spinner: 'brand' },
   // Secondary actions listed in a sheet: no underline, they don't read as links.
   text: { container: '', text: 'text-brand', icon: colors.brand, spinner: 'brand' },
+  // On a vino background: main action on cream, secondary ones on pesca.
+  onBrand: { container: 'bg-background', text: 'text-brand', icon: colors.brand, spinner: 'brand' },
+  onBrandSoft: { container: 'bg-accent', text: 'text-brand', icon: colors.brand, spinner: 'brand' },
 } as const;
 
 const SIZES = {

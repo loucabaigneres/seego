@@ -66,8 +66,7 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
                     ? 'Création du voyage…'
                     : 'On part quand ?'
                 }
-                variant="outline"
-                className="border-0 bg-background"
+                variant="onBrand"
                 icon={ArrowRightIcon}
                 loading={result.isSaving}
                 onPress={result.save}
@@ -75,17 +74,17 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
               <View className="flex-row gap-2">
                 <Button
                   label="Continuer à swiper"
-                  variant="text"
+                  variant="onBrandSoft"
                   size="sm"
                   onPress={result.close}
-                  className="flex-1 bg-accent"
+                  className="flex-1"
                 />
                 <Button
                   label="Recommencer"
-                  variant="text"
+                  variant="onBrandSoft"
                   size="sm"
                   onPress={onRestart}
-                  className="flex-1 bg-accent"
+                  className="flex-1"
                 />
               </View>
             </View>
