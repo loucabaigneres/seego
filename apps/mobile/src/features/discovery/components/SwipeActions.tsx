@@ -31,6 +31,8 @@ export interface SwipeActionsProps {
   onLike?: () => void;
   onDetails?: () => void;
   disabled?: boolean;
+  /** The top card shows its details: the middle button closes them. */
+  detailsOpen?: boolean;
   /** Horizontal drag of the top card. */
   dragX?: SharedValue<number>;
 }
@@ -40,6 +42,7 @@ export function SwipeActions({
   onLike,
   onDetails,
   disabled = false,
+  detailsOpen = false,
   dragX,
 }: SwipeActionsProps) {
   const skipStyle = useAnimatedStyle(() => ({
@@ -50,7 +53,7 @@ export function SwipeActions({
   }));
 
   return (
-    <View className="flex-row items-center justify-center gap-6">
+    <View className="flex-row items-center justify-center gap-7">
       <Animated.View style={skipStyle}>
         <Pressable
           role="button"
@@ -59,7 +62,7 @@ export function SwipeActions({
           disabled={disabled}
           onPress={onSkip}
           className={cn(
-            'size-16 items-center justify-center rounded-full border border-brand active:opacity-80',
+            'size-16 items-center justify-center rounded-full border-[1.5px] border-brand active:opacity-80',
             disabled && 'opacity-50',
           )}
         >
@@ -69,16 +72,21 @@ export function SwipeActions({
 
       <Pressable
         role="button"
-        aria-label="Voir les détails"
+        aria-label={detailsOpen ? 'Fermer les détails' : 'Voir les détails'}
         aria-disabled={disabled}
         disabled={disabled}
         onPress={onDetails}
         className={cn(
-          'size-12 items-center justify-center rounded-full border border-brand active:opacity-80',
+          'size-[52px] items-center justify-center rounded-full active:opacity-80',
+          detailsOpen ? 'bg-brand' : 'bg-surface',
           disabled && 'opacity-50',
         )}
       >
-        <InfoIcon size={24} color={colors.brand} />
+        <InfoIcon
+          size={24}
+          weight={detailsOpen ? 'fill' : 'regular'}
+          color={detailsOpen ? colors.accent : colors.brand}
+        />
       </Pressable>
 
       <Animated.View style={likeStyle}>
@@ -93,7 +101,7 @@ export function SwipeActions({
             disabled && 'opacity-50',
           )}
         >
-          <HeartIcon size={28} weight="fill" color={colors.ink.inverse} />
+          <HeartIcon size={28} weight="fill" color={colors.accent} />
         </Pressable>
       </Animated.View>
     </View>

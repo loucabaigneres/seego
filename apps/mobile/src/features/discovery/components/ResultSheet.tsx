@@ -1,7 +1,7 @@
 import { View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { Button, EmptyState, ErrorState, LoadingState, Notice, Sheet } from '@/ui';
+import { Button, cn, EmptyState, ErrorState, LoadingState, Notice, Sheet } from '@/ui';
 import { ArrowRightIcon, CompassIcon } from '@/ui/icons';
 
 import type { useDestinationResult } from '../hooks/useDestinationResult';
@@ -27,7 +27,12 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
 
   return (
     // Fixed height: the sheet keeps its size from the spinner to the result instead of jumping.
-    <Sheet visible={result.isOpen} onClose={result.close} className="h-[88%] px-0">
+    // The match itself is on vino; the waiting, error and empty states stay on crema.
+    <Sheet
+      visible={result.isOpen}
+      onClose={result.close}
+      className={cn('h-[88%] px-0', state === 'ready' && 'bg-brand')}
+    >
       {/* Keyed by state so each one fades in rather than popping. */}
       <Animated.View key={state} entering={FadeIn.duration(220)} className="flex-1">
         {state === 'loading' && <LoadingState label="On calcule ta destination…" />}
@@ -51,7 +56,7 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
               seenCount={seenCount}
               onClose={result.close}
             />
-            <View className="gap-2 border-t border-line px-6 pt-3">
+            <View className="gap-1.5 px-6 pt-3">
               {result.saveFailed && (
                 <Notice message="Impossible de créer ton voyage pour le moment. Réessaie dans un instant." />
               )}
@@ -59,9 +64,9 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
                 label={
                   result.isSaving
                     ? 'Création du voyage…'
-                    : `Planifier mon voyage à ${destination.city}`
+                    : 'On part quand ?'
                 }
-                variant="cta"
+                variant="onBrand"
                 icon={ArrowRightIcon}
                 loading={result.isSaving}
                 onPress={result.save}
@@ -69,14 +74,14 @@ export function ResultSheet({ result, likeCount, seenCount, onRestart }: ResultS
               <View className="flex-row gap-2">
                 <Button
                   label="Continuer à swiper"
-                  variant="outline"
+                  variant="onBrandSoft"
                   size="sm"
                   onPress={result.close}
                   className="flex-1"
                 />
                 <Button
                   label="Recommencer"
-                  variant="ghost"
+                  variant="onBrandSoft"
                   size="sm"
                   onPress={onRestart}
                   className="flex-1"
