@@ -19,6 +19,7 @@ export default function HomeScreen() {
   const { user, isSignedIn } = useAuthSession();
   // Optional shortcut: hidden while loading or on error, the Trips tab has the full states.
   const { trips } = useMyTrips({ enabled: isSignedIn });
+  // mergeTrips sorts newest first, so this is the latest draft.
   const draft = trips.find((trip) => trip.status === 'draft');
 
   return (
@@ -59,7 +60,7 @@ export default function HomeScreen() {
       {draft && (
         <Reveal order={3}>
           <DraftResume
-            title={draft.destination?.trim() || tripDisplayTitle(draft)}
+            title={draft.title?.trim() || draft.destination?.trim() || tripDisplayTitle(draft)}
             onPress={() =>
               router.push({ pathname: '/trip/[tripId]', params: { tripId: draft.id } })
             }

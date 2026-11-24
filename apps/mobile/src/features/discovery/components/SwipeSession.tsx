@@ -1,5 +1,4 @@
 import * as WebBrowser from 'expo-web-browser';
-import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { offerHost } from '@/domain/place';
@@ -21,11 +20,8 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
   const openResult = () => result.open();
   const deck = useSwipeDeck(places, { onLikeGoal: openResult });
   const result = useDestinationResult(tripId, deck.swipes);
-  // Keyed by card: the next card arrives closed, whatever the last one was.
-  const [openDetailsId, setOpenDetailsId] = useState<string | null>(null);
-  const topCard = deck.cards.at(0);
-  const detailsOpen = !!topCard && openDetailsId === topCard.id;
-  const offerUrl = detailsOpen ? topCard.url : null;
+  const detailsOpen = deck.detailsOpen;
+  const offerUrl = detailsOpen ? (deck.cards.at(0)?.url ?? null) : null;
   const host = offerHost(offerUrl);
 
   const restart = () => {
@@ -56,7 +52,8 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
           dragX={deck.dragX}
           isLeaving={deck.isLeaving}
           onDecide={deck.decide}
-          onDetailsChange={(open) => setOpenDetailsId(open ? (topCard?.id ?? null) : null)}
+          detailsOpen={detailsOpen}
+          onDetailsChange={deck.setDetailsOpen}
         />
       )}
 

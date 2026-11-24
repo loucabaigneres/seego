@@ -12,7 +12,9 @@ export interface SwipeDeckProps {
   dragX: SharedValue<number>;
   isLeaving: boolean;
   onDecide: (liked: boolean) => void;
-  onDetailsChange?: (open: boolean) => void;
+  /** Whether the top card shows its details. */
+  detailsOpen: boolean;
+  onDetailsChange: (open: boolean) => void;
 }
 
 export function SwipeDeck({
@@ -21,6 +23,7 @@ export function SwipeDeck({
   dragX,
   isLeaving,
   onDecide,
+  detailsOpen,
   onDetailsChange,
 }: SwipeDeckProps) {
   return (
@@ -36,6 +39,7 @@ export function SwipeDeck({
             isLeaving={isLeaving}
             dragX={dragX}
             onDecide={onDecide}
+            isExpanded={position === 0 && detailsOpen}
             onExpandedChange={position === 0 ? onDetailsChange : undefined}
           />
         ))

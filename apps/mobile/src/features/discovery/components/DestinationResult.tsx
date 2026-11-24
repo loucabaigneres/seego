@@ -8,7 +8,7 @@ import { IconButton, Text } from '@/ui';
 import { ImageIcon, XIcon } from '@/ui/icons';
 
 import { confidenceLabel, confidencePercent, type Destination } from '../lib/recommendation';
-import { LikedPlacesCarousel } from './LikedPlacesCarousel';
+import { LikedPlacesThumbnails } from './LikedPlacesThumbnails';
 import { MatchRing } from './MatchRing';
 
 /** Ambiance pills under the liked places. */
@@ -112,7 +112,7 @@ export function DestinationResult({
               <Text variant="overline" tone="accent" className="opacity-80">
                 Tes coups de cœur à {destination.city}
               </Text>
-              <LikedPlacesCarousel places={destination.likedHere} />
+              <LikedPlacesThumbnails places={destination.likedHere} />
             </>
           )}
           {ambiances.length > 0 && (
