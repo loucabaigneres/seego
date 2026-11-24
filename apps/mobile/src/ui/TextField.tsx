@@ -10,12 +10,14 @@ import {
 import { colors } from '@seego/ui';
 
 import { cn } from './cn';
-import { EyeIcon, EyeSlashIcon } from './icons';
+import { EyeIcon, EyeSlashIcon, type AppIcon } from './icons';
 import { Text } from './Text';
 
 export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
   label: string;
   error?: string;
+  /** Phosphor icon shown before the input. */
+  icon?: AppIcon;
   className?: string;
   /** Unit shown after the value, e.g. « ans ». */
   suffix?: string;
@@ -27,6 +29,7 @@ export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
 export function TextField({
   label,
   error,
+  icon: Icon,
   className,
   suffix,
   variant = 'outline',
@@ -74,7 +77,10 @@ export function TextField({
         )}
       >
         {filled && labelText}
-        <View className={cn('flex-row items-center', !filled && 'min-h-14')}>
+        <View
+          className={cn('flex-row items-center', !filled && 'min-h-14', Icon && !filled && 'pl-4')}
+        >
+          {Icon && <Icon size={20} color={isFocused ? colors.brand : colors.ink.muted} />}
           <TextInput
             aria-label={label}
             aria-invalid={!!error}
@@ -96,6 +102,7 @@ export function TextField({
               'font-sans text-ink',
               filled ? 'min-w-7 p-0 text-label' : 'min-h-14 px-4 text-body',
               !(filled && suffix) && 'flex-1',
+              Icon && (filled ? 'pl-2' : 'pl-3'),
             )}
             {...props}
           />

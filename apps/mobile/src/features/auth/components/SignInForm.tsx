@@ -4,6 +4,7 @@ import { View, type TextInputInstance } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
+import { EnvelopeIcon, LockSimpleIcon } from '@/ui/icons';
 
 import { useAuthForm } from '../hooks/useAuthForm';
 import { useEmailVerification } from '../hooks/useEmailVerification';
@@ -32,9 +33,10 @@ export function SignInForm() {
   const verification = useEmailVerification({ onSignInFailed: form.setFormError });
 
   return (
-    <View className="gap-5">
+    <View className="flex-1 gap-5">
       <TextField
         label="Email"
+        icon={EnvelopeIcon}
         placeholder="lea@exemple.fr"
         value={form.values.email}
         onChangeText={(value) => form.setField('email', value)}
@@ -52,6 +54,7 @@ export function SignInForm() {
       <TextField
         ref={passwordRef}
         label="Mot de passe"
+        icon={LockSimpleIcon}
         value={form.values.password}
         onChangeText={(value) => form.setField('password', value)}
         error={form.fieldErrors.password}
@@ -64,7 +67,7 @@ export function SignInForm() {
       />
       <Button
         label="Mot de passe oublié ?"
-        variant="ghost"
+        variant="text"
         size="sm"
         className="-mt-3 self-end px-0"
         onPress={() => router.push('/auth/forgot-password')}
@@ -77,7 +80,8 @@ export function SignInForm() {
         variant="cta"
         loading={form.isSubmitting}
         onPress={form.submit}
-        className="mt-1"
+        // Pinned to the bottom of the screen when the form leaves room.
+        className="mt-auto"
       />
 
       <VerifyEmailSheet verification={verification} />

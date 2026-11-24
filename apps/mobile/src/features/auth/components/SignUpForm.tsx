@@ -3,6 +3,7 @@ import { View, type TextInputInstance } from 'react-native';
 
 import { authClient } from '@/lib/auth-client';
 import { Button, Notice, TextField } from '@/ui';
+import { EnvelopeIcon, LockSimpleIcon, UserCircleIcon } from '@/ui/icons';
 
 import { useAuthForm } from '../hooks/useAuthForm';
 import { useEmailVerification } from '../hooks/useEmailVerification';
@@ -22,9 +23,10 @@ export function SignUpForm() {
   const verification = useEmailVerification({ onSignInFailed: form.setFormError });
 
   return (
-    <View className="gap-5">
+    <View className="flex-1 gap-5">
       <TextField
         label="Prénom"
+        icon={UserCircleIcon}
         placeholder="Léa"
         value={form.values.name}
         onChangeText={(value) => form.setField('name', value)}
@@ -40,6 +42,7 @@ export function SignUpForm() {
       <TextField
         ref={emailRef}
         label="Email"
+        icon={EnvelopeIcon}
         placeholder="lea@exemple.fr"
         value={form.values.email}
         onChangeText={(value) => form.setField('email', value)}
@@ -57,6 +60,7 @@ export function SignUpForm() {
       <TextField
         ref={passwordRef}
         label="Mot de passe"
+        icon={LockSimpleIcon}
         placeholder="8 caractères minimum"
         value={form.values.password}
         onChangeText={(value) => form.setField('password', value)}
@@ -76,7 +80,8 @@ export function SignUpForm() {
         variant="cta"
         loading={form.isSubmitting}
         onPress={form.submit}
-        className="mt-1"
+        // Pinned to the bottom of the screen when the form leaves room.
+        className="mt-auto"
       />
 
       <VerifyEmailSheet verification={verification} />
