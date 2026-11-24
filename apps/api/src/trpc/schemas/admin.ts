@@ -23,6 +23,28 @@ export const grantAdminSchema = z.object({
   password,
 });
 
+// Resend identifiers (templates also accept their alias).
+const resendId = z.string().trim().min(1).max(100);
+
+export const emailTemplateSchema = z.object({ templateId: resendId });
+
+export const createBroadcastSchema = z.object({
+  templateId: resendId,
+  name: z.string().trim().min(1).max(120),
+});
+
+/** Word the admin types by hand before a broadcast goes to the whole segment. */
+export const BROADCAST_CONFIRMATION_WORD = 'ENVOYER';
+
+export const sendBroadcastSchema = z.object({
+  broadcastId: resendId,
+  confirmation: z.literal(BROADCAST_CONFIRMATION_WORD, {
+    error: `Tape ${BROADCAST_CONFIRMATION_WORD} pour confirmer l’envoi.`,
+  }),
+});
+
+export const removeBroadcastSchema = z.object({ broadcastId: resendId });
+
 export const revokeAdminSchema = z.object({
   userId: z.string().min(1),
   password,

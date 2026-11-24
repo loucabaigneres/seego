@@ -1,5 +1,6 @@
 import { ArrowUpRight, Heart, Info, Sparkles, Target, X } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
+import { track } from '../lib/analytics';
 import { PHOTOS, unsplash } from '../lib/photos';
 import { LineReveal, SectionLabel } from './ui';
 
@@ -117,6 +118,7 @@ export function WebAppSection() {
 
           <a
             href={WEBAPP_URL}
+            onClick={() => track('webapp_cta_clicked')}
             target="_blank"
             rel="noreferrer"
             className="group mt-8 inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3.5 text-sm font-bold text-ink shadow-lg shadow-cta/30 transition hover:brightness-110 active:scale-95"

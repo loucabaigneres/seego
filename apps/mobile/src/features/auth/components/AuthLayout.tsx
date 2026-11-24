@@ -8,7 +8,7 @@ import { Button, Screen, Text } from '@/ui';
 import { XIcon } from '@/ui/icons';
 
 import { closeAuth } from '../lib/navigation';
-import { GoogleSignIn } from './GoogleSignIn';
+import { SocialSignIn } from './SocialSignIn';
 
 export interface AuthLayoutProps {
   overline: string;
@@ -18,7 +18,7 @@ export interface AuthLayoutProps {
   switchCta: string;
   switchHref: Href;
   /** `false` on screens that are not a sign-in, such as the password reset request. */
-  showGoogle?: boolean;
+  showSocial?: boolean;
   children: ReactNode;
 }
 
@@ -29,7 +29,7 @@ export function AuthLayout({
   switchPrompt,
   switchCta,
   switchHref,
-  showGoogle = true,
+  showSocial = true,
   children,
 }: AuthLayoutProps) {
   return (
@@ -58,7 +58,7 @@ export function AuthLayout({
 
         {children}
 
-        {showGoogle && <GoogleSignIn />}
+        {showSocial && <SocialSignIn />}
 
         <View className="mt-auto flex-row flex-wrap items-center justify-center">
           <Text tone="muted">{switchPrompt}</Text>

@@ -10,7 +10,7 @@ export default function ForgotPasswordScreen() {
       switchPrompt="Tu t’en souviens ?"
       switchCta="Retour à la connexion"
       switchHref="/auth/sign-in"
-      showGoogle={false}
+      showSocial={false}
     >
       <ForgotPasswordForm />
     </AuthLayout>
