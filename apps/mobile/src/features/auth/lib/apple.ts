@@ -26,6 +26,21 @@ export function isAppleCancel(error: unknown): boolean {
   );
 }
 
+const isStringOrNull = (value: unknown) => value === null || typeof value === 'string';
+
+/** Checks a profile read back from storage: anything malformed is treated as no profile. */
+export function isAppleProfile(value: unknown): value is AppleProfile {
+  if (typeof value !== 'object' || value === null) return false;
+  const profile = value as Record<string, unknown>;
+  return (
+    typeof profile.user === 'string' &&
+    profile.user.length > 0 &&
+    isStringOrNull(profile.givenName) &&
+    isStringOrNull(profile.familyName) &&
+    isStringOrNull(profile.email)
+  );
+}
+
 /** The one-time profile of this authorization, or `null` when Apple sent neither name nor e-mail. */
 export function appleProfileOf(credential: AppleCredential): AppleProfile | null {
   const givenName = credential.fullName?.givenName ?? null;

@@ -68,6 +68,8 @@ BETTER_AUTH_SECRET=generate_a_random_string_here_at_least_10_chars
 BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=found_in_your_google_cloud_console
 GOOGLE_CLIENT_SECRET=found_in_your_google_cloud_console
+# iOS bundle ID (`ios.bundleIdentifier` in apps/mobile/app.json): audience of Sign in with Apple tokens
+APPLE_APP_BUNDLE_IDENTIFIER=fr.seego.app
 FRONTEND_URL=http://localhost:5173
 
 # AI Analysis Configuration (optional to start the server, required to analyze posts)

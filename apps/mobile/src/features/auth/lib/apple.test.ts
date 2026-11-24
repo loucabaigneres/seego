@@ -1,4 +1,10 @@
-import { appleIdTokenPayload, appleProfileOf, isAppleCancel, withSavedProfile } from './apple';
+import {
+  appleIdTokenPayload,
+  appleProfileOf,
+  isAppleCancel,
+  isAppleProfile,
+  withSavedProfile,
+} from './apple';
 
 const credential = {
   user: 'apple-user-1',
@@ -87,6 +93,24 @@ describe('withSavedProfile', () => {
 
   it('changes nothing without a saved profile', () => {
     expect(withSavedProfile(credential, null)).toBe(credential);
+  });
+});
+
+describe('isAppleProfile', () => {
+  it('accepts a complete profile, nulls included', () => {
+    expect(
+      isAppleProfile({ user: 'apple-user-1', givenName: null, familyName: null, email: null }),
+    ).toBe(true);
+  });
+
+  it('rejects anything malformed', () => {
+    expect(isAppleProfile(null)).toBe(false);
+    expect(isAppleProfile('Jane')).toBe(false);
+    expect(isAppleProfile({ givenName: 'Jane', familyName: null, email: null })).toBe(false);
+    expect(isAppleProfile({ user: '', givenName: null, familyName: null, email: null })).toBe(
+      false,
+    );
+    expect(isAppleProfile({ user: 'u', givenName: 42, familyName: null, email: null })).toBe(false);
   });
 });
 

@@ -19,11 +19,14 @@ export function SocialSignIn() {
   // Each hook keeps its own error: show only the one of the provider tried last.
   const [lastTried, setLastTried] = useState<Provider | null>(null);
   const isPending = apple.isPending || google.isPending;
-  const error = lastTried ? { apple, google }[lastTried].error : null;
+  let error: string | null = null;
+  if (lastTried === 'apple') error = apple.error;
+  else if (lastTried === 'google') error = google.error;
 
   const signInWith = (provider: Provider) => {
     setLastTried(provider);
-    void { apple, google }[provider].signIn();
+    if (provider === 'apple') void apple.signIn();
+    else void google.signIn();
   };
 
   return (
