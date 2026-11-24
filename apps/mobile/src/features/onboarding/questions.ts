@@ -18,11 +18,13 @@ import {
   type AppIcon,
 } from '@/ui/icons';
 
-import type { QuizOption, QuizQuestion } from './lib/quiz';
+import { QUIZ_QUESTIONS, type QuizAnswers, type QuizOption, type QuizQuestion } from './lib/quiz';
 
 export interface QuestionOption<Q extends QuizQuestion> {
   value: QuizOption<Q>;
   title: string;
+  /** Chip label on the analysis screen. */
+  shortTitle: string;
   description: string;
   icon: AppIcon;
 }
@@ -41,24 +43,28 @@ export const QUESTIONS: { [Q in QuizQuestion]: QuestionCopy<Q> } = {
       {
         value: 'city',
         title: 'Cité vibrante & histoire',
+        shortTitle: 'Cité vibrante',
         description: 'Architecture, ruelles vivantes, musées et effervescence urbaine.',
         icon: BuildingsIcon,
       },
       {
         value: 'coast',
         title: 'Littoral & grand large',
+        shortTitle: 'Littoral',
         description: 'Plages, côtes sauvages, brise marine et couchers de soleil.',
         icon: WavesIcon,
       },
       {
         value: 'nature',
         title: 'Montagne & grands espaces',
+        shortTitle: 'Montagne',
         description: 'Sentiers d’altitude, air pur, forêts et panoramas ouverts.',
         icon: MountainsIcon,
       },
       {
         value: 'countryside',
         title: 'Terroir & campagne',
+        shortTitle: 'Terroir',
         description: 'Villages préservés, vignobles et quiétude.',
         icon: BarnIcon,
       },
@@ -71,30 +77,35 @@ export const QUESTIONS: { [Q in QuizQuestion]: QuestionCopy<Q> } = {
       {
         value: 'culture',
         title: 'Culture & patrimoine',
+        shortTitle: 'Culture',
         description: 'Monuments, expositions et immersion locale.',
         icon: BankIcon,
       },
       {
         value: 'food',
         title: 'Gastronomie & terroir',
+        shortTitle: 'Gastronomie',
         description: 'Marchés typiques, spécialités régionales et tables gourmandes.',
         icon: ForkKnifeIcon,
       },
       {
         value: 'outdoor',
         title: 'Outdoor & aventure',
+        shortTitle: 'Outdoor',
         description: 'Randonnées, activités de plein air et sensations.',
         icon: PersonSimpleHikeIcon,
       },
       {
         value: 'relax',
         title: 'Farniente & déconnexion',
+        shortTitle: 'Farniente',
         description: 'Rythme lent, terrasses paisibles et détente au calme.',
         icon: CoffeeIcon,
       },
       {
         value: 'nightlife',
         title: 'Vie nocturne & sorties',
+        shortTitle: 'Vie nocturne',
         description: 'Bars animés, concerts et ambiance festive le soir.',
         icon: MartiniIcon,
       },
@@ -107,24 +118,28 @@ export const QUESTIONS: { [Q in QuizQuestion]: QuestionCopy<Q> } = {
       {
         value: 'solo',
         title: 'En solo',
+        shortTitle: 'En solo',
         description: 'Liberté complète et découvertes à ton rythme.',
         icon: UserIcon,
       },
       {
         value: 'couple',
         title: 'En couple',
+        shortTitle: 'En couple',
         description: 'Escapade intime et moments à deux.',
         icon: HeartIcon,
       },
       {
         value: 'friends',
         title: 'Entre potes',
+        shortTitle: 'Entre potes',
         description: 'Sorties, fous rires et road trip partagé.',
         icon: UsersThreeIcon,
       },
       {
         value: 'family',
         title: 'En famille',
+        shortTitle: 'En famille',
         description: 'Des activités pour les petits comme pour les grands.',
         icon: UsersFourIcon,
       },
@@ -137,21 +152,33 @@ export const QUESTIONS: { [Q in QuizQuestion]: QuestionCopy<Q> } = {
       {
         value: 'warm',
         title: 'Grand soleil & chaleur',
+        shortTitle: 'Grand soleil',
         description: 'Chaleur estivale, idéal pour vivre dehors.',
         icon: SunIcon,
       },
       {
         value: 'mild',
         title: 'Douceur tempérée',
+        shortTitle: 'Douceur tempérée',
         description: 'Températures agréables, parfaites pour explorer à pied.',
         icon: CloudSunIcon,
       },
       {
         value: 'cold',
         title: 'Fraîcheur & hiver',
+        shortTitle: 'Fraîcheur',
         description: 'Air vif, plaids et paysages de neige.',
         icon: SnowflakeIcon,
       },
     ],
   },
 };
+
+/** Short labels of the chosen options, in quiz order. */
+export function answerLabels(answers: QuizAnswers): string[] {
+  return QUIZ_QUESTIONS.flatMap((question) =>
+    (QUESTIONS[question].options as QuestionOption<QuizQuestion>[])
+      .filter((option) => (answers[question] as string[]).includes(option.value))
+      .map((option) => option.shortTitle),
+  );
+}

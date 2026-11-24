@@ -16,18 +16,15 @@ export function QuestionStep({ question, selected, onToggle }: QuestionStepProps
   const { title, subtitle, options } = QUESTIONS[question];
 
   return (
-    <View className="gap-6">
-      <Reveal order={0} className="gap-2">
+    <View className="gap-8">
+      <Reveal order={0} className="gap-2.5">
         <Text variant="title" role="heading">
           {title}
         </Text>
         <Text tone="muted">{subtitle}</Text>
-        <Text variant="overline" className="mt-2">
-          Plusieurs choix possibles
-        </Text>
       </Reveal>
 
-      <View className="gap-3">
+      <View role="group" aria-label={title} className="gap-2.5">
         {options.map((option, index) => (
           <Reveal key={option.value} order={index + 1}>
             <OptionTile
