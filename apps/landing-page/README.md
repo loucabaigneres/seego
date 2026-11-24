@@ -38,6 +38,15 @@ pnpm --filter "@seego/landing-page" lint
 | `VITE_POSTHOG_KEY`  | Public `phc_…` key. Tracking only runs in production builds with a key                    |
 | `VITE_POSTHOG_HOST` | Defaults to the EU cloud (`https://eu.i.posthog.com`)                                     |
 
+## Instagram bio link
+
+`https://www.seego.fr/ig` is a temporary redirect (in [`vercel.json`](vercel.json)) to
+`/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&utm_campaign=beta_launch`, so the bio
+shows a clean seego.fr link instead of a URL shortener. The source, medium and content are the
+exact values Instagram appends to bio links: keep them identical, so the duplicated parameters
+agree whichever comes first, while links shared outside the bio stay attributed. Only
+`utm_campaign` is ours. The web app has the same `/ig` redirect (`app.seego.fr/ig`).
+
 ## Waitlist CTA
 
 The e-mail form lives in [`src/components/WaitlistForm.tsx`](src/components/WaitlistForm.tsx)
