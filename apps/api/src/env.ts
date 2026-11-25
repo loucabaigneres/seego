@@ -45,6 +45,10 @@ const envSchema = z.object({
     .string()
     .startsWith('whsec_', 'RESEND_WEBHOOK_SECRET must start with "whsec_"')
     .optional(),
+
+  // Signing secret of the Tally webhook pointing at POST /webhooks/tally (survey e-mails →
+  // waitlist leads). When absent, the route answers 503.
+  TALLY_SIGNING_SECRET: z.string().min(16).optional(),
 });
 
 // Parse and validate environment variables

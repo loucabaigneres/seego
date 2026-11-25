@@ -101,6 +101,9 @@ RESEND_API_KEY=re_your_resend_api_key
 # `unsubscribe_url` (must exist on the account): newsletter templates use {{{contact.unsubscribe_url}}}.
 # RESEND_WAITLIST_SEGMENT_ID=
 # RESEND_WEBHOOK_SECRET=whsec_...
+# Signing secret of the Tally survey webhook pointing at POST /webhooks/tally (production only):
+# e-mails left at the end of the survey become waitlist leads.
+# TALLY_SIGNING_SECRET=
 ```
 
 > ℹ️ `DATABASE_URL` uses the `db` host because the API runs inside Docker. If you run the API outside Docker, use `localhost` instead.
