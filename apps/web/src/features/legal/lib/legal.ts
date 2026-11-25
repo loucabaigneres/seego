@@ -11,6 +11,6 @@ export const LEGAL = {
   address: '[Adresse postale du siège]',
   registration: '[RCS / SIREN, ou « Non immatriculé »]',
   publicationDirector: '[Nom du directeur de la publication]',
-  contactEmail: '[contact@seego.fr]',
+  contactEmail: 'contact@seego.fr',
   lastUpdated: '20 novembre 2026',
 } as const;
