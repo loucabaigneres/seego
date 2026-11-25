@@ -2,7 +2,10 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { AddToTripSheet } from '@/features/inspirations/components/AddToTripSheet';
+import {
+  AddToTripSheet,
+  type AddToTripSheetProps,
+} from '@/features/inspirations/components/AddToTripSheet';
 import { ImportInspirationForm } from '@/features/inspirations/components/ImportInspirationForm';
 import { ImportResult } from '@/features/inspirations/components/ImportResult';
 import { useImportInspiration } from '@/features/inspirations/hooks/useImportInspiration';
@@ -16,7 +19,7 @@ import { ArrowLeftIcon, LockSimpleIcon } from '@/ui/icons';
 export default function ImportInspirationScreen() {
   const session = useAuthSession();
   const form = useImportInspiration({ canAnalyze: session.isSignedIn });
-  const [addingId, setAddingId] = useState<string | null>(null);
+  const [adding, setAdding] = useState<AddToTripSheetProps['inspiration']>(null);
   useSharedLink(form.receiveSharedLink);
   useLinkParam(form.receiveSharedLink);
 
@@ -57,14 +60,14 @@ export default function ImportInspirationScreen() {
       ) : form.result ? (
         <ImportResult
           result={form.result}
-          onAddToTrip={() => setAddingId(form.result!.inspiration.id)}
+          onAddToTrip={() => setAdding(form.result!.inspiration)}
           onImportAnother={form.reset}
         />
       ) : (
         <ImportInspirationForm form={form} />
       )}
 
-      <AddToTripSheet inspirationId={addingId} onClose={() => setAddingId(null)} />
+      <AddToTripSheet inspiration={adding} onClose={() => setAdding(null)} />
     </Screen>
   );
 }

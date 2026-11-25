@@ -19,6 +19,8 @@ export interface TextFieldProps extends Omit<TextInputProps, 'className'> {
   /** Phosphor icon shown before the input. */
   icon?: AppIcon;
   className?: string;
+  /** Shown at the right of the label, e.g. « 15 / 80 ». */
+  counter?: string;
   /** Unit shown after the value, e.g. « ans ». */
   suffix?: string;
   /** `filled`: label inside a borderless surface box (compact grids). */
@@ -31,6 +33,7 @@ export function TextField({
   error,
   icon: Icon,
   className,
+  counter,
   suffix,
   variant = 'outline',
   editable = true,
@@ -60,7 +63,15 @@ export function TextField({
 
   return (
     <View className={cn('gap-2', className)}>
-      {!filled && labelText}
+      {!filled &&
+        (counter ? (
+          <View className="flex-row justify-between gap-3">
+            {labelText}
+            <Text variant="caption">{counter}</Text>
+          </View>
+        ) : (
+          labelText
+        ))}
       <View
         className={cn(
           'rounded-field',

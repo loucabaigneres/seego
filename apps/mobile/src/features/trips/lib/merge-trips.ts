@@ -20,6 +20,13 @@ export function mergeTrips(owned: OwnedTrip[], groups: GroupTrip[]): TripListIte
       destination,
       status,
       createdAt,
+      // Not sent for a joined trip: its delete sheet and stats are never shown.
+      startDate: null,
+      durationDays: null,
+      daysCount: 0,
+      stepsCount: 0,
+      likedCount: 0,
+      coverImage: null,
       groupRole: role,
     }));
 

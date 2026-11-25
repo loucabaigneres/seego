@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { cn } from './cn';
+import { IconButton } from './IconButton';
+import { XIcon } from './icons';
 import { Text } from './Text';
 
 /** Decelerates in, accelerates out: no bounce, like the system sheets. */
@@ -21,11 +23,23 @@ export interface SheetProps {
   visible: boolean;
   onClose: () => void;
   title?: string;
+  /** Caption under the title. */
+  subtitle?: string;
+  /** Replaces the close button at the right of the title. */
+  headerAction?: ReactNode;
   children: ReactNode;
   className?: string;
 }
 
-export function Sheet({ visible, onClose, title, children, className }: SheetProps) {
+export function Sheet({
+  visible,
+  onClose,
+  title,
+  subtitle,
+  headerAction,
+  children,
+  className,
+}: SheetProps) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   // A Modal sits above every screen (on iOS, above screens pushed later too):
@@ -79,9 +93,22 @@ export function Sheet({ visible, onClose, title, children, className }: SheetPro
         >
           <View className="mb-3 h-1.5 w-10 self-center rounded-full bg-surface" />
           {title && (
-            <Text variant="section" className="mb-3">
-              {title}
-            </Text>
+            <View className="mb-4 flex-row items-start gap-3">
+              <View className="flex-1 gap-1">
+                <Text variant="section" role="heading">
+                  {title}
+                </Text>
+                {subtitle && <Text variant="caption">{subtitle}</Text>}
+              </View>
+              {headerAction ?? (
+                <IconButton
+                  label="Fermer"
+                  icon={XIcon}
+                  onPress={onClose}
+                  className="-mr-2.5 -mt-1.5"
+                />
+              )}
+            </View>
           )}
           {children}
         </Animated.View>

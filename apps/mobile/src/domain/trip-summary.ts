@@ -1,4 +1,4 @@
-import { formatDate, pluralize } from './date';
+import { addDays, formatDate, formatDayMonth, pluralize } from './date';
 
 export type TripStatus = 'draft' | 'finalized' | 'archived';
 
@@ -38,4 +38,40 @@ export function tripDisplayTitle(trip: {
   if (title) return title;
   const destination = trip.destination?.trim();
   return destination ? `Voyage à ${destination}` : 'Voyage sans destination';
+}
+
+/** "Li" for Lisbonne: the two letters printed on a trip's tile, from its destination else title. */
+export function tripMonogram(trip: { title: string | null; destination: string | null }): string {
+  const source = trip.destination?.trim() || trip.title?.trim() || '';
+  // `Array.from` splits by code point, so an accented first letter stays whole.
+  const [first = '', second = ''] = Array.from(source);
+  return first.toLocaleUpperCase('fr-FR') + second.toLocaleLowerCase('fr-FR');
+}
+
+/** "12 – 16 juil.", "28 juil. – 2 août", "12 juil." — empty without a start date. */
+export function tripDateRange(trip: {
+  startDate?: string | null;
+  durationDays?: number | null;
+}): string {
+  if (!trip.startDate) return '';
+  const start = formatDayMonth(trip.startDate);
+  if (!trip.durationDays || trip.durationDays < 2) return start;
+  const endDate = addDays(trip.startDate, trip.durationDays - 1);
+  const end = formatDayMonth(endDate);
+  const sameMonth = trip.startDate.slice(0, 7) === endDate.slice(0, 7);
+  return `${sameMonth ? start.split(' ')[0] : start} – ${end}`;
+}
+
+/** A trip in a picker: "12 – 16 juil. · 13 étapes", else its status ("Brouillon"). */
+export function tripPickerDetails(trip: {
+  startDate?: string | null;
+  durationDays?: number | null;
+  stepsCount?: number;
+  status?: string | null;
+}): string {
+  const facts = [
+    tripDateRange(trip),
+    trip.stepsCount ? pluralize(trip.stepsCount, 'étape') : '',
+  ].filter(Boolean);
+  return facts.length > 0 ? facts.join(' · ') : tripStatusMeta(trip.status).label;
 }

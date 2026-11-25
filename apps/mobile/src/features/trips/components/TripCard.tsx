@@ -2,13 +2,12 @@ import { router } from 'expo-router';
 import { Pressable, View } from 'react-native';
 
 import { formatDate } from '@/domain/date';
-import { tripDisplayTitle, tripStatusMeta } from '@/domain/trip-summary';
+import { tripDisplayTitle, tripMonogram, tripStatusMeta } from '@/domain/trip-summary';
 import { colors } from '@seego/ui';
 import { Badge, cn, IconButton, Text } from '@/ui';
 import { SuitcaseRollingIcon, TrashIcon } from '@/ui/icons';
 
 import type { TripListItem } from '../lib/merge-trips';
-import { tripMonogram } from '../lib/trip-list';
 
 export interface TripCardProps {
   trip: TripListItem;

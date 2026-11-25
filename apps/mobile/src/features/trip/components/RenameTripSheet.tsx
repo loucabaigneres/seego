@@ -11,6 +11,7 @@ export function RenameTripSheet({ rename }: { rename: ReturnType<typeof useTripR
       <View className="gap-4">
         <TextField
           label="Titre du voyage"
+          counter={`${rename.value.length} / ${TRIP_TITLE_MAX_LENGTH}`}
           value={rename.value}
           onChangeText={rename.setValue}
           error={rename.error ?? undefined}

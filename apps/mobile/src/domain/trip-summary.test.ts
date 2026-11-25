@@ -1,4 +1,11 @@
-import { tripDisplayTitle, tripFacts, tripStatusMeta } from './trip-summary';
+import {
+  tripDateRange,
+  tripDisplayTitle,
+  tripFacts,
+  tripMonogram,
+  tripPickerDetails,
+  tripStatusMeta,
+} from './trip-summary';
 
 describe('tripStatusMeta', () => {
   it('translates each status', () => {
@@ -38,5 +45,43 @@ describe('tripFacts', () => {
   it('leaves out what the trip does not have', () => {
     expect(tripFacts({ startDate: null, durationDays: 1 }, 0)).toEqual(['1 jour']);
     expect(tripFacts({}, 0)).toEqual([]);
+  });
+});
+
+describe('tripMonogram', () => {
+  it('takes the destination first, else the title', () => {
+    expect(tripMonogram({ title: 'Week-end', destination: 'lisbonne' })).toBe('Li');
+    expect(tripMonogram({ title: 'Été à Séville', destination: null })).toBe('Ét');
+    expect(tripMonogram({ title: ' ', destination: null })).toBe('');
+  });
+});
+
+describe('tripDateRange', () => {
+  it('shortens a range within one month', () => {
+    expect(tripDateRange({ startDate: '2026-07-12', durationDays: 5 })).toBe('12 – 16 juil.');
+  });
+
+  it('keeps both months across a month change', () => {
+    expect(tripDateRange({ startDate: '2026-07-30', durationDays: 4 })).toBe('30 juil. – 2 août');
+  });
+
+  it('is empty without a start date', () => {
+    expect(tripDateRange({ startDate: null, durationDays: 3 })).toBe('');
+  });
+});
+
+describe('tripPickerDetails', () => {
+  it('shows the dates and steps, else the status', () => {
+    expect(
+      tripPickerDetails({
+        startDate: '2026-07-12',
+        durationDays: 5,
+        stepsCount: 13,
+        status: 'finalized',
+      }),
+    ).toBe('12 – 16 juil. · 13 étapes');
+    expect(tripPickerDetails({ startDate: null, stepsCount: 0, status: 'draft' })).toBe(
+      'Brouillon',
+    );
   });
 });
