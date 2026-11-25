@@ -2,8 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { EmptyState, ErrorState, Notice, Skeleton } from '@/ui';
-import { MagnifyingGlassIcon, SparkleIcon } from '@/ui/icons';
+import { colors } from '@seego/ui';
+import { Button, EmptyState, ErrorState, Notice, Skeleton, Tag, Text } from '@/ui';
+import { ArrowRightIcon, MagnifyingGlassIcon, PlusIcon } from '@/ui/icons';
 
 import { useDeleteInspiration } from '../hooks/useDeleteInspiration';
 import { useMyInspirations } from '../hooks/useMyInspirations';
@@ -12,6 +13,34 @@ import { AddToTripSheet, type AddToTripSheetProps } from './AddToTripSheet';
 import { InspirationCard } from './InspirationCard';
 import { InspirationFilterBar } from './InspirationFilterBar';
 import { InspirationFilterSheet } from './InspirationFilterSheet';
+
+/** No inspiration yet: a video in, places out, and the way to import the first one. */
+function NoInspirations() {
+  return (
+    <View className="gap-4 rounded-card border border-line px-5 py-[22px]">
+      <View aria-hidden className="flex-row items-center gap-2">
+        <Tag label="TikTok" capitalize={false} className="bg-brand" textClassName="text-accent" />
+        <Tag label="Instagram" capitalize={false} />
+        <ArrowRightIcon size={20} color={colors.line.strong} />
+        <Tag label="3 lieux" capitalize={false} className="bg-accent" textClassName="text-brand" />
+      </View>
+      <View className="gap-1.5">
+        <Text variant="title" role="heading" className="text-[26px] leading-[30px]">
+          Pas encore d’inspiration
+        </Text>
+        <Text tone="muted" className="text-[15px] leading-[22px]">
+          Importe un TikTok ou un Reel : on repère les lieux pour tes prochains voyages. Tu peux
+          aussi le partager à Seego depuis l’app.
+        </Text>
+      </View>
+      <Button
+        label="Importer une inspiration"
+        icon={PlusIcon}
+        onPress={() => router.push('/inspiration/import')}
+      />
+    </View>
+  );
+}
 
 /** The user's imported inspirations with their loading, empty and error states. */
 export function InspirationList() {
@@ -43,15 +72,7 @@ export function InspirationList() {
   }
 
   if (inspirations.length === 0) {
-    return (
-      <EmptyState
-        className="flex-none rounded-card border border-brand/15 bg-surface py-10"
-        icon={SparkleIcon}
-        title="Pas encore d’inspiration"
-        description="Importe un TikTok ou un Reel : on repère les lieux pour tes prochains voyages. Tu peux aussi le partager à Seego depuis l’app."
-        action={{ label: 'Importer une vidéo', onPress: () => router.push('/inspiration/import') }}
-      />
-    );
+    return <NoInspirations />;
   }
 
   return (
