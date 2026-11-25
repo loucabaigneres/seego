@@ -19,7 +19,7 @@ vi.mock('../../env.js', () => ({
 }));
 
 const { appRouter } = await import('../router.js');
-const { generateInvitePayload, INVITE_CODE_LENGTH } = await import('./group.js');
+const { generateInvitePayload, INVITE_CODE_LENGTH, summarizeMembers } = await import('./group.js');
 
 const TRIP_ID = '00000000-0000-4000-8000-000000000001';
 const ME = 'user-me';
@@ -56,6 +56,34 @@ describe('generateInvitePayload', () => {
       expect(inviteCode).toMatch(new RegExp(`^[A-HJ-NP-Z2-9]{${INVITE_CODE_LENGTH}}$`));
       expect(inviteCodeExpiresAt.getTime() - Date.now()).toBeGreaterThan(23.9 * 3600 * 1000);
     }
+  });
+});
+
+describe('summarizeMembers', () => {
+  it('counts members and keeps the owner first, then the earliest 3 by join date', () => {
+    const at = (d: number) => new Date(2026, 10, d);
+    const rows = [
+      { tripId: 'a', id: 'u3', name: 'Inès', role: 'member' as const, joinedAt: at(3) },
+      { tripId: 'a', id: 'u4', name: 'Hugo', role: 'member' as const, joinedAt: at(4) },
+      { tripId: 'a', id: 'u2', name: 'Tom', role: 'member' as const, joinedAt: at(2) },
+      { tripId: 'a', id: 'u1', name: 'Léa', role: 'owner' as const, joinedAt: at(5) },
+      { tripId: 'b', id: 'u2', name: 'Tom', role: 'owner' as const, joinedAt: at(1) },
+    ];
+    const byTrip = summarizeMembers(rows);
+    expect(byTrip.get('a')).toEqual({
+      memberCount: 4,
+      ownerName: 'Léa',
+      members: [
+        { id: 'u1', name: 'Léa' },
+        { id: 'u2', name: 'Tom' },
+        { id: 'u3', name: 'Inès' },
+      ],
+    });
+    expect(byTrip.get('b')).toEqual({
+      memberCount: 1,
+      ownerName: 'Tom',
+      members: [{ id: 'u2', name: 'Tom' }],
+    });
   });
 });
 

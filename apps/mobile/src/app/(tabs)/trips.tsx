@@ -1,6 +1,7 @@
 import { RefreshControl } from 'react-native';
 
-import { GroupTripActions } from '@/features/group-trip/components/GroupTripActions';
+import { CreateGroupTripButton } from '@/features/group-trip/components/CreateGroupTripButton';
+import { JoinCodeForm } from '@/features/group-trip/components/JoinCodeForm';
 import { JoinCodeLink } from '@/features/group-trip/components/JoinCodeLink';
 import { useProfileRefresh } from '@/features/profile/hooks/useProfileRefresh';
 import { GuestInvite } from '@/features/profile/components/GuestInvite';
@@ -44,7 +45,11 @@ export default function TripsScreen() {
         />
       }
     >
-      <TripList groupActions={<GroupTripActions />} joinLink={<JoinCodeLink />} />
+      <TripList
+        groupJoin={<JoinCodeForm />}
+        groupCreate={<CreateGroupTripButton />}
+        joinLink={<JoinCodeLink />}
+      />
     </Screen>
   );
 }

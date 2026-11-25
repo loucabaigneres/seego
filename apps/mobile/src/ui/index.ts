@@ -3,6 +3,7 @@
  * Built on NativeWind classes mapped to the `@seego/ui` tokens, `cn()` (clsx + tailwind-merge)
  * and Phosphor icons.
  */
+export { Avatar, AvatarStack } from './Avatar';
 export { Badge } from './Badge';
 export { Button } from './Button';
 export { Card } from './Card';

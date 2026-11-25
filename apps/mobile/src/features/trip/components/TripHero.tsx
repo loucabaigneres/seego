@@ -13,6 +13,7 @@ import {
   MapPinIcon,
   MapTrifoldIcon,
   PencilSimpleIcon,
+  UsersThreeIcon,
 } from '@/ui/icons';
 
 function leaveTrip() {
@@ -30,6 +31,8 @@ export interface TripHeroProps {
   onRename?: () => void;
   /** Once the itinerary exists. */
   pdf?: { onExport: () => void; isExporting: boolean };
+  /** A group trip: opens its participants. */
+  participants?: { count: number; onPress: () => void };
 }
 
 export function TripHero({
@@ -39,6 +42,7 @@ export function TripHero({
   onLayout,
   onRename,
   pdf,
+  participants,
 }: TripHeroProps) {
   const status = tripStatusMeta(trip.status);
   const facts = tripFacts(trip, plannedCount);
@@ -73,7 +77,8 @@ export function TripHero({
           />
         </View>
         <View className="flex-row items-center gap-2">
-          <Badge label={status.label} tone={status.tone} />
+          {/* A group trip has more actions up here: its status moves down, over the title. */}
+          {!trip.isGroup && <Badge label={status.label} tone={status.tone} />}
           {pdf && (
             <IconButton
               variant="scrim"
@@ -84,6 +89,26 @@ export function TripHero({
               onPress={pdf.onExport}
               className={pdf.isExporting ? 'opacity-50' : undefined}
             />
+          )}
+          {participants && (
+            <View>
+              <IconButton
+                variant="scrim"
+                label={`Participants, ${participants.count}`}
+                icon={UsersThreeIcon}
+                onPress={participants.onPress}
+              />
+              {participants.count > 0 && (
+                <View
+                  aria-hidden
+                  className="absolute -right-0.5 -top-0.5 h-[18px] min-w-[18px] items-center justify-center rounded-full bg-accent px-1"
+                >
+                  <Text className="font-sans-semibold text-[11px] leading-[14px] text-brand">
+                    {participants.count}
+                  </Text>
+                </View>
+              )}
+            </View>
           )}
           {onRename && (
             <IconButton
@@ -97,11 +122,12 @@ export function TripHero({
       </View>
 
       <View className="gap-2 px-6 pb-14">
+        {trip.isGroup && <Badge label={status.label} tone={status.tone} />}
         {trip.destination && (
           <View className="flex-row items-center gap-1.5">
             <MapPinIcon size={16} weight="fill" color={colors.accent} />
             <Text variant="caption" tone="inverse" numberOfLines={1}>
-              {trip.destination}
+              {trip.isGroup ? `Voyage de groupe · ${trip.destination}` : trip.destination}
             </Text>
           </View>
         )}

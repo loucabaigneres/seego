@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Share } from 'react-native';
@@ -15,13 +16,16 @@ type Trip = RouterOutputs['discovery']['getTrip']['trip'];
 export type GroupMember = RouterOutputs['group']['getGroupMembers'][number];
 
 /**
- * The group side of a trip page: turning the trip into a group, sharing its invite, and the
- * "Voyage de groupe" sheet (destination, members, new code, leaving or deleting the group).
+ * The group side of a trip: turning it into a group, its invite (share, copy, new code), its
+ * destination, its members, leaving or deleting it. Shared by the trip page and the participants
+ * screen.
  */
 export function useGroupTrip(tripId: string, trip: Trip | null) {
   const queryClient = useQueryClient();
   const { user } = useAuthSession();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  /** The member the remove sheet asks about (and their place in the list, for the avatar). */
+  const [removing, setRemoving] = useState<{ member: GroupMember; index: number } | null>(null);
   /** `null` until the destination field is edited. */
   const [destinationDraft, setDestinationDraft] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +44,6 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
 
   /** Out of the trip once the user no longer belongs to it. */
   const exitTrip = (deleted: boolean) => {
-    setIsOpen(false);
     router.replace('/trips');
     if (deleted)
       queryClient.removeQueries({ queryKey: trpc.discovery.getTrip.queryKey({ tripId }) });
@@ -70,8 +73,10 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
   );
   const removeMember = useMutation(
     trpc.group.removeMember.mutationOptions({
-      onSuccess: () => queryClient.invalidateQueries({ queryKey: membersKey }),
-      onError: fail('Impossible de retirer ce membre. Réessaie.'),
+      onSuccess: () => {
+        setRemoving(null);
+        return queryClient.invalidateQueries({ queryKey: membersKey });
+      },
     }),
   );
   const leave = useMutation(
@@ -89,7 +94,8 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
 
   const members = useQuery({
     ...trpc.group.getGroupMembers.queryOptions({ tripId }),
-    enabled: isOpen && state === 'active',
+    // Avatars and counts show on the trip page, not only on the participants screen.
+    enabled: state === 'active',
   });
 
   const destination = destinationDraft ?? trip?.destination ?? '';
@@ -98,9 +104,22 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
   return {
     state,
     isHost,
+    meId: user?.id,
     code,
     status: inviteStatus(trip?.inviteCodeExpiresAt),
     signIn: () => router.push('/auth/sign-in'),
+    openParticipants: () =>
+      router.push({ pathname: '/trip/[tripId]/participants', params: { tripId } }),
+    copy: {
+      run: () => {
+        if (!code) return;
+        void Clipboard.setStringAsync(code).then(() => {
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        });
+      },
+      isCopied,
+    },
     convert: {
       run: () => convert.mutate({ tripId, destination: trip?.destination ?? undefined }),
       isPending: convert.isPending,
@@ -116,31 +135,24 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
       run: () => regenerate.mutate({ tripId }),
       isPending: regenerate.isPending,
     },
-    sheet: {
-      isOpen,
-      open: () => {
-        setError(null);
-        setIsOpen(true);
-      },
-      close: () => setIsOpen(false),
-      error,
-    },
+    error,
     members: {
       list: members.data ?? [],
       isLoading: members.isPending,
       failed: members.isError,
       retry: () => members.refetch(),
       removingId: removeMember.isPending ? removeMember.variables?.userId : undefined,
-      remove: (member: GroupMember) =>
-        confirmDestructive({
-          title: 'Retirer ce membre ?',
-          message: `${member.name || member.email} n’aura plus accès à ce voyage.`,
-          confirmLabel: 'Retirer',
-          onConfirm: () => {
-            setError(null);
-            removeMember.mutate({ tripId, userId: member.id });
-          },
-        }),
+      removal: {
+        pending: removing,
+        open: (member: GroupMember, index: number) => {
+          removeMember.reset();
+          setRemoving({ member, index });
+        },
+        close: () => setRemoving(null),
+        confirm: () => removing && removeMember.mutate({ tripId, userId: removing.member.id }),
+        isRemoving: removeMember.isPending,
+        failed: removeMember.isError,
+      },
     },
     destination: {
       value: destination,
@@ -178,5 +190,19 @@ export function useGroupTrip(tripId: string, trip: Trip | null) {
         }),
       isPending: deleteTrip.isPending,
     },
+  };
+}
+
+/** A group trip loaded on its own, for the screens outside the trip page (participants). */
+export function useGroupTripById(tripId: string) {
+  const query = useQuery(trpc.discovery.getTrip.queryOptions({ tripId }));
+  const trip = query.data?.trip ?? null;
+  const group = useGroupTrip(tripId, trip);
+  return {
+    trip,
+    isLoading: query.isPending,
+    failed: query.isError,
+    retry: () => query.refetch(),
+    group,
   };
 }

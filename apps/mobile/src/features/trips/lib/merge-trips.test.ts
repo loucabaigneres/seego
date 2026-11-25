@@ -12,13 +12,20 @@ const group = (id: string, createdAt: string, role: 'owner' | 'member') =>
     role,
     inviteCode: 'ABCD2345',
     inviteCodeExpiresAt: null,
+    memberCount: 2,
+    members: [{ id: 'u1', name: 'Léa' }],
+    ownerName: 'Léa',
   }) as never;
 
 describe('mergeTrips', () => {
   it('shows a hosted group trip once, with its role', () => {
     const trips = mergeTrips([owned('a', '2026-11-01')], [group('a', '2026-11-01', 'owner')]);
     expect(trips).toHaveLength(1);
-    expect(trips[0]).toMatchObject({ id: 'a', groupRole: 'owner' });
+    expect(trips[0]).toMatchObject({
+      id: 'a',
+      groupRole: 'owner',
+      group: { memberCount: 2, ownerName: 'Léa', members: [{ id: 'u1', name: 'Léa' }] },
+    });
   });
 
   it('adds the joined trips and keeps solo ones without a role, newest first', () => {

@@ -25,13 +25,43 @@ function findMembership(ctx: { db: Context['db']; user: { id: string } }, tripId
   });
 }
 
+type MemberRow = {
+  tripId: string;
+  id: string;
+  name: string;
+  role: 'owner' | 'member' | null;
+  joinedAt: Date;
+};
+
+/** Per trip: member count, the first 3 members (owner first, then by join date) and the owner's name. */
+export function summarizeMembers(rows: MemberRow[]) {
+  const sorted = [...rows].sort(
+    (a, b) =>
+      Number(b.role === 'owner') - Number(a.role === 'owner') ||
+      a.joinedAt.getTime() - b.joinedAt.getTime(),
+  );
+  const byTrip = new Map<
+    string,
+    { memberCount: number; members: { id: string; name: string }[]; ownerName: string | null }
+  >();
+  for (const r of sorted) {
+    const entry = byTrip.get(r.tripId) ?? { memberCount: 0, members: [], ownerName: null };
+    entry.memberCount++;
+    if (entry.members.length < 3) entry.members.push({ id: r.id, name: r.name });
+    if (r.role === 'owner') entry.ownerName = r.name;
+    byTrip.set(r.tripId, entry);
+  }
+  return byTrip;
+}
+
 export const groupRouter = createTRPCRouter({
   createOrConvertGroupTrip: protectedProcedure
     .input(
       z
         .object({
           tripId: z.uuid().optional(),
-          destination: z.string().optional(),
+          title: z.string().trim().min(1).max(80).optional(),
+          destination: z.string().trim().min(1).optional(),
         })
         .optional(),
     )
@@ -84,7 +114,7 @@ export const groupRouter = createTRPCRouter({
         .values({
           userId: ctx.user.id,
           // Replaced by "Voyage à <ville>" once the host has swiped its places.
-          title: 'Nouveau voyage de groupe',
+          title: input?.title ?? 'Nouveau voyage de groupe',
           destination: input?.destination ?? 'Destination à définir',
           isGroup: true,
           inviteCode,
@@ -198,7 +228,7 @@ export const groupRouter = createTRPCRouter({
     }),
 
   getMyGroupTrips: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
+    const trips = await ctx.db
       .select({
         id: trip.id,
         title: trip.title,
@@ -215,6 +245,30 @@ export const groupRouter = createTRPCRouter({
         and(eq(tripMembers.userId, ctx.user.id), eq(trip.isGroup, true), isNull(trip.deletedAt)),
       )
       .orderBy(desc(trip.createdAt));
+    if (trips.length === 0) return [];
+
+    // One query for every trip's members, instead of one per trip.
+    const memberRows = await ctx.db
+      .select({
+        tripId: tripMembers.tripId,
+        id: user.id,
+        name: user.name,
+        role: tripMembers.role,
+        joinedAt: tripMembers.joinedAt,
+      })
+      .from(tripMembers)
+      .innerJoin(user, eq(tripMembers.userId, user.id))
+      .where(
+        inArray(
+          tripMembers.tripId,
+          trips.map((t) => t.id),
+        ),
+      );
+    const byTrip = summarizeMembers(memberRows);
+    return trips.map((t) => ({
+      ...t,
+      ...(byTrip.get(t.id) ?? { memberCount: 0, members: [], ownerName: null }),
+    }));
   }),
 
   getGroupMembers: protectedProcedure

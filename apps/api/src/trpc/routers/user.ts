@@ -2,7 +2,7 @@ import { TRPCError } from '@trpc/server';
 import { userOnboarding } from '@seego/database';
 import { and, count, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { activity, discoveryContent, swipes, trip, tripDay, user } from '../../lib/tables.js';
+import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
 export const userRouter = createTRPCRouter({
@@ -47,23 +47,29 @@ export const userRouter = createTRPCRouter({
         createdAt: trip.createdAt,
         startDate: trip.startDate,
         durationDays: trip.durationDays,
+        // Correlated subqueries in plain SQL: Drizzle drops the table name of columns interpolated
+        // into `sql` on a single-table select, so `${trip.id}` would render an ambiguous "id".
         // Day 0 holds the liked places, day -1 the alternative hotels, day 1+ the itinerary.
-        daysCount:
-          sql<number>`(select count(*) from ${tripDay} where ${tripDay.tripId} = ${trip.id} and ${tripDay.dayIndex} > 0)`.mapWith(
-            Number,
-          ),
-        stepsCount:
-          sql<number>`(select count(*) from ${activity} join ${tripDay} on ${tripDay.id} = ${activity.tripDayId} where ${tripDay.tripId} = ${trip.id} and ${tripDay.dayIndex} > 0 and ${activity.deletedAt} is null)`.mapWith(
-            Number,
-          ),
-        likedCount:
-          sql<number>`(select count(*) from ${activity} join ${tripDay} on ${tripDay.id} = ${activity.tripDayId} where ${tripDay.tripId} = ${trip.id} and ${tripDay.dayIndex} = 0 and ${activity.deletedAt} is null)`.mapWith(
-            Number,
-          ),
+        daysCount: sql<number>`(
+          select count(*) from trip_day td where td.trip_id = "trip"."id" and td.day_index > 0
+        )`.mapWith(Number),
+        stepsCount: sql<number>`(
+          select count(*) from activity a join trip_day td on td.id = a.trip_day_id
+          where td.trip_id = "trip"."id" and td.day_index > 0 and a.deleted_at is null
+        )`.mapWith(Number),
+        likedCount: sql<number>`(
+          select count(*) from activity a join trip_day td on td.id = a.trip_day_id
+          where td.trip_id = "trip"."id" and td.day_index = 0 and a.deleted_at is null
+        )`.mapWith(Number),
         // Same rule as the trip page: the first itinerary photo, else a liked place's.
-        coverImage: sql<
-          string | null
-        >`(select ${discoveryContent.mainMediaUrl} from ${activity} join ${tripDay} on ${tripDay.id} = ${activity.tripDayId} join ${discoveryContent} on ${discoveryContent.id} = ${activity.discoveryContentId} where ${tripDay.tripId} = ${trip.id} and ${tripDay.dayIndex} >= 0 and ${activity.deletedAt} is null order by ${tripDay.dayIndex} = 0, ${tripDay.dayIndex}, ${activity.orderIndex} limit 1)`,
+        coverImage: sql<string | null>`(
+          select dc.main_media_url from activity a
+          join trip_day td on td.id = a.trip_day_id
+          join discovery_content dc on dc.id = a.discovery_content_id
+          where td.trip_id = "trip"."id" and td.day_index >= 0 and a.deleted_at is null
+          order by td.day_index = 0, td.day_index, a.order_index
+          limit 1
+        )`,
       })
       .from(trip)
       .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))

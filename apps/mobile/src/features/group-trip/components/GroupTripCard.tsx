@@ -1,7 +1,8 @@
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
-import { Badge, Button, Card, Notice, Text } from '@/ui';
-import { ShareNetworkIcon, UsersThreeIcon } from '@/ui/icons';
+import { firstName, membersLabel } from '@/domain/group';
+import { AvatarStack, Button, Card, Notice, Skeleton, Text } from '@/ui';
+import { PlusIcon, UsersThreeIcon } from '@/ui/icons';
 
 import type { useGroupTrip } from '../hooks/useGroupTrip';
 
@@ -36,51 +37,46 @@ export function GroupTripCard({ group }: { group: ReturnType<typeof useGroupTrip
     );
   }
 
-  const { expired, hoursLeft } = group.status;
+  const { list } = group.members;
+  const owner = list.find((m) => m.role === 'owner');
+  const caption = group.isHost
+    ? 'Tu organises ce voyage'
+    : owner
+      ? `Organisé par ${firstName(owner.name)}`
+      : 'Voyage de groupe';
+
   return (
-    <Card className="gap-4">
-      <View className="gap-2">
-        <Badge label="Voyage de groupe" tone="success" />
-        <Text variant="overline">Code d’invitation</Text>
-        <Text variant="section" className="tracking-[3px]" selectable>
-          {group.code ?? '—'}
-        </Text>
-        <Text variant="caption" tone={expired ? 'brand' : 'success'}>
-          {expired
-            ? group.isHost
-              ? 'Code expiré : génère-en un nouveau.'
-              : 'Code expiré : demande un nouveau code à l’hôte.'
-            : `Valide encore ${hoursLeft} h`}
-        </Text>
-      </View>
-      <View className="flex-row gap-3">
-        {expired && group.isHost ? (
-          <Button
-            label="Nouveau code"
-            size="sm"
-            className="flex-1"
-            loading={group.regenerate.isPending}
-            onPress={group.regenerate.run}
-          />
+    <View className="flex-row items-center gap-3.5 rounded-card bg-surface px-4 py-3.5">
+      <Pressable
+        role="button"
+        aria-label={`Participants : ${membersLabel(list, group.meId)}. ${caption}`}
+        onPress={group.openParticipants}
+        className="flex-1 flex-row items-center gap-3.5 active:opacity-80"
+      >
+        {group.members.isLoading ? (
+          <Skeleton className="h-[34px] w-20 rounded-full" />
         ) : (
-          <Button
-            label="Partager"
-            size="sm"
-            className="flex-1"
-            icon={ShareNetworkIcon}
-            disabled={expired}
-            onPress={group.share}
+          <AvatarStack
+            names={list.slice(0, 3).map((m) => m.name || m.email)}
+            extra={Math.max(list.length - 3, 0)}
+            size="md"
+            ringClassName="border-surface"
           />
         )}
-        <Button
-          label="Membres"
-          variant="outline"
-          size="sm"
-          className="flex-1"
-          icon={UsersThreeIcon}
-          onPress={group.sheet.open}
-        />
-      </View>
-    </Card>
+        <View className="flex-1">
+          <Text variant="label" className="text-[15px] leading-5" numberOfLines={1}>
+            {group.members.failed ? 'Participants' : membersLabel(list, group.meId) || '…'}
+          </Text>
+          <Text variant="caption">{caption}</Text>
+        </View>
+      </Pressable>
+      <Button
+        label="Inviter"
+        variant="outline"
+        size="sm"
+        icon={PlusIcon}
+        onPress={group.openParticipants}
+      />
+    </View>
   );
 }

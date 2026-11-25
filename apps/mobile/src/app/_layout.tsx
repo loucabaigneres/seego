@@ -37,7 +37,9 @@ export default function RootLayout() {
             <Stack.Screen name="onboarding" />
             <Stack.Screen name="discovery" options={{ gestureEnabled: false }} />
             <Stack.Screen name="trip/configure" />
-            <Stack.Screen name="trip/[tripId]" />
+            <Stack.Screen name="trip/[tripId]/index" />
+            <Stack.Screen name="trip/[tripId]/participants" />
+            <Stack.Screen name="group/create" />
             <Stack.Screen name="settings" />
             <Stack.Screen name="inspiration/import" />
             <Stack.Screen name="join/[inviteCode]" />
