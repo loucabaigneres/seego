@@ -6,6 +6,8 @@ export const resend = new Resend(env.RESEND_API_KEY);
 
 const FROM_TRANSACTIONAL = 'Seego <noreply@mail.seego.fr>';
 export const FROM_MARKETING = 'Seego <hello@news.seego.fr>';
+/** Human-read inbox (Cloudflare Email Routing → team Gmail): replies to app emails land there. */
+export const REPLY_TO = 'Seego <contact@seego.fr>';
 
 export const TEMPLATES = {
   verifyEmailOtp: 'verify-email-otp',
@@ -22,6 +24,7 @@ async function sendTemplate(opts: {
   try {
     const { error } = await resend.emails.send({
       from: FROM_TRANSACTIONAL,
+      replyTo: REPLY_TO,
       to: opts.to,
       subject: opts.subject,
       template: { id: opts.template, variables: opts.variables },
