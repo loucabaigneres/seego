@@ -2,8 +2,10 @@ import {
   groupCardState,
   inviteStatus,
   inviteUrl,
+  isCodeRejected,
   joinErrorMessage,
   parseInviteCode,
+  waitingMembers,
 } from './invite';
 
 describe('inviteUrl', () => {
@@ -35,6 +37,10 @@ describe('parseInviteCode', () => {
     expect(parseInviteCode('seego://join/ABCD2345')).toBe('ABCD2345');
   });
 
+  it('keeps at most 12 characters', () => {
+    expect(parseInviteCode('ABCD2345ABCD2345')).toBe('ABCD2345ABCD');
+  });
+
   it('gives nothing for an empty input', () => {
     expect(parseInviteCode('   ')).toBeNull();
   });
@@ -62,10 +68,29 @@ describe('groupCardState', () => {
   });
 });
 
+describe('waitingMembers', () => {
+  it('names up to three members', () => {
+    expect(waitingMembers([])).toBeNull();
+    expect(waitingMembers(['Léa'])).toBe('Léa t’attend.');
+    expect(waitingMembers(['Léa', 'Tom'])).toBe('Léa et Tom t’attendent.');
+    expect(waitingMembers(['Léa', 'Tom', 'Inès'])).toBe('Léa, Tom et Inès t’attendent.');
+  });
+
+  it('counts the rest past three', () => {
+    expect(waitingMembers(['Léa', 'Tom', 'Inès', 'Sam'])).toBe('Léa, Tom et 2 autres t’attendent.');
+  });
+});
+
 describe('joinErrorMessage', () => {
   it('tells an unknown code from an expired one', () => {
-    expect(joinErrorMessage('NOT_FOUND')).toMatch(/aucun voyage/);
-    expect(joinErrorMessage('BAD_REQUEST')).toMatch(/expiré/);
-    expect(joinErrorMessage(undefined)).toMatch(/Réessaie/);
+    expect(joinErrorMessage('NOT_FOUND').message).toMatch(/aucun voyage/);
+    expect(joinErrorMessage('BAD_REQUEST').title).toMatch(/expiré/);
+    expect(joinErrorMessage(undefined).message).toMatch(/Réessaie/);
+  });
+
+  it('only rejects the code itself for an unknown or expired one', () => {
+    expect(isCodeRejected('NOT_FOUND')).toBe(true);
+    expect(isCodeRejected('BAD_REQUEST')).toBe(true);
+    expect(isCodeRejected('INTERNAL_SERVER_ERROR')).toBe(false);
   });
 });
