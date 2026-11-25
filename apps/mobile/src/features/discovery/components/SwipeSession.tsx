@@ -1,14 +1,15 @@
 import * as WebBrowser from 'expo-web-browser';
 import { Pressable, View } from 'react-native';
 
-import { offerHost } from '@/domain/place';
+import { offerHost, placePhotos } from '@/domain/place';
 import { colors } from '@seego/ui';
-import { EmptyState, Text } from '@/ui';
-import { ArrowSquareOutIcon, MapTrifoldIcon } from '@/ui/icons';
+import { Text } from '@/ui';
+import { ArrowSquareOutIcon } from '@/ui/icons';
 
 import { useDestinationResult } from '../hooks/useDestinationResult';
 import { useSwipeDeck } from '../hooks/useSwipeDeck';
 import type { DiscoveryPlace } from '../lib/discovery-place';
+import { DeckFinished } from './DeckFinished';
 import { DeckHeader } from './DeckHeader';
 import { ResultSheet } from './ResultSheet';
 import { SwipeActions } from './SwipeActions';
@@ -23,6 +24,7 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
   const detailsOpen = deck.detailsOpen;
   const offerUrl = detailsOpen ? (deck.cards.at(0)?.url ?? null) : null;
   const host = offerHost(offerUrl);
+  const photos = places.slice(0, 2).flatMap((place) => placePhotos(place).slice(0, 1));
 
   const restart = () => {
     deck.restart();
@@ -34,16 +36,12 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
       <DeckHeader likeCount={deck.progressCount} onShowResult={result.open} />
 
       {deck.isFinished ? (
-        <EmptyState
-          className="rounded-card border border-brand/15 bg-surface"
-          icon={MapTrifoldIcon}
-          title="Tu as parcouru tous les lieux !"
-          description="Découvre la destination qui te correspond, ou recommence pour affiner tes goûts."
-          action={
-            deck.likeCount > 0
-              ? { label: 'Voir ma destination', onPress: result.open }
-              : { label: 'Recommencer', onPress: restart }
-          }
+        <DeckFinished
+          seenCount={deck.swipes.length}
+          likeCount={deck.likeCount}
+          photos={photos}
+          onShowResult={result.open}
+          onRestart={restart}
         />
       ) : (
         <SwipeDeck
@@ -57,14 +55,16 @@ export function SwipeSession({ tripId, places }: { tripId: string; places: Disco
         />
       )}
 
-      <SwipeActions
-        onSkip={deck.skip}
-        onLike={deck.like}
-        onDetails={deck.toggleDetails}
-        disabled={deck.isFinished || deck.isLeaving}
-        detailsOpen={detailsOpen}
-        dragX={deck.dragX}
-      />
+      {!deck.isFinished && (
+        <SwipeActions
+          onSkip={deck.skip}
+          onLike={deck.like}
+          onDetails={deck.toggleDetails}
+          disabled={deck.isLeaving}
+          detailsOpen={detailsOpen}
+          dragX={deck.dragX}
+        />
+      )}
 
       {!deck.isFinished && (
         // Fixed height: the deck keeps its size when the hint turns into the offer link.
