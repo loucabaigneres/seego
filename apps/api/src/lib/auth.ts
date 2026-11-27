@@ -71,26 +71,36 @@ export const auth = betterAuth({
     //   (`clientId`) and the client secret;
     // - native iOS: the app sends Apple's identity token, whose audience is the bundle ID.
     //   `audience` lists both clients so either kind of token is accepted.
-    apple: {
-      clientId: env.APPLE_CLIENT_ID,
-      // Getter: read at each call to Apple, so the secret is renewed before its 6 months expire.
-      get clientSecret() {
-        return appleClientSecret();
-      },
-      appBundleIdentifier: env.APPLE_APP_BUNDLE_IDENTIFIER,
-      audience: [env.APPLE_APP_BUNDLE_IDENTIFIER, env.APPLE_CLIENT_ID],
-      // Apple may send a token without e-mail (see `resolveAppleEmail`), and an account created
-      // that way gets the e-mail and name once Apple shares them (`upgradeApplePlaceholder`).
-      mapProfileToUser: async (profile) => {
-        if (typeof profile.sub === 'string' && profile.email) {
-          await upgradeApplePlaceholder(db, profile.sub, {
-            email: profile.email,
-            emailVerified: profile.email_verified,
-            name: profile.name,
-          });
-        }
-        return resolveAppleEmail(profile, (sub) => findUserByAppleSubject(db, sub));
-      },
+    // Async, as in the Better Auth docs: the client secret is signed (jose) before the provider
+    // is set up. A key that cannot be read leaves the redirect flow off without breaking the rest
+    // of auth: the native iOS flow does not need the secret.
+    apple: async () => {
+      try {
+        await appleClientSecret.init();
+      } catch (err) {
+        console.error('[apple] could not sign the client secret, web sign-in is off:', err);
+      }
+      return {
+        clientId: env.APPLE_CLIENT_ID,
+        // Getter: read at each call to Apple, so the secret is renewed before its 6 months expire.
+        get clientSecret() {
+          return appleClientSecret.current();
+        },
+        appBundleIdentifier: env.APPLE_APP_BUNDLE_IDENTIFIER,
+        audience: [env.APPLE_APP_BUNDLE_IDENTIFIER, env.APPLE_CLIENT_ID],
+        // Apple may send a token without e-mail (see `resolveAppleEmail`), and an account created
+        // that way gets the e-mail and name once Apple shares them (`upgradeApplePlaceholder`).
+        mapProfileToUser: async (profile) => {
+          if (typeof profile.sub === 'string' && profile.email) {
+            await upgradeApplePlaceholder(db, profile.sub, {
+              email: profile.email,
+              emailVerified: profile.email_verified,
+              name: profile.name,
+            });
+          }
+          return resolveAppleEmail(profile, (sub) => findUserByAppleSubject(db, sub));
+        },
+      };
     },
   },
   // Le front (app.seego.fr / *.vercel.app) et l'API sont sur des sites différents :
