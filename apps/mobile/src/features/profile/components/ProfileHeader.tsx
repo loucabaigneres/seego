@@ -5,7 +5,7 @@ import { formatDate } from '@/domain/date';
 import type { RouterOutputs } from '@/lib/trpc';
 import { Text } from '@/ui';
 
-import { avatarInitial } from '../lib/profile';
+import { avatarInitial, displayEmail } from '../lib/profile';
 
 type ProfileUser = NonNullable<RouterOutputs['user']['getProfile']['user']>;
 
@@ -40,9 +40,11 @@ export function ProfileHeader({ user }: { user: ProfileUser }) {
         <Text variant="section" role="heading" numberOfLines={1}>
           {user.name || 'Voyageur'}
         </Text>
-        <Text tone="muted" numberOfLines={1}>
-          {user.email}
-        </Text>
+        {displayEmail(user.email) && (
+          <Text tone="muted" numberOfLines={1}>
+            {displayEmail(user.email)}
+          </Text>
+        )}
         {since && <Text variant="caption">Membre depuis le {since}</Text>}
       </View>
     </View>

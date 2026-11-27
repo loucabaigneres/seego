@@ -80,7 +80,13 @@ server.route({
       const req = new Request(url.toString(), {
         method: request.method,
         headers,
-        ...(request.body ? { body: JSON.stringify(request.body) } : {}),
+        // Form posts (Apple's `form_post` callback) arrive as the raw string (parser registered in
+        // routes/unsubscribe.ts): forward them as is, JSON-encoding them would break Better Auth.
+        ...(request.body
+          ? {
+              body: typeof request.body === 'string' ? request.body : JSON.stringify(request.body),
+            }
+          : {}),
       });
 
       const response = await auth.handler(req);

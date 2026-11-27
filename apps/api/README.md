@@ -39,7 +39,10 @@ Validated with Zod in `src/env.ts`: the process exits if a variable is missing o
 | `DATABASE_URL`, `PORT`, `NODE_ENV`         | `NODE_ENV` defaults to `development`                                   |
 | `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`    | Secret ≥ 10 chars. In prod, `BETTER_AUTH_URL` is the front URL (proxy) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Required                                                               |
+| `APPLE_CLIENT_ID`                          | Required, Services ID of the Apple redirect flow (web, later Android)  |
 | `APPLE_APP_BUNDLE_IDENTIFIER`              | Required, audience of the native Sign in with Apple token              |
+| `APPLE_TEAM_ID`, `APPLE_KEY_ID`            | Required, Sign in with Apple key that signs the client secret          |
+| `APPLE_PRIVATE_KEY`                        | Required, content of the `.p8` key (line breaks may be written `\n`)   |
 | `FRONTEND_URL`                             | Defaults to `http://localhost:5173`; trusted origin + email links      |
 | `AI_MODEL`, `GEMINI_API_KEY`               | `provider:model` (`google:` or `mistral:`); key only needed to analyse |
 | `RESEND_API_KEY`                           | Required, must start with `re_`                                        |
@@ -59,9 +62,28 @@ CORS is an allowlist hard-coded in `src/index.ts` (seego.fr domains, `*.vercel.a
 ## Auth (`src/lib/auth.ts`)
 
 - Email + password with mandatory email verification by 6-digit OTP (`emailOTP` plugin), password reset by email.
-- Google (browser redirect flow) and Apple (native iOS only: the app sends the identity token, checked against Apple's keys).
+- Google (browser redirect flow) and Apple (see below).
 - `expo()` plugin for the mobile app (`seego://` scheme, `exp://` and `localhost:8081` in development).
 - `admin()` plugin: default role `traveler`, only `admin` opens the back-office.
+
+### Sign in with Apple
+
+Configured as in the [Better Auth docs](https://www.better-auth.com/docs/authentication/apple), with two flows side by side:
+
+- **Redirect** (web, later Android): the browser goes to Apple, which posts the result (`form_post`) to `<BETTER_AUTH_URL>/api/auth/callback/apple`. The code is exchanged with the Services ID (`APPLE_CLIENT_ID`) and a client secret.
+- **Native iOS**: the app sends Apple's identity token, whose audience is the bundle ID. `audience` lists both the bundle ID and the Services ID, so both kinds of token are accepted.
+
+The client secret is an ES256 JWT signed at runtime with the `.p8` key (`src/lib/apple/clientSecret.ts`, valid 6 months, renewed a day before expiry): nothing to generate by hand. `https://appleid.apple.com` is a trusted origin (it posts the callback), and the Fastify bridge forwards form bodies as is.
+
+Apple Developer setup (Certificates, Identifiers & Profiles):
+
+1. **App ID** `fr.seego.app` with _Sign in with Apple_ (primary).
+2. **Services ID** (the `APPLE_CLIENT_ID`), _Sign in with Apple_ enabled and grouped with `fr.seego.app`, with one domain and return URL per environment. `BETTER_AUTH_URL` is the front URL (Vercel proxy), so:
+   - production: domain `app.seego.fr`, return URL `https://app.seego.fr/api/auth/callback/apple`;
+   - staging: the staging `BETTER_AUTH_URL` domain, same path.
+3. **Key** with _Sign in with Apple_, configured on `fr.seego.app`: its Key ID and the `.p8` content go in `APPLE_KEY_ID` / `APPLE_PRIVATE_KEY`, the Team ID in `APPLE_TEAM_ID`.
+
+Apple only accepts HTTPS return URLs on registered domains: the redirect flow cannot be tested on `localhost`. Test it on staging, or locally through an HTTPS tunnel (e.g. `cloudflared tunnel --url http://localhost:3000`) whose domain is added to the Services ID and set as `BETTER_AUTH_URL`. The native iOS flow works locally as usual.
 
 ## tRPC
 

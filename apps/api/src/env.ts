@@ -18,9 +18,17 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
 
-  // Sign in with Apple (native iOS): the identity token's audience is the app's bundle ID.
-  // No default: a missing value must stop the API, not fail every Apple sign-in silently.
+  // Sign in with Apple. No defaults: a missing value must stop the API, not fail every Apple
+  // sign-in silently. See "Sign in with Apple" in apps/api/README.md.
+  // Services ID: client of the redirect flow (web, later Android).
+  APPLE_CLIENT_ID: z.string().min(1),
+  // iOS bundle ID: audience of the identity tokens the native app sends.
   APPLE_APP_BUNDLE_IDENTIFIER: z.string().min(1),
+  // Sign in with Apple key (.p8) that signs the client secret.
+  APPLE_TEAM_ID: z.string().min(1),
+  APPLE_KEY_ID: z.string().min(1),
+  // Content of the .p8 file; line breaks may be written as `\n`.
+  APPLE_PRIVATE_KEY: z.string().min(1),
 
   // Frontend URL configuration
   FRONTEND_URL: z.url().default('http://localhost:5173'),
