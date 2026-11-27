@@ -2,14 +2,22 @@ import { router } from 'expo-router';
 import { useState, type ReactNode } from 'react';
 import { View } from 'react-native';
 
-import { tripDisplayTitle } from '@/domain/trip-summary';
-import { Button, EmptyState, ErrorState, Notice, SegmentedControl, Skeleton, Text, type Segment } from '@/ui';
+import {
+  Button,
+  EmptyState,
+  ErrorState,
+  SegmentedControl,
+  Skeleton,
+  Text,
+  type Segment,
+} from '@/ui';
 import { MapTrifoldIcon, PlusIcon, UsersThreeIcon } from '@/ui/icons';
 
 import { useDeleteTrip } from '../hooks/useDeleteTrip';
 import { useMyTrips } from '../hooks/useMyTrips';
 import type { TripListItem } from '../lib/merge-trips';
 import { tripsOverline } from '../lib/trip-list';
+import { DeleteTripSheet } from './DeleteTripSheet';
 import { TripFeatureCard, TripRow } from './TripCard';
 
 // shortcut: user.getTrips returns every trip and the list shows them 10 at a time; paginate in the API if accounts reach hundreds of trips.
@@ -42,7 +50,7 @@ export function TripList({ groupActions }: TripListProps) {
 
   const cardProps = (trip: TripListItem) => ({
     trip,
-    onDelete: () => deletion.remove(trip.id, tripDisplayTitle(trip)),
+    onDelete: () => deletion.open(trip),
     isDeleting: deletion.deletingId === trip.id,
   });
 
@@ -80,9 +88,6 @@ export function TripList({ groupActions }: TripListProps) {
             }}
           />
           {kind === 'group' && groupActions}
-          {deletion.failed && (
-            <Notice message="Impossible de supprimer ce voyage pour le moment. Réessaie." />
-          )}
           {!featured &&
             (kind === 'solo' ? (
               <EmptyState
@@ -90,7 +95,10 @@ export function TripList({ groupActions }: TripListProps) {
                 icon={MapTrifoldIcon}
                 title="Pas encore de voyage"
                 description="Lance le quiz ou swipe quelques destinations pour créer ton premier itinéraire."
-                action={{ label: 'Découvrir des destinations', onPress: () => router.navigate('/') }}
+                action={{
+                  label: 'Découvrir des destinations',
+                  onPress: () => router.navigate('/'),
+                }}
               />
             ) : (
               <EmptyState
@@ -125,6 +133,7 @@ export function TripList({ groupActions }: TripListProps) {
           )}
         </>
       )}
+      <DeleteTripSheet deletion={deletion} />
     </View>
   );
 }

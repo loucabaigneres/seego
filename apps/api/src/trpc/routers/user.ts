@@ -1,8 +1,21 @@
 import { TRPCError } from '@trpc/server';
 import { userOnboarding } from '@seego/database';
-import { and, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  like,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { z } from 'zod';
-import { swipes, trip, user } from '../../lib/tables.js';
+import { activity, discoveryContent, swipes, trip, tripDay, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
 
 export const userRouter = createTRPCRouter({
@@ -38,6 +51,28 @@ export const userRouter = createTRPCRouter({
   }),
 
   getTrips: protectedProcedure.query(async ({ ctx }) => {
+    // Correlated subqueries built with Drizzle so `trip.id` renders qualified ("trip"."id").
+    // Day 0 holds the liked places, day -1 the alternative hotels, day 1+ the itinerary.
+    const tripDayIds = (dayFilter: SQL) =>
+      ctx.db
+        .select({ id: tripDay.id })
+        .from(tripDay)
+        .where(and(eq(tripDay.tripId, trip.id), dayFilter));
+    const activityCount = (dayFilter: SQL) =>
+      ctx.db.$count(
+        activity,
+        and(isNull(activity.deletedAt), inArray(activity.tripDayId, tripDayIds(dayFilter))),
+      );
+    // Same rule as the trip page: the first itinerary photo, else a liked place's.
+    const coverImage = ctx.db
+      .select({ url: discoveryContent.mainMediaUrl })
+      .from(activity)
+      .innerJoin(tripDay, eq(tripDay.id, activity.tripDayId))
+      .innerJoin(discoveryContent, eq(discoveryContent.id, activity.discoveryContentId))
+      .where(and(eq(tripDay.tripId, trip.id), gte(tripDay.dayIndex, 0), isNull(activity.deletedAt)))
+      .orderBy(sql`${tripDay.dayIndex} = 0`, tripDay.dayIndex, activity.orderIndex)
+      .limit(1);
+
     return await ctx.db
       .select({
         id: trip.id,
@@ -45,6 +80,15 @@ export const userRouter = createTRPCRouter({
         destination: trip.destination,
         status: trip.status,
         createdAt: trip.createdAt,
+        startDate: trip.startDate,
+        durationDays: trip.durationDays,
+        daysCount: ctx.db.$count(
+          tripDay,
+          and(eq(tripDay.tripId, trip.id), gt(tripDay.dayIndex, 0)),
+        ),
+        stepsCount: activityCount(gt(tripDay.dayIndex, 0)),
+        likedCount: activityCount(eq(tripDay.dayIndex, 0)),
+        coverImage: sql<string | null>`(${coverImage})`,
       })
       .from(trip)
       .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))

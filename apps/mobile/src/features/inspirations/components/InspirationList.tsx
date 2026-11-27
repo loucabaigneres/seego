@@ -8,7 +8,7 @@ import { MagnifyingGlassIcon, SparkleIcon } from '@/ui/icons';
 import { useDeleteInspiration } from '../hooks/useDeleteInspiration';
 import { useMyInspirations } from '../hooks/useMyInspirations';
 import { cityOptions, filterInspirations, hasActiveFilter, NO_FILTERS } from '../lib/filters';
-import { AddToTripSheet } from './AddToTripSheet';
+import { AddToTripSheet, type AddToTripSheetProps } from './AddToTripSheet';
 import { InspirationCard } from './InspirationCard';
 import { InspirationFilterBar } from './InspirationFilterBar';
 import { InspirationFilterSheet } from './InspirationFilterSheet';
@@ -17,7 +17,7 @@ import { InspirationFilterSheet } from './InspirationFilterSheet';
 export function InspirationList() {
   const { inspirations, isLoading, hasFailed, retry } = useMyInspirations();
   const deletion = useDeleteInspiration();
-  const [addingId, setAddingId] = useState<string | null>(null);
+  const [adding, setAdding] = useState<AddToTripSheetProps['inspiration']>(null);
   const [filters, setFilters] = useState(NO_FILTERS);
   const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
   const shown = filterInspirations(inspirations, filters);
@@ -79,10 +79,10 @@ export function InspirationList() {
           inspiration={inspiration}
           onDelete={() => deletion.remove(inspiration.id)}
           isDeleting={deletion.deletingId === inspiration.id}
-          onAddToTrip={() => setAddingId(inspiration.id)}
+          onAddToTrip={() => setAdding(inspiration)}
         />
       ))}
-      <AddToTripSheet inspirationId={addingId} onClose={() => setAddingId(null)} />
+      <AddToTripSheet inspiration={adding} onClose={() => setAdding(null)} />
       <InspirationFilterSheet
         visible={isFilterSheetOpen}
         onClose={() => setIsFilterSheetOpen(false)}

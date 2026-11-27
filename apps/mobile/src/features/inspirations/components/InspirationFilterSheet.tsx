@@ -26,7 +26,7 @@ export interface InspirationFilterSheetProps {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="gap-3 border-b border-line py-5">
+    <View className="gap-3 border-b border-line py-4">
       <Text variant="label">{title}</Text>
       <View className="flex-row flex-wrap gap-2">{children}</View>
     </View>
@@ -46,8 +46,24 @@ export function InspirationFilterSheet({
   const isDefault = count === 0 && filters.sort === NO_FILTERS.sort;
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="Filtres" className="px-0">
-      <ScrollView className="px-6" contentContainerClassName="pb-2">
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      title={count > 0 ? `Filtres · ${count}` : 'Filtres'}
+      headerAction={
+        <Button
+          label="Réinitialiser"
+          variant="text"
+          size="sm"
+          disabled={isDefault}
+          // The search stays: it lives outside the sheet.
+          onPress={() => onChange({ ...NO_FILTERS, query: filters.query })}
+          className="-mr-4 -mt-1.5"
+        />
+      }
+      className="h-[86%]"
+    >
+      <ScrollView className="flex-1" contentContainerClassName="pb-2">
         <Section title="Réseau">
           {PLATFORM_FILTERS.map(({ value, label }) => (
             <Chip
@@ -98,26 +114,15 @@ export function InspirationFilterSheet({
         </Section>
       </ScrollView>
 
-      <View className="flex-row gap-3 px-6 pt-4">
-        <Button
-          label={count > 0 ? `Tout effacer (${count})` : 'Tout effacer'}
-          variant="outline"
-          disabled={isDefault}
-          // The search stays: it lives outside the sheet.
-          onPress={() => onChange({ ...NO_FILTERS, query: filters.query })}
-          className="flex-1"
-        />
-        <Button
-          label={
-            resultCount === 0
-              ? 'Aucun résultat'
-              : `Voir ${resultCount} inspiration${resultCount > 1 ? 's' : ''}`
-          }
-          variant="cta"
-          onPress={onClose}
-          className="flex-[1.4]"
-        />
-      </View>
+      <Button
+        label={
+          resultCount === 0
+            ? 'Aucun résultat'
+            : `Voir ${resultCount} inspiration${resultCount > 1 ? 's' : ''}`
+        }
+        onPress={onClose}
+        className="mt-4"
+      />
     </Sheet>
   );
 }

@@ -91,6 +91,8 @@ export function usePlanningDraft(tripId: string, itinerary: TripDay[]) {
     }),
     /** Days the place being moved can go to; `null` while no move is open. */
     moveTargets: draft && moving ? draft.filter((day) => day.id !== moving.dayId) : null,
+    /** "Da Enzo al 29 · actuellement au jour 1", under the sheet's title. */
+    movingLabel: movingLabel(draft, moving),
     closeMoveToDay: () => setMoving(null),
     moveTo: (targetDayId: string) => {
       if (moving) update((d) => moveToDay(d, moving.dayId, moving.activityId, targetDayId));
@@ -101,3 +103,12 @@ export function usePlanningDraft(tripId: string, itinerary: TripDay[]) {
 
 export type PlanningDraft = ReturnType<typeof usePlanningDraft>;
 export type DayEdit = ReturnType<PlanningDraft['editDay']>;
+
+function movingLabel(
+  draft: TripDay[] | null,
+  moving: { dayId: string; activityId: string } | null,
+): string | undefined {
+  const day = moving && draft?.find((d) => d.id === moving.dayId);
+  const place = day?.activities.find((activity) => activity.id === moving!.activityId);
+  return day && place ? `${place.title} · actuellement au jour ${day.dayIndex}` : undefined;
+}

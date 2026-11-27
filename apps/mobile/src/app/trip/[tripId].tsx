@@ -49,6 +49,7 @@ function TripPage({ tripId }: { tripId: string }) {
   } = useTrip(tripId);
   const group = useGroupTrip(tripId, trip);
   const showMap = isGenerated && itineraryView.view === 'map';
+  const coverImage = tripCoverImage(days.itinerary, days.likedPlaces);
 
   if (!trip) {
     return (
@@ -95,7 +96,7 @@ function TripPage({ tripId }: { tripId: string }) {
       >
         <TripHero
           trip={trip}
-          coverImage={tripCoverImage(days.itinerary, days.likedPlaces)}
+          coverImage={coverImage}
           plannedCount={plannedCount(days.itinerary)}
           onRename={rename.canRename && !edit.isEditing ? rename.open : undefined}
           pdf={
@@ -175,9 +176,16 @@ function TripPage({ tripId }: { tripId: string }) {
       <ReplacePlaceSheet replace={replace} />
       <RenameTripSheet rename={rename} />
       <GroupTripSheet group={group} />
-      <PdfActionsSheet visible={pdf.isChoosing} onPick={pdf.run} onClose={pdf.dismiss} />
+      <PdfActionsSheet
+        visible={pdf.isChoosing}
+        trip={trip}
+        coverImage={coverImage}
+        onPick={pdf.run}
+        onClose={pdf.dismiss}
+      />
       <MoveToDaySheet
         targets={edit.moveTargets}
+        subtitle={edit.movingLabel}
         onPick={edit.moveTo}
         onClose={edit.closeMoveToDay}
       />
