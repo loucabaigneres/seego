@@ -69,7 +69,7 @@ export function DeleteTripSheet({ deletion }: { deletion: ReturnType<typeof useD
           {shown.daysCount > 0 && (
             <Loss
               icon={MapTrifoldIcon}
-              label={`L’itinéraire de ${pluralize(shown.daysCount, 'jour')} et ses ${pluralize(shown.stepsCount, 'étape')}`}
+              label={`L’itinéraire de ${pluralize(shown.daysCount, 'jour')}${shown.stepsCount > 0 ? ` et ses ${pluralize(shown.stepsCount, 'étape')}` : ''}`}
             />
           )}
           {shown.likedCount > 0 && (
