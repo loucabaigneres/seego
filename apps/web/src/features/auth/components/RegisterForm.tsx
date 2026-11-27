@@ -3,6 +3,7 @@ import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
 import { useAuthSubmit } from '../hooks/useAuthSubmit';
+import { AppleSignIn } from './AppleSignIn';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
@@ -84,6 +85,8 @@ export function RegisterForm({ redirect }: { redirect: string | undefined }) {
             .
           </p>
         </form>
+
+        <AppleSignIn redirect={redirect} />
       </AuthCard>
 
       {showVerify && (

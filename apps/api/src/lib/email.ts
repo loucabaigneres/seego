@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { env } from '../env.js';
+import { isApplePlaceholderEmail } from './apple/email.js';
 import { buildUnsubscribeUrl } from './unsubscribe.js';
 
 export const resend = new Resend(env.RESEND_API_KEY);
@@ -21,6 +22,9 @@ async function sendTemplate(opts: {
   template: string;
   variables?: Record<string, string | number>;
 }) {
+  // Stand-in address of an Apple account without e-mail: it can never receive anything, and a
+  // bounce would hurt the sender's reputation.
+  if (isApplePlaceholderEmail(opts.to)) return;
   try {
     const { error } = await resend.emails.send({
       from: FROM_TRANSACTIONAL,

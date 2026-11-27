@@ -84,8 +84,15 @@ BETTER_AUTH_SECRET=generate_a_random_string_here_at_least_10_chars
 BETTER_AUTH_URL=http://localhost:3000
 GOOGLE_CLIENT_ID=found_in_your_google_cloud_console
 GOOGLE_CLIENT_SECRET=found_in_your_google_cloud_console
-# iOS bundle ID (`ios.bundleIdentifier` in apps/mobile/app.json): audience of Sign in with Apple tokens
+# Sign in with Apple (all required, see "Sign in with Apple" in apps/api/README.md)
+# Services ID (redirect flow: web, later Android)
+APPLE_CLIENT_ID=your_services_id
+# iOS bundle ID (`ios.bundleIdentifier` in apps/mobile/app.json): audience of native tokens
 APPLE_APP_BUNDLE_IDENTIFIER=fr.seego.app
+# Sign in with Apple key (.p8): Team ID, Key ID and the file content (line breaks as \n)
+APPLE_TEAM_ID=BSH2PBLALU
+APPLE_KEY_ID=your_key_id
+APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 FRONTEND_URL=http://localhost:5173
 
 # AI analysis (optional to start the server, required to analyze posts). Format: "provider:model"

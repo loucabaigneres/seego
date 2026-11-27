@@ -3,12 +3,21 @@ import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
 import { useAuthSubmit } from '../hooks/useAuthSubmit';
+import { socialErrorMessage } from '../lib/redirect';
+import { AppleSignIn } from './AppleSignIn';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
 import { VerifyEmailModal } from './VerifyEmailModal';
 
-export function LoginForm({ redirect }: { redirect: string | undefined }) {
+export function LoginForm({
+  redirect,
+  socialError,
+}: {
+  redirect: string | undefined;
+  /** `error` search param set by the API after a failed Apple sign-in. */
+  socialError?: string;
+}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showVerify, setShowVerify] = useState(false);
@@ -49,7 +58,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
       <AuthCard
         title="Connexion"
         subtitle="Connecte-toi pour retrouver et enregistrer tes voyages."
-        error={error}
+        error={error ?? socialErrorMessage(socialError)}
         footer={
           <>
             Pas encore de compte ?{' '}
@@ -83,6 +92,8 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
           />
           <SubmitButton loading={loading} label="Se connecter" loadingLabel="Connexion en cours…" />
         </form>
+
+        <AppleSignIn redirect={redirect} />
       </AuthCard>
 
       {showVerify && (

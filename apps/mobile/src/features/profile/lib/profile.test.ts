@@ -1,4 +1,15 @@
-import { avatarInitial, nameChange } from './profile';
+import { avatarInitial, displayEmail, nameChange } from './profile';
+
+describe('displayEmail', () => {
+  it('shows a real address', () => {
+    expect(displayEmail('jane@privaterelay.appleid.com')).toBe('jane@privaterelay.appleid.com');
+  });
+
+  it('hides the stand-in address of an Apple account without e-mail', () => {
+    expect(displayEmail('001234.abcd@apple.placeholder.invalid')).toBeNull();
+    expect(avatarInitial(null, '001234.abcd@apple.placeholder.invalid')).toBe('?');
+  });
+});
 
 describe('avatarInitial', () => {
   it('uses the first letter of the name, uppercased', () => {

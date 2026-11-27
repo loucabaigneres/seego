@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      jose:
-        specifier: ^6.2.3
-        version: 6.2.3
     devDependencies:
       '@commitlint/cli':
         specifier: ^20.5.2
@@ -166,6 +162,9 @@ importers:
       fastify:
         specifier: ^5.8.5
         version: 5.8.5
+      jose:
+        specifier: ^6.2.3
+        version: 6.2.3
       resend:
         specifier: ^6.34.1
         version: 6.34.1
