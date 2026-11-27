@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { IconButton, Text } from '@/ui';
 import { ArrowLeftIcon } from '@/ui/icons';
 
-export function SettingsHeader() {
+export function SettingsHeader({ title = 'Paramètres' }: { title?: string }) {
   return (
     <View className="flex-row items-center gap-2">
       <IconButton
@@ -14,7 +14,7 @@ export function SettingsHeader() {
         className="-ml-2"
       />
       <Text variant="section" role="heading">
-        Paramètres
+        {title}
       </Text>
     </View>
   );

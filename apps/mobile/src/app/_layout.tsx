@@ -39,6 +39,7 @@ export default function RootLayout() {
             <Stack.Screen name="trip/configure" />
             <Stack.Screen name="trip/[tripId]" />
             <Stack.Screen name="settings" />
+            <Stack.Screen name="delete-account" />
             <Stack.Screen name="inspiration/import" />
             <Stack.Screen name="join/[inviteCode]" />
             <Stack.Screen name="auth/sign-in" options={{ presentation: 'modal' }} />

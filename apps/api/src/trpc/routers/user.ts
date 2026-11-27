@@ -2,8 +2,23 @@ import { TRPCError } from '@trpc/server';
 import { userOnboarding } from '@seego/database';
 import { and, count, desc, eq, inArray, isNull, like, or } from 'drizzle-orm';
 import { z } from 'zod';
+import { env } from '../../env.js';
+import {
+  DELETE_CONFIRMATION,
+  deleteAccount,
+  isSessionFresh,
+} from '../../lib/account/deleteAccount.js';
+import { findAppleRefreshToken } from '../../lib/apple/knownUser.js';
+import { revokeAppleAccess } from '../../lib/apple/revoke.js';
 import { swipes, trip, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
+
+/** Sign in with Apple key, to revoke the user's Apple authorization on deletion. */
+const appleKey = {
+  teamId: env.APPLE_TEAM_ID,
+  keyId: env.APPLE_KEY_ID,
+  privateKey: env.APPLE_PRIVATE_KEY,
+};
 
 export const userRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -97,6 +112,44 @@ export const userRouter = createTRPCRouter({
       }
 
       return { success: true, trip: updatedTrip };
+    }),
+
+  /**
+   * Deletes the account and its data for good (GDPR, App Store guideline 5.1.1(v)).
+   * Needs a recent sign-in, and for an Apple account a fresh authorization code from the device
+   * so the Apple token can be revoked. Owned group trips go to another member.
+   */
+  deleteAccount: protectedProcedure
+    .input(
+      z.object({
+        confirmation: z.literal(DELETE_CONFIRMATION),
+        appleAuthorizationCode: z.string().min(1).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!isSessionFresh(new Date(ctx.session.session.createdAt))) {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'Reconnecte-toi avant de supprimer ton compte.',
+        });
+      }
+
+      // Before deleting: the Apple account row (and its stored token) goes with the user, and
+      // the app's code is single-use. Best effort, the account is erased even if Apple is down.
+      const revocation = await revokeAppleAccess({
+        authorizationCode: input.appleAuthorizationCode,
+        storedRefreshToken: await findAppleRefreshToken(ctx.db, ctx.user.id),
+        bundleId: env.APPLE_APP_BUNDLE_IDENTIFIER,
+        servicesId: env.APPLE_CLIENT_ID,
+        key: appleKey,
+      });
+      // Only trace of whether Apple was told (App Store 5.1.1(v)).
+      if (revocation.status === 'failed') {
+        console.error('[deleteAccount] Apple revocation failed:', revocation);
+      }
+
+      const result = await deleteAccount(ctx.db, ctx.user.id);
+      return { ...result, appleRevoked: revocation.status === 'revoked' };
     }),
 
   deleteTrip: protectedProcedure

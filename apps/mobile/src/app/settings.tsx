@@ -34,6 +34,12 @@ export default function SettingsScreen() {
         onPress={signOut}
         className="mt-auto"
       />
+      <Button
+        label="Supprimer mon compte"
+        variant="text"
+        size="sm"
+        onPress={() => router.push('/delete-account')}
+      />
     </Screen>
   );
 }

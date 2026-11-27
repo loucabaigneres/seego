@@ -18,6 +18,7 @@ describe('authErrorMessage', () => {
 
   it('translates social sign-in errors', () => {
     expect(authErrorMessage({ code: 'INVALID_TOKEN' })).toMatch(/échoué/);
+    expect(authErrorMessage({ code: 'USER_EMAIL_NOT_FOUND', status: 401 })).toMatch(/retire Seego/);
   });
 
   it('points to the password only when the e-mail belongs to an unlinked account', () => {

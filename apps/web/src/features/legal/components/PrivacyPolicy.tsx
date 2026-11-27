@@ -189,7 +189,7 @@ export function PrivacyPolicy() {
         <LegalList
           items={[
             'droit d’accès et de rectification (ton nom est modifiable depuis ton espace) ;',
-            'droit à l’effacement, y compris la suppression de ton compte ;',
+            'droit à l’effacement : tu peux supprimer ton compte toi-même, depuis les Paramètres de l’app ou de ton espace sur le site ;',
             'droit d’opposition et de limitation du traitement ;',
             'droit à la portabilité ;',
             'droit de retirer ton consentement, sans que cela remette en cause les traitements déjà effectués ;',

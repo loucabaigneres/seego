@@ -45,6 +45,7 @@ export interface AnalyticsEvents {
   password_reset_completed: Record<string, never>;
   guest_trips_claimed: { count: number };
   profile_updated: Record<string, never>;
+  account_deleted: Record<string, never>;
   // Group trips
   group_trip_created: Record<string, never>;
   group_invite_copied: { source: 'create_button' | 'invite_card' | 'popover' };

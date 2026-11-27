@@ -92,6 +92,14 @@ Apple only accepts HTTPS return URLs on registered domains, so the redirect flow
 
 The native iOS flow works locally as usual.
 
+### Account deletion (`user.deleteAccount`)
+
+GDPR erasure and App Store guideline 5.1.1(v). The client sends the typed word `SUPPRIMER`; the session must be under 24 h old (`PRECONDITION_FAILED` otherwise, the user signs in again).
+
+- `lib/account/deleteAccount.ts` erases everything in one transaction. Several tables hold a `user_id` without a foreign key (`trip`, `swipe`, `imported_inspiration`, `payment_transaction`, `places.owner_user_id`), so they are cleaned explicitly; sessions, linked accounts, trip memberships and onboarding answers follow the `user` row by cascade.
+- Owned group trips with other members go to the member who joined first; other owned trips are deleted with their days, activities, documents and payments. Private imported places are deleted, or detached (`owner_user_id = null`, still inactive) when another user's trip or swipe uses them.
+- Apple accounts (`lib/apple/revoke.ts`, Sign in with Apple key): from the iOS app, a fresh authorization code is exchanged (bundle ID) and the token revoked; from the web, the refresh token Better Auth stored at a redirect-flow sign-in is revoked (Services ID). Best effort: an account with neither (native sign-in deleted from the web), or Apple being unreachable, does not block the deletion.
+
 ## tRPC
 
 - `src/trpc/init.ts`: `publicProcedure`, `protectedProcedure` (needs a session), `adminProcedure` (session + `role === 'admin'`, otherwise `FORBIDDEN`).
