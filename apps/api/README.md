@@ -83,7 +83,14 @@ Apple Developer setup (Certificates, Identifiers & Profiles):
    - staging: the staging `BETTER_AUTH_URL` domain, same path.
 3. **Key** with _Sign in with Apple_, configured on `fr.seego.app`: its Key ID and the `.p8` content go in `APPLE_KEY_ID` / `APPLE_PRIVATE_KEY`, the Team ID in `APPLE_TEAM_ID`.
 
-Apple only accepts HTTPS return URLs on registered domains: the redirect flow cannot be tested on `localhost`. Test it on staging, or locally through an HTTPS tunnel (e.g. `cloudflared tunnel --url http://localhost:3000`) whose domain is added to the Services ID and set as `BETTER_AUTH_URL`. The native iOS flow works locally as usual.
+Apple only accepts HTTPS return URLs on registered domains, so the redirect flow cannot run on `localhost`. To test it locally, expose the web app through an HTTPS tunnel and let its dev proxy reach the API, as the Vercel proxy does in production:
+
+1. `apps/web/.env`: `VITE_USE_API_PROXY=true` (the Vite dev server then relays `/api/*` to `http://localhost:3000`).
+2. `cloudflared tunnel --url http://localhost:5173` gives an `https://<name>.trycloudflare.com` URL.
+3. Start the API with `BETTER_AUTH_URL` and `FRONTEND_URL` set to that URL.
+4. In the Services ID, add the tunnel domain and `https://<name>.trycloudflare.com/api/auth/callback/apple` (a new URL at each tunnel start), then open the app through the tunnel URL.
+
+The native iOS flow works locally as usual.
 
 ## tRPC
 
