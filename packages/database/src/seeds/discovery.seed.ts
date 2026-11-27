@@ -1,3 +1,5 @@
+/* eslint-disable no-console -- script de seed : la progression s'affiche en console */
+
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
