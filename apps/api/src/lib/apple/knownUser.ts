@@ -52,3 +52,20 @@ export async function upgradeApplePlaceholder(
     console.warn('[apple] could not replace the placeholder e-mail:', err);
   }
 }
+
+/**
+ * Refresh token Better Auth stored for this user's Apple account, when they signed in through the
+ * redirect flow (web). Stored as is: `account.encryptOAuthTokens` is not enabled in auth.ts (if it
+ * ever is, decrypt it here). `null` for native iOS sign-ins, which keep no Apple token.
+ */
+export async function findAppleRefreshToken(
+  db: typeof appDb,
+  userId: string,
+): Promise<string | null> {
+  const [row] = await db
+    .select({ refreshToken: account.refreshToken })
+    .from(account)
+    .where(and(eq(account.userId, userId), eq(account.providerId, 'apple')))
+    .limit(1);
+  return row?.refreshToken ?? null;
+}

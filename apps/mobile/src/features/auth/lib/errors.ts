@@ -19,6 +19,9 @@ const MESSAGES: Record<string, string> = {
   INVALID_ORIGIN: "L'app n'est pas autorisée par le serveur. Préviens l'équipe.",
   // Apple / Google identity token sign-in.
   INVALID_TOKEN: 'La connexion a échoué. Réessaie.',
+  // Apple sent no e-mail: the authorization was granted without it, only the user can reset it.
+  USER_EMAIL_NOT_FOUND:
+    "Apple n'a pas partagé ton email. Dans Réglages, touche ton nom puis Connexion et sécurité > Se connecter avec Apple, retire Seego et réessaie.",
   // Also raised when the account or session cannot be created: only `account not linked`
   // (below) means an e-mail account already exists.
   OAUTH_LINK_ERROR: 'La connexion a échoué. Réessaie.',

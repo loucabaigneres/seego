@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { PageSpinner } from '@/components/PageSpinner';
 import { InspirationList } from '@/features/inspiration/components/InspirationList';
+import { DeleteAccountSection } from '@/features/profile/components/DeleteAccountSection'
 import { MyTripsList } from '@/features/profile/components/MyTripsList';
 import { ProfileHeader } from '@/features/profile/components/ProfileHeader';
 import { ProfileSettingsForm } from '@/features/profile/components/ProfileSettingsForm';
@@ -44,7 +45,10 @@ function ProfilePage() {
             </Link>
           </div>
         ) : (
-          <ProfileSettingsForm initialName={profile?.user?.name ?? ''} />
+          <>
+            <ProfileSettingsForm initialName={profile?.user?.name ?? ''} />
+            <DeleteAccountSection />
+          </>
         )}
       </div>
     </div>
