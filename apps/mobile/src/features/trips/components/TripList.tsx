@@ -36,8 +36,8 @@ function kindSegments(groupCount: number): readonly Segment<Kind>[] {
 export interface TripListProps {
   /** Join or start a group trip, shown above the "Groupés" view. */
   groupActions?: ReactNode;
-  /** "Join with a code" link, under the empty state of an account with no trip at all. */
-  joinLink?: ReactNode;
+  /** "Create a group trip" and "join with a code", under the empty state of an account with no trip at all. */
+  groupLinks?: ReactNode;
 }
 
 /** Decorative blank ticket: where the first trip will go. */
@@ -68,7 +68,7 @@ function BlankTicket() {
 }
 
 /** No trip at all, solo or group: the blank ticket and the two ways to get a first one. */
-function NoTrips({ joinLink }: { joinLink?: ReactNode }) {
+function NoTrips({ groupLinks }: { groupLinks?: ReactNode }) {
   return (
     <View className="gap-12 pt-6">
       <BlankTicket />
@@ -87,14 +87,14 @@ function NoTrips({ joinLink }: { joinLink?: ReactNode }) {
           onPress={() => router.navigate('/')}
           className="self-stretch"
         />
-        {joinLink}
+        {groupLinks}
       </View>
     </View>
   );
 }
 
 /** The Trips tab: title, "Mes voyages" / "Groupés" switch, the latest trip large, then the rest. */
-export function TripList({ groupActions, joinLink }: TripListProps) {
+export function TripList({ groupActions, groupLinks }: TripListProps) {
   const { trips, isLoading, hasFailed, retry } = useMyTrips();
   const deletion = useDeleteTrip();
   const [kind, setKind] = useState<Kind>('solo');
@@ -133,7 +133,7 @@ export function TripList({ groupActions, joinLink }: TripListProps) {
           onRetry={retry}
         />
       ) : trips.length === 0 ? (
-        <NoTrips joinLink={joinLink} />
+        <NoTrips groupLinks={groupLinks} />
       ) : (
         <>
           <SegmentedControl
