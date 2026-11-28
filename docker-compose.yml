@@ -34,6 +34,7 @@ services:
       - CI=true
       - BETTER_AUTH_SECRET=1234
       - BETTER_AUTH_URL=http://localhost:3000
+      - APPLE_APP_BUNDLE_IDENTIFIER=fr.seego.app
     volumes:
       - .:/app
       - /app/node_modules

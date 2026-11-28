@@ -7,7 +7,9 @@
     "scheme": "seego",
     "userInterfaceStyle": "light",
     "ios": {
-      "bundleIdentifier": "com.seego.app"
+      "bundleIdentifier": "fr.seego.app",
+      "appleTeamId": "BSH2PBLALU",
+      "usesAppleSignIn": true
     },
     "android": {
       "package": "com.seego.app",
@@ -39,6 +41,7 @@
           ]
         }
       ],
+      "expo-apple-authentication",
       "expo-secure-store",
       "expo-image",
       "expo-sharing",
@@ -67,7 +70,7 @@
             "NSExtensionActivationSupportsText": true
           },
           "androidIntentFilters": ["text/*"],
-          "iosAppGroupIdentifier": "group.com.seego.app"
+          "iosAppGroupIdentifier": "group.fr.seego.app"
         }
       ]
     ],

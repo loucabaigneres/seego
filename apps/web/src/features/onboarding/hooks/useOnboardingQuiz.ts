@@ -1,4 +1,5 @@
 import { useGuestId } from '@/hooks/useGuestId';
+import { track } from '@/lib/analytics';
 import { trpc } from '@/lib/trpc';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -31,6 +32,7 @@ export function useOnboardingQuiz() {
   const submission = useMutation(
     trpc.onboarding.submit.mutationOptions({
       onSuccess: (data) => {
+        track('onboarding_completed');
         setTimeout(() => {
           navigate({
             to: '/discovery',
@@ -39,6 +41,7 @@ export function useOnboardingQuiz() {
         }, ANALYSIS_DELAY_MS);
       },
       onError: (err) => {
+        track('onboarding_failed', { message: err.message });
         setIsFinishing(false);
         setIsAnalyzing(false);
         setErrorMessage(err.message || 'Une erreur est survenue lors du calcul.');
@@ -54,6 +57,11 @@ export function useOnboardingQuiz() {
   }, [isFinishing]);
 
   const goForward = () => {
+    track('onboarding_step_completed', {
+      step: state.stepIndex + 1,
+      total_steps: QUIZ_QUESTIONS.length,
+      question: String(currentQuestion(state)),
+    });
     if (!isLastStep(state)) {
       dispatch({ type: 'next' });
       return;

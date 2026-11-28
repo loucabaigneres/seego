@@ -16,16 +16,32 @@ export interface TagProps {
   /** Catalogue tags come lowercase ("vue mer"); turn it off for names, dates and counts. */
   capitalize?: boolean;
   className?: string;
+  /** Overrides the tone's text colour */
+  textClassName?: string;
 }
 
 /**
  * Static descriptive pill ("plage", "vue mer"…). Not pressable, unlike `Chip`,
  * and in sentence case, unlike `Badge`.
  */
-export function Tag({ label, tone = 'neutral', capitalize = true, className }: TagProps) {
+export function Tag({
+  label,
+  tone = 'neutral',
+  capitalize = true,
+  className,
+  textClassName,
+}: TagProps) {
   return (
     <View className={cn('self-start rounded-full px-3 py-1', TONES[tone].container, className)}>
-      <Text variant="caption" className={cn('font-sans-medium', capitalize && 'capitalize', TONES[tone].text)}>
+      <Text
+        variant="caption"
+        className={cn(
+          'font-sans-medium',
+          capitalize && 'capitalize',
+          TONES[tone].text,
+          textClassName,
+        )}
+      >
         {label}
       </Text>
     </View>

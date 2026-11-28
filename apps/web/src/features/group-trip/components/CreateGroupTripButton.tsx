@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { trpc } from '@/lib/trpc';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { trpc } from '@/lib/trpc';
 
 export function CreateGroupTripButton() {
   const [inviteLink, setInviteLink] = useState<string | null>(null);
@@ -18,6 +19,7 @@ export function CreateGroupTripButton() {
   const handleCopy = () => {
     if (!inviteLink) return;
     navigator.clipboard.writeText(inviteLink);
+    track('group_invite_copied', { source: 'create_button' });
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };

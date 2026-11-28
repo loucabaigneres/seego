@@ -6,6 +6,8 @@
  */
 export type { Icon as AppIcon } from 'phosphor-react-native';
 
+export { AirplaneIcon } from 'phosphor-react-native/src/icons/Airplane';
+export { ArrowCounterClockwiseIcon } from 'phosphor-react-native/src/icons/ArrowCounterClockwise';
 export { ArrowDownIcon } from 'phosphor-react-native/src/icons/ArrowDown';
 export { ArrowLeftIcon } from 'phosphor-react-native/src/icons/ArrowLeft';
 export { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';

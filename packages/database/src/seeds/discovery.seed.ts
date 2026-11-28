@@ -1,12 +1,15 @@
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import type { DiscoveryContentData } from '../data.js';
-import { discoveryContent } from '../schemas/inspiration.js';
+import { fillCityCenters, insertLegacyPlace, type LegacyPlaceRow } from '../catalogue/write.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_FILE_PATH = path.resolve(__dirname, '../../data.json');
 
+/**
+ * Importe `data.json` (ancien format `discovery_content`) dans le catalogue, avec les mêmes
+ * règles que la migration 0007. Les lieux dont l'URL existe déjà sont ignorés.
+ */
 export async function seedDiscoveryContent(
   db: ReturnType<typeof import('../index.js').createClient>,
 ) {
@@ -19,23 +22,15 @@ export async function seedDiscoveryContent(
     return;
   }
 
-  const items: DiscoveryContentData[] = JSON.parse(raw);
+  const items: LegacyPlaceRow[] = JSON.parse(raw);
 
-  const values = items.map((item) => ({
-    url: item.url,
-    mainMediaUrl: item.mainMediaUrl,
-    carousselUrls: item.carousselUrls,
-    locationName: item.locationName,
-    description: item.description,
-    country: item.country,
-    city: item.city,
-    coordinates: item.coordinates,
-    tags: item.tags,
-    isActive: item.isActive,
-  }));
-
-  await db
-    .insert(discoveryContent)
-    .values(values)
-    .onConflictDoNothing({ target: discoveryContent.url });
+  let inserted = 0;
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      if (await insertLegacyPlace(tx, item)) inserted++;
+    }
+    await fillCityCenters(tx);
+  });
+  // eslint-disable-next-line no-console
+  console.log(`   ${inserted} lieu(x) ajoutés au catalogue sur ${items.length}.`);
 }
