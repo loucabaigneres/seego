@@ -1,3 +1,4 @@
+import { useLocalSearchParams } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
 import { pluralize } from '@/domain/date';
@@ -8,7 +9,8 @@ import { answerLabels } from '@/features/onboarding/questions';
 import { Button, Notice, Screen, StepHeader, Text } from '@/ui';
 
 export default function OnboardingScreen() {
-  const quiz = useOnboardingQuiz();
+  const { tripId } = useLocalSearchParams<{ tripId?: string }>();
+  const quiz = useOnboardingQuiz(tripId);
 
   if (quiz.isSubmitting) {
     return <AnalyzingView answers={answerLabels(quiz.answers)} />;

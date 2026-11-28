@@ -11,6 +11,9 @@ import { createTRPCRouter, protectedProcedure } from '../init.js';
 const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const INVITE_CODE_LENGTH = 8;
 
+/** Title of a group trip the host has not named. */
+export const DEFAULT_GROUP_TRIP_TITLE = 'Nouveau voyage de groupe';
+
 export function generateInvitePayload() {
   const bytes = crypto.randomBytes(INVITE_CODE_LENGTH);
   const inviteCode = Array.from(bytes, (b) => INVITE_ALPHABET[b % INVITE_ALPHABET.length]).join('');
@@ -113,9 +116,10 @@ export const groupRouter = createTRPCRouter({
         .insert(trip)
         .values({
           userId: ctx.user.id,
-          // Replaced by "Voyage à <ville>" once the host has swiped its places.
-          title: input?.title ?? 'Nouveau voyage de groupe',
-          destination: input?.destination ?? 'Destination à définir',
+          // Unnamed: replaced by "Voyage à <ville>" once the host has swiped its places.
+          title: input?.title ?? DEFAULT_GROUP_TRIP_TITLE,
+          // null until the group picks its city: clients show their own placeholder.
+          destination: input?.destination ?? null,
           isGroup: true,
           inviteCode,
           inviteCodeExpiresAt,

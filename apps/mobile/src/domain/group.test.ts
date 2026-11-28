@@ -5,11 +5,9 @@ const tom = { id: 'u2', name: 'Tom Garnier' };
 const ines = { id: 'u3', name: 'Inès' };
 
 describe('isDestinationPending', () => {
-  it('treats empty values and the API placeholders as pending', () => {
+  it('treats an empty destination as pending', () => {
     expect(isDestinationPending(null)).toBe(true);
     expect(isDestinationPending('  ')).toBe(true);
-    expect(isDestinationPending('Destination à définir')).toBe(true);
-    expect(isDestinationPending('Nouvelle aventure')).toBe(true);
     expect(isDestinationPending('Lisbonne')).toBe(false);
   });
 });

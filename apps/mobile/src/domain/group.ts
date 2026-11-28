@@ -1,8 +1,6 @@
-/** Placeholders the API writes while a group has not picked its city (see `discovery.ts`). */
-const PENDING_DESTINATIONS = ['Destination à définir', 'Nouvelle aventure'];
-
+/** The API leaves a group trip's destination empty (`null`) until the group picks its city. */
 export function isDestinationPending(destination: string | null | undefined): boolean {
-  return !destination?.trim() || PENDING_DESTINATIONS.includes(destination.trim());
+  return !destination?.trim();
 }
 
 export function firstName(name: string): string {
