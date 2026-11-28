@@ -2,10 +2,11 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
 import Animated, { FadeInLeft, FadeInRight, LayoutAnimationConfig } from 'react-native-reanimated';
 
+import { isDestinationPending } from '@/domain/group';
 import { plannedCount, tripCoverImage } from '@/domain/trip';
 import { tripDisplayTitle } from '@/domain/trip-summary';
+import { GroupDestination } from '@/features/group-trip/components/GroupDestination';
 import { GroupTripCard } from '@/features/group-trip/components/GroupTripCard';
-import { GroupTripSheet } from '@/features/group-trip/components/GroupTripSheet';
 import { useGroupTrip } from '@/features/group-trip/hooks/useGroupTrip';
 import { DayTimeline } from '@/features/trip/components/DayTimeline';
 import { EditPlanningBar } from '@/features/trip/components/EditPlanningBar';
@@ -70,6 +71,10 @@ function TripPage({ tripId }: { tripId: string }) {
     );
   }
 
+  if (trip.isGroup && isDestinationPending(trip.destination)) {
+    return <GroupDestination trip={trip} group={group} />;
+  }
+
   return (
     <>
       <Screen
@@ -99,6 +104,11 @@ function TripPage({ tripId }: { tripId: string }) {
           coverImage={coverImage}
           plannedCount={plannedCount(days.itinerary)}
           onRename={rename.canRename && !edit.isEditing ? rename.open : undefined}
+          participants={
+            group.state === 'active' && !edit.isEditing
+              ? { count: group.members.list.length, onPress: group.openParticipants }
+              : undefined
+          }
           pdf={
             isGenerated && !edit.isEditing
               ? { onExport: pdf.choose, isExporting: pdf.isExporting }
@@ -175,7 +185,6 @@ function TripPage({ tripId }: { tripId: string }) {
 
       <ReplacePlaceSheet replace={replace} />
       <RenameTripSheet rename={rename} />
-      <GroupTripSheet group={group} />
       <PdfActionsSheet
         visible={pdf.isChoosing}
         trip={trip}

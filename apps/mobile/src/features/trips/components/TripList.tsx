@@ -19,7 +19,7 @@ import { useMyTrips } from '../hooks/useMyTrips';
 import type { TripListItem } from '../lib/merge-trips';
 import { tripsOverline } from '../lib/trip-list';
 import { DeleteTripSheet } from './DeleteTripSheet';
-import { TripFeatureCard, TripRow } from './TripCard';
+import { GroupTripRow, TripFeatureCard, TripRow } from './TripCard';
 
 // shortcut: user.getTrips returns every trip and the list shows them 10 at a time; paginate in the API if accounts reach hundreds of trips.
 const PAGE_SIZE = 10;
@@ -34,8 +34,10 @@ function kindSegments(groupCount: number): readonly Segment<Kind>[] {
 }
 
 export interface TripListProps {
-  /** Join or start a group trip, shown above the "Groupés" view. */
-  groupActions?: ReactNode;
+  /** Join a friend's trip, shown above the "Groupés" list. */
+  groupJoin?: ReactNode;
+  /** Start a group trip, shown under the "Groupés" list. */
+  groupCreate?: ReactNode;
   /** "Create a group trip" and "join with a code", under the empty state of an account with no trip at all. */
   groupLinks?: ReactNode;
 }
@@ -94,7 +96,7 @@ function NoTrips({ groupLinks }: { groupLinks?: ReactNode }) {
 }
 
 /** The Trips tab: title, "Mes voyages" / "Groupés" switch, the latest trip large, then the rest. */
-export function TripList({ groupActions, groupLinks }: TripListProps) {
+export function TripList({ groupJoin, groupCreate, groupLinks }: TripListProps) {
   const { trips, isLoading, hasFailed, retry } = useMyTrips();
   const deletion = useDeleteTrip();
   const [kind, setKind] = useState<Kind>('solo');
@@ -145,7 +147,14 @@ export function TripList({ groupActions, groupLinks }: TripListProps) {
               setVisibleCount(PAGE_SIZE);
             }}
           />
-          {kind === 'group' && groupActions}
+          {kind === 'group' && groupJoin}
+          {kind === 'group' && featured && (
+            <View className="-mt-2">
+              {[featured, ...others].map((trip, index) => (
+                <GroupTripRow key={trip.id} trip={trip} index={index} />
+              ))}
+            </View>
+          )}
           {!featured &&
             (kind === 'solo' ? (
               <EmptyState
@@ -166,8 +175,8 @@ export function TripList({ groupActions, groupLinks }: TripListProps) {
                 description="Rejoins un ami avec son code, ou crée un voyage de groupe et invite tes amis."
               />
             ))}
-          {featured && <TripFeatureCard {...cardProps(featured)} />}
-          {others.length > 0 && (
+          {kind === 'solo' && featured && <TripFeatureCard {...cardProps(featured)} />}
+          {kind === 'solo' && others.length > 0 && (
             <View className="-mt-2">
               {others.map((trip, index) => (
                 <TripRow key={trip.id} index={index} {...cardProps(trip)} />
@@ -181,6 +190,7 @@ export function TripList({ groupActions, groupLinks }: TripListProps) {
               onPress={() => setVisibleCount((count) => count + PAGE_SIZE)}
             />
           )}
+          {kind === 'group' && groupCreate}
           {kind === 'solo' && featured && (
             <Button
               label="Planifier un nouveau voyage"

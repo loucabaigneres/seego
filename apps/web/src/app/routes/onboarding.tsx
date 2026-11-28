@@ -1,10 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 import { AnalyzingView } from '@/features/onboarding/components/AnalyzingView';
 import { QuestionStep } from '@/features/onboarding/components/QuestionStep';
 import { QuizFooter } from '@/features/onboarding/components/QuizFooter';
 import { QuizHeader } from '@/features/onboarding/components/QuizHeader';
 import { useOnboardingQuiz } from '@/features/onboarding/hooks/useOnboardingQuiz';
 import { seo } from '@/lib/seo';
+
+const onboardingSearchSchema = z.object({
+  /** Group trip the quiz fills instead of creating a trip. */
+  tripId: z.string().optional(),
+});
 
 export const Route = createFileRoute('/onboarding')({
   head: () =>
@@ -14,11 +20,13 @@ export const Route = createFileRoute('/onboarding')({
         'Quatre questions sur tes décors, tes envies, tes compagnons de route et ton climat préféré pour personnaliser tes suggestions.',
       path: '/onboarding',
     }),
+  validateSearch: (search: Record<string, unknown>) => onboardingSearchSchema.parse(search),
   component: OnboardingPage,
 });
 
 function OnboardingPage() {
-  const quiz = useOnboardingQuiz();
+  const { tripId } = Route.useSearch();
+  const quiz = useOnboardingQuiz(tripId);
 
   if (quiz.isAnalyzing) {
     return <AnalyzingView />;

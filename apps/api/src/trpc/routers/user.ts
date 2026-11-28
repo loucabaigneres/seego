@@ -17,6 +17,7 @@ import {
 import { z } from 'zod';
 import { activity, discoveryContent, swipes, trip, tripDay, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
+import { tripTitleSchema } from '../schemas/trip.js';
 
 export const userRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -119,11 +120,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         tripId: z.string().uuid(),
-        title: z
-          .string()
-          .trim()
-          .min(1, 'Le titre ne peut pas être vide.')
-          .max(80, 'Le titre doit comporter au plus 80 caractères.'),
+        title: tripTitleSchema,
       }),
     )
     .mutation(async ({ ctx, input }) => {

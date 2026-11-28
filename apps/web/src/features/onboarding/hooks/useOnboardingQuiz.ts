@@ -20,8 +20,11 @@ const COMPLETION_ANIMATION_MS = 600;
 /** Time the "analysing" screen stays up before opening the swipe deck. */
 const ANALYSIS_DELAY_MS = 1800;
 
-/** "Guide-moi": the 4-question quiz, then the trip it creates opens in the swipe deck. */
-export function useOnboardingQuiz() {
+/**
+ * "Guide-moi": the 4-question quiz, then the trip it creates opens in the swipe deck.
+ * With `tripId` (a group trip), the quiz fills that trip instead of creating one.
+ */
+export function useOnboardingQuiz(tripId?: string) {
   const navigate = useNavigate();
   const guestId = useGuestId();
   const [state, dispatch] = useReducer(quizReducer, initialQuizState);
@@ -68,7 +71,7 @@ export function useOnboardingQuiz() {
     }
     setErrorMessage(null);
     setIsFinishing(true);
-    submission.mutate({ ...state.answers, guestId });
+    submission.mutate({ ...state.answers, guestId, tripId });
   };
 
   const question = currentQuestion(state);

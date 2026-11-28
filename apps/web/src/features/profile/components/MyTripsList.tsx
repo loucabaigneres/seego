@@ -16,9 +16,9 @@ export function MyTripsList({ trips, isLoading }: { trips: ProfileTrip[] | undef
           >
             <div>
               <h3 className="font-bold text-ink">
-                {item.title || `Voyage à ${item.destination}`}
+                {item.title || (item.destination ? `Voyage à ${item.destination}` : 'Voyage sans destination')}
               </h3>
-              <p className="mt-0.5 text-xs text-ink-muted">Destination : {item.destination}</p>
+              <p className="mt-0.5 text-xs text-ink-muted">Destination : {item.destination ?? 'à définir'}</p>
             </div>
             <span className="rounded-full bg-brand/10 px-3.5 py-1 text-xs font-bold text-brand capitalize">
               {item.status}

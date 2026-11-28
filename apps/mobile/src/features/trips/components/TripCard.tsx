@@ -1,11 +1,13 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { formatDate } from '@/domain/date';
+import { groupRowCaption, isDestinationPending } from '@/domain/group';
 import { tripDisplayTitle, tripMonogram, tripStatusMeta } from '@/domain/trip-summary';
 import { colors } from '@seego/ui';
-import { Badge, cn, IconButton, Text } from '@/ui';
-import { SuitcaseRollingIcon, TrashIcon } from '@/ui/icons';
+import { AvatarStack, Badge, cn, IconButton, Tag, Text } from '@/ui';
+import { CompassIcon, SuitcaseRollingIcon, TrashIcon } from '@/ui/icons';
 
 import type { TripListItem } from '../lib/merge-trips';
 
@@ -26,11 +28,10 @@ function openTrip(tripId: string) {
   router.push({ pathname: '/trip/[tripId]', params: { tripId } });
 }
 
-/** "Créé le 3 nov. 2026 · Hôte" */
+/** "Créé le 3 nov. 2026" */
 function tripDetails(trip: TripListItem): string {
   const createdAt = formatDate(trip.createdAt);
-  const role = trip.groupRole && (trip.groupRole === 'owner' ? 'Hôte' : 'Membre');
-  return [createdAt && `Créé le ${createdAt}`, role].filter(Boolean).join(' · ');
+  return createdAt ? `Créé le ${createdAt}` : '';
 }
 
 function DeleteButton({
@@ -125,5 +126,72 @@ export function TripRow({ index, ...props }: TripCardProps & { index: number }) 
       </Pressable>
       <DeleteButton {...props} title={title} variant="ghost" />
     </View>
+  );
+}
+
+/** A group trip in the "Groupés" tab: tile, title, who is in it and the user's role. */
+export function GroupTripRow({ trip, index }: { trip: TripListItem; index: number }) {
+  const title = tripDisplayTitle(trip);
+  const pending = isDestinationPending(trip.destination);
+  const monogram = tripMonogram(trip);
+  const tone = TILE_TONES[index % TILE_TONES.length];
+  const group = trip.group ?? { memberCount: 1, members: [], ownerName: null };
+  const isOwner = trip.groupRole === 'owner';
+  const caption = pending
+    ? 'Destination à définir'
+    : groupRowCaption(isOwner ? 'owner' : 'member', group.memberCount, group.ownerName);
+  const roleLabel = isOwner ? 'Organisateur' : 'Membre';
+
+  return (
+    <Pressable
+      role="link"
+      aria-label={`${title}, ${caption}, ${roleLabel}`}
+      onPress={() => openTrip(trip.id)}
+      className="flex-row items-center gap-3.5 border-b border-line py-3 active:opacity-80"
+    >
+      <View
+        aria-hidden
+        className={cn(
+          'size-16 items-center justify-center overflow-hidden rounded-[14px]',
+          pending ? 'bg-surface' : tone.tile,
+        )}
+      >
+        {pending ? (
+          <CompassIcon size={24} color={colors.brand} />
+        ) : trip.coverImage ? (
+          <Image source={trip.coverImage} style={StyleSheet.absoluteFill} contentFit="cover" />
+        ) : (
+          <Text variant="section" className={cn('text-[26px] leading-7', tone.text)}>
+            {monogram}
+          </Text>
+        )}
+      </View>
+      <View className="flex-1 gap-1">
+        <Text variant="label" numberOfLines={2}>
+          {title}
+        </Text>
+        <View className="flex-row items-center gap-2">
+          {!pending && group.members.length > 0 && (
+            <AvatarStack
+              names={group.members.map((m) => m.name)}
+              extra={group.memberCount - group.members.length}
+            />
+          )}
+          <Text
+            variant="caption"
+            numberOfLines={1}
+            className={cn('flex-1', pending && 'font-sans-semibold text-brand')}
+          >
+            {caption}
+          </Text>
+        </View>
+      </View>
+      <Tag
+        label={roleLabel}
+        capitalize={false}
+        className={cn(isOwner && 'bg-accent')}
+        textClassName={cn('font-sans-semibold', isOwner ? 'text-brand' : 'text-ink')}
+      />
+    </Pressable>
   );
 }

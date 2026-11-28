@@ -3,6 +3,7 @@ import { track } from '@/lib/analytics';
 import { authClient } from '@/lib/auth-client';
 import { trpc } from '@/lib/trpc';
 import { useQuery } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useGroupTripMutations } from '../hooks/useGroupTripMutations';
 import { ConfirmOverlay } from './ConfirmOverlay';
@@ -222,6 +223,17 @@ export function GroupTripPopover() {
                     <p className="text-sm font-black text-ink">
                       {activeTrip.destination ?? 'Destination à définir'}
                     </p>
+                    {isOwner &&
+                      !activeTrip.destination && (
+                        <Link
+                          to="/onboarding"
+                          search={{ tripId: activeTrip.id }}
+                          onClick={() => setIsOpen(false)}
+                          className="mt-1 inline-block text-[11px] font-semibold text-brand hover:underline"
+                        >
+                          Trouver la destination avec le quiz
+                        </Link>
+                      )}
                   </div>
 
                   <InviteLinkSection

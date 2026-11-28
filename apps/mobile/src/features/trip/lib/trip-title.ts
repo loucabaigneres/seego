@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-export const TRIP_TITLE_MAX_LENGTH = 80;
+import { TRIP_TITLE_MAX_LENGTH } from '@/domain/trip';
 
 /** Same rule as `user.renameTrip`, so the API never has to refuse a title. */
 const titleSchema = z

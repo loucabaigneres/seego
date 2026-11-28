@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+/** Mirrored by the mobile app (`domain/trip.ts`), which can only import API types. */
+export const TRIP_TITLE_MAX_LENGTH = 80;
+
+export const tripTitleSchema = z
+  .string()
+  .trim()
+  .min(1, 'Le titre ne peut pas être vide.')
+  .max(
+    TRIP_TITLE_MAX_LENGTH,
+    `Le titre doit comporter au plus ${TRIP_TITLE_MAX_LENGTH} caractères.`,
+  );
+
 export const tripFormSchema = z.object({
   destination: z.string().min(1),
   startDate: z.string().min(1),
