@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import { z } from 'zod';
 import type { Context } from '../context.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
+import { tripTitleSchema } from '../schemas/trip.js';
 
 // Upper case only, no 0/O nor 1/I: codes are read aloud and typed by hand. 32 symbols, so a
 // random byte modulo the length stays unbiased.
@@ -63,7 +64,7 @@ export const groupRouter = createTRPCRouter({
       z
         .object({
           tripId: z.uuid().optional(),
-          title: z.string().trim().min(1).max(80).optional(),
+          title: tripTitleSchema.optional(),
           destination: z.string().trim().min(1).optional(),
         })
         .optional(),

@@ -1,9 +1,9 @@
 import { View } from 'react-native';
 
+import { TRIP_TITLE_MAX_LENGTH } from '@/domain/trip';
 import { Button, Sheet, TextField } from '@/ui';
 
 import type { useTripRename } from '../hooks/useTripRename';
-import { TRIP_TITLE_MAX_LENGTH } from '../lib/trip-title';
 
 export function RenameTripSheet({ rename }: { rename: ReturnType<typeof useTripRename> }) {
   return (

@@ -1,5 +1,8 @@
 import { pluralize } from './date';
 
+/** Longest trip title, same as the API (`schemas/trip.ts`). */
+export const TRIP_TITLE_MAX_LENGTH = 80;
+
 /**
  * `trip_day.dayIndex` conventions shared with the API:
  * - 0  → places liked while swiping (before the itinerary exists)

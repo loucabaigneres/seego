@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
+import { TRIP_TITLE_MAX_LENGTH } from '@/domain/trip';
 import { tripDisplayTitle, tripPickerDetails } from '@/domain/trip-summary';
 import { colors } from '@seego/ui';
 import {
@@ -31,7 +32,6 @@ import { useCreateGroupTrip, useSoloTrips } from '../hooks/useCreateGroupTrip';
 
 type Mode = 'scratch' | 'existing';
 
-const TITLE_MAX = 80;
 
 function ModeCard({
   icon: Icon,
@@ -224,8 +224,12 @@ export function CreateGroupTrip() {
               placeholder="Ex. Les 30 ans de Sam"
               value={title}
               onChangeText={setTitle}
-              maxLength={TITLE_MAX}
-              counter={title.length > TITLE_MAX - 20 ? `${title.length} / ${TITLE_MAX}` : undefined}
+              maxLength={TRIP_TITLE_MAX_LENGTH}
+              counter={
+                title.length > TRIP_TITLE_MAX_LENGTH - 20
+                  ? `${title.length} / ${TRIP_TITLE_MAX_LENGTH}`
+                  : undefined
+              }
               editable={!isCreating}
               returnKeyType="next"
             />
