@@ -22,7 +22,7 @@ export function JoinCode({ initialCode = '', error }: { initialCode?: string; er
   const message = rejected ? joinErrorMessage(rejected) : null;
 
   const change = (next: string) => {
-    setValue((parseInviteCode(next) ?? '').slice(0, INVITE_CODE_LENGTH));
+    setValue(parseInviteCode(next) ?? '');
     setRejected(undefined);
   };
   const paste = async () => change(await Clipboard.getStringAsync());

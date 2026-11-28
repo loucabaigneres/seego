@@ -15,8 +15,7 @@ export const INVITE_CODE_LENGTH = 8;
 /** What was typed or pasted: a code (any case, spaces allowed) or the whole invite link. */
 export function parseInviteCode(input: string): string | null {
   const raw = input.match(/\/join\/([^/?#\s]+)/)?.[1] ?? input;
-  // 12: the column's length, so older codes still fit.
-  const code = raw.replace(/\s+/g, '').toUpperCase().slice(0, 12);
+  const code = raw.replace(/\s+/g, '').toUpperCase().slice(0, INVITE_CODE_LENGTH);
   return code || null;
 }
 

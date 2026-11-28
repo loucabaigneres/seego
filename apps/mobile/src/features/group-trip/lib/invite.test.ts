@@ -37,8 +37,8 @@ describe('parseInviteCode', () => {
     expect(parseInviteCode('seego://join/ABCD2345')).toBe('ABCD2345');
   });
 
-  it('keeps at most 12 characters', () => {
-    expect(parseInviteCode('ABCD2345ABCD2345')).toBe('ABCD2345ABCD');
+  it('keeps at most 8 characters, the length the API generates', () => {
+    expect(parseInviteCode('ABCD2345ABCD2345')).toBe('ABCD2345');
   });
 
   it('gives nothing for an empty input', () => {
