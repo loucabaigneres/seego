@@ -42,6 +42,8 @@ export default function RootLayout() {
             <Stack.Screen name="group/create" />
             <Stack.Screen name="settings" />
             <Stack.Screen name="inspiration/import" />
+            <Stack.Screen name="trip/[tripId]/welcome" options={{ gestureEnabled: false }} />
+            <Stack.Screen name="join/index" />
             <Stack.Screen name="join/[inviteCode]" />
             <Stack.Screen name="auth/sign-in" options={{ presentation: 'modal' }} />
             <Stack.Screen name="auth/sign-up" options={{ presentation: 'modal' }} />

@@ -1,17 +1,20 @@
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 
-import { Button, Notice, Text, TextField } from '@/ui';
+import { Button, Text, TextField } from '@/ui';
 
-import { useJoinGroupTrip } from '../hooks/useJoinGroupTrip';
 import { parseInviteCode } from '../lib/invite';
 
-/** "Groupés" tab: join a friend's trip with the code (or the whole link) they sent. */
+/** "Groupés" tab: a friend's code (or the whole link they sent) opens its invitation. */
 export function JoinCodeForm() {
   const [value, setValue] = useState('');
-  const { join, isJoining, error, reset } = useJoinGroupTrip();
   const code = parseInviteCode(value);
-  const submit = () => code && join(code);
+  const submit = () => {
+    if (!code) return;
+    router.push({ pathname: '/join/[inviteCode]', params: { inviteCode: code } });
+    setValue('');
+  };
 
   return (
     <View className="gap-2.5 rounded-card bg-surface p-4">
@@ -23,20 +26,15 @@ export function JoinCodeForm() {
           label="Entre le code reçu de ton ami"
           placeholder="Ex. AZ7KQ2MP"
           value={value}
-          onChangeText={(next) => {
-            setValue(next);
-            reset();
-          }}
-          editable={!isJoining}
+          onChangeText={setValue}
           autoCapitalize="characters"
           autoCorrect={false}
           returnKeyType="go"
           onSubmitEditing={submit}
           className="flex-1"
         />
-        <Button label="Rejoindre" loading={isJoining} disabled={!code} onPress={submit} />
+        <Button label="Rejoindre" disabled={!code} onPress={submit} />
       </View>
-      {error && <Notice message={error} />}
     </View>
   );
 }

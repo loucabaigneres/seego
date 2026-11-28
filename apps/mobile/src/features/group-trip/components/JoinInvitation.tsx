@@ -1,45 +1,65 @@
+import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
 import { View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '@seego/ui';
 import { useAuthSession } from '@/hooks/useAuthSession';
-import { Button, Card, LoadingState, Notice, Text } from '@/ui';
-import { UsersThreeIcon } from '@/ui/icons';
+import { Button, IconButton, LoadingState, Notice, Tag, Text } from '@/ui';
+import { UsersThreeIcon, XIcon } from '@/ui/icons';
 
 import { useJoinGroupTrip } from '../hooks/useJoinGroupTrip';
 
-/** Screen of an invite link: join right away, or sign in first (the auth modal comes back here). */
+/**
+ * An invitation, from a link or a typed code: join right away, or sign in first (the auth modal
+ * comes back here). The trip itself stays hidden until joined: only members may see it.
+ */
 export function JoinInvitation({ code }: { code: string }) {
   const { isSignedIn, isPending } = useAuthSession();
-  const { join, isJoining, error } = useJoinGroupTrip({ replace: true });
+  const { join, isJoining, failed } = useJoinGroupTrip();
 
   if (isPending) return <LoadingState />;
 
   return (
-    <View className="flex-1 justify-center">
-      <Card className="items-center gap-5 p-8">
-        <View className="h-14 w-14 items-center justify-center rounded-full bg-accent">
-          <UsersThreeIcon size={28} color={colors.brand} />
-        </View>
-        <View className="items-center gap-1.5">
-          <Text variant="title" role="heading" className="text-center">
+    <SafeAreaView edges={['top']} className="flex-1 bg-brand">
+      <StatusBar style="light" />
+      <View className="flex-row justify-end px-4 pt-2">
+        <IconButton
+          label="Fermer"
+          variant="scrim"
+          icon={XIcon}
+          onPress={() => router.replace('/')}
+        />
+      </View>
+      <View aria-hidden className="flex-1 items-center justify-center pb-10">
+        <UsersThreeIcon size={96} color={colors.accent} weight="light" />
+      </View>
+
+      <SafeAreaView
+        edges={['bottom']}
+        className="-mt-8 gap-4 rounded-t-[28px] bg-background px-6 pb-2 pt-6"
+      >
+        <View className="gap-1">
+          <Text variant="overline" tone="brand">
+            Voyage de groupe
+          </Text>
+          <Text variant="title" role="heading" className="text-[40px] leading-[42px]">
             Rejoindre un voyage
           </Text>
-          <Text tone="secondary" className="text-center">
-            Tu as reçu une invitation pour participer à une aventure à plusieurs.
-          </Text>
         </View>
-
-        <View className="w-full items-center gap-1 rounded-card bg-background p-3">
-          <Text variant="overline">Code d’invitation</Text>
-          <Text variant="section" className="tracking-[3px]">
-            {code}
-          </Text>
+        <View className="flex-row flex-wrap gap-1.5">
+          <Tag label={`Code ${code}`} capitalize={false} />
+          <Tag label="Valable 24 h" capitalize={false} />
         </View>
+        <Text tone="muted">
+          Rejoins le groupe pour voir l’itinéraire et préparer le voyage ensemble.
+        </Text>
 
-        {error && <Notice message={error} className="w-full" />}
+        {failed && (
+          <Notice message="Impossible de rejoindre le voyage pour le moment. Réessaie." />
+        )}
 
-        <View className="w-full gap-2">
+        <View className="mt-4 gap-1.5">
           {isSignedIn ? (
             <Button
               label="Rejoindre le voyage"
@@ -61,9 +81,15 @@ export function JoinInvitation({ code }: { code: string }) {
               />
             </>
           )}
-          <Button label="Plus tard" variant="ghost" size="sm" onPress={() => router.replace('/')} />
+          <Button
+            label="Plus tard"
+            variant="text"
+            size="sm"
+            disabled={isJoining}
+            onPress={() => router.replace('/')}
+          />
         </View>
-      </Card>
-    </View>
+      </SafeAreaView>
+    </SafeAreaView>
   );
 }
