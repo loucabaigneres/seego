@@ -9,18 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root';
-import { Route as DiscoveryRouteImport } from './routes/discovery';
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password';
-import { Route as ImportVideoRouteImport } from './routes/importVideo';
-import { Route as IndexRouteImport } from './routes/index';
-import { Route as JoinInviteCodeRouteImport } from './routes/join.$inviteCode';
-import { Route as LoginRouteImport } from './routes/login';
-import { Route as OnboardingRouteImport } from './routes/onboarding';
-import { Route as ProfileRouteImport } from './routes/profile';
-import { Route as RegisterRouteImport } from './routes/register';
 import { Route as ResetPasswordRouteImport } from './routes/reset-password';
-import { Route as TripTripIdRouteImport } from './routes/trip.$tripId';
+import { Route as RegisterRouteImport } from './routes/register';
+import { Route as ProfileRouteImport } from './routes/profile';
+import { Route as OnboardingRouteImport } from './routes/onboarding';
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales';
+import { Route as LoginRouteImport } from './routes/login';
+import { Route as ImportVideoRouteImport } from './routes/importVideo';
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password';
+import { Route as DiscoveryRouteImport } from './routes/discovery';
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite';
+import { Route as IndexRouteImport } from './routes/index';
 import { Route as TripConfigureRouteImport } from './routes/trip/configure';
+import { Route as TripTripIdRouteImport } from './routes/trip.$tripId';
+import { Route as JoinInviteCodeRouteImport } from './routes/join.$inviteCode';
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -42,6 +44,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any);
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
+  getParentRoute: () => rootRouteImport,
+} as any);
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -60,6 +67,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const DiscoveryRoute = DiscoveryRouteImport.update({
   id: '/discovery',
   path: '/discovery',
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
   getParentRoute: () => rootRouteImport,
 } as any);
 const IndexRoute = IndexRouteImport.update({
@@ -85,10 +97,12 @@ const JoinInviteCodeRoute = JoinInviteCodeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute;
+  '/confidentialite': typeof ConfidentialiteRoute;
   '/discovery': typeof DiscoveryRoute;
   '/forgot-password': typeof ForgotPasswordRoute;
   '/importVideo': typeof ImportVideoRoute;
   '/login': typeof LoginRoute;
+  '/mentions-legales': typeof MentionsLegalesRoute;
   '/onboarding': typeof OnboardingRoute;
   '/profile': typeof ProfileRoute;
   '/register': typeof RegisterRoute;
@@ -99,10 +113,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute;
+  '/confidentialite': typeof ConfidentialiteRoute;
   '/discovery': typeof DiscoveryRoute;
   '/forgot-password': typeof ForgotPasswordRoute;
   '/importVideo': typeof ImportVideoRoute;
   '/login': typeof LoginRoute;
+  '/mentions-legales': typeof MentionsLegalesRoute;
   '/onboarding': typeof OnboardingRoute;
   '/profile': typeof ProfileRoute;
   '/register': typeof RegisterRoute;
@@ -114,10 +130,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   '/': typeof IndexRoute;
+  '/confidentialite': typeof ConfidentialiteRoute;
   '/discovery': typeof DiscoveryRoute;
   '/forgot-password': typeof ForgotPasswordRoute;
   '/importVideo': typeof ImportVideoRoute;
   '/login': typeof LoginRoute;
+  '/mentions-legales': typeof MentionsLegalesRoute;
   '/onboarding': typeof OnboardingRoute;
   '/profile': typeof ProfileRoute;
   '/register': typeof RegisterRoute;
@@ -130,10 +148,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | '/'
+    | '/confidentialite'
     | '/discovery'
     | '/forgot-password'
     | '/importVideo'
     | '/login'
+    | '/mentions-legales'
     | '/onboarding'
     | '/profile'
     | '/register'
@@ -144,10 +164,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | '/'
+    | '/confidentialite'
     | '/discovery'
     | '/forgot-password'
     | '/importVideo'
     | '/login'
+    | '/mentions-legales'
     | '/onboarding'
     | '/profile'
     | '/register'
@@ -158,10 +180,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/confidentialite'
     | '/discovery'
     | '/forgot-password'
     | '/importVideo'
     | '/login'
+    | '/mentions-legales'
     | '/onboarding'
     | '/profile'
     | '/register'
@@ -173,10 +197,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
+  ConfidentialiteRoute: typeof ConfidentialiteRoute;
   DiscoveryRoute: typeof DiscoveryRoute;
   ForgotPasswordRoute: typeof ForgotPasswordRoute;
   ImportVideoRoute: typeof ImportVideoRoute;
   LoginRoute: typeof LoginRoute;
+  MentionsLegalesRoute: typeof MentionsLegalesRoute;
   OnboardingRoute: typeof OnboardingRoute;
   ProfileRoute: typeof ProfileRoute;
   RegisterRoute: typeof RegisterRoute;
@@ -216,6 +242,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    '/mentions-legales': {
+      id: '/mentions-legales';
+      path: '/mentions-legales';
+      fullPath: '/mentions-legales';
+      preLoaderRoute: typeof MentionsLegalesRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/login': {
       id: '/login';
       path: '/login';
@@ -242,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/discovery';
       fullPath: '/discovery';
       preLoaderRoute: typeof DiscoveryRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    '/confidentialite': {
+      id: '/confidentialite';
+      path: '/confidentialite';
+      fullPath: '/confidentialite';
+      preLoaderRoute: typeof ConfidentialiteRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     '/': {
@@ -277,10 +317,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
   DiscoveryRoute: DiscoveryRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   ImportVideoRoute: ImportVideoRoute,
   LoginRoute: LoginRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,

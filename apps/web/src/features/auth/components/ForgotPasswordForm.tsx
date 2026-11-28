@@ -1,6 +1,7 @@
+import { track } from '@/lib/analytics';
+import { authClient } from '@/lib/auth-client';
 import { Link } from '@tanstack/react-router';
 import React, { useState } from 'react';
-import { authClient } from '@/lib/auth-client';
 import { AuthCard } from './AuthCard';
 import { AuthField } from './AuthField';
 import { SubmitButton } from './SubmitButton';
@@ -20,6 +21,7 @@ export function ForgotPasswordForm() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
+    track('password_reset_requested');
     setLoading(false);
     setSent(true);
   };

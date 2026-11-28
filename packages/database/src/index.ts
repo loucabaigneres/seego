@@ -2,7 +2,9 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
 import * as enums from './enums.js';
+import * as admin from './schemas/admin.js';
 import * as auth from './schemas/auth.js';
+import * as catalogue from './schemas/catalogue.js';
 import * as document from './schemas/document.js';
 import * as inspiration from './schemas/inspiration.js';
 import * as payment from './schemas/payment.js';
@@ -11,7 +13,9 @@ import * as onboarding from './schemas/onboarding.js';
 import * as waitlist from './schemas/waitlist.js';
 
 export * from './enums.js';
+export * from './schemas/admin.js';
 export * from './schemas/auth.js';
+export * from './schemas/catalogue.js';
 export * from './schemas/document.js';
 export * from './schemas/inspiration.js';
 export * from './schemas/payment.js';
@@ -19,12 +23,15 @@ export * from './schemas/trip.js';
 export * from './schemas/onboarding.js';
 export * from './schemas/waitlist.js';
 
+export * from './catalogue/write.js';
 export { loadDiscoveryData, type DiscoveryContentData } from './data.js';
 export type { DiscoveryTags } from './schemas/inspiration.js';
 
 export const schema = {
   ...enums,
+  ...admin,
   ...auth,
+  ...catalogue,
   ...document,
   ...inspiration,
   ...payment,
