@@ -1,3 +1,4 @@
+import { track } from '@/lib/analytics';
 import { trpc, type RouterOutputs } from '@/lib/trpc';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -24,6 +25,7 @@ export function useInspirationMutations({
   const addToTrip = useMutation(
     trpc.inspiration.addToTrip.mutationOptions({
       onSuccess: (data) => {
+        track('inspiration_added_to_trip', { count: data.added });
         queryClient.invalidateQueries(trpc.discovery.getTrip.queryFilter({ tripId: data.tripId }));
         onAddedToTrip?.(data);
       },
@@ -33,6 +35,7 @@ export function useInspirationMutations({
   const remove = useMutation(
     trpc.inspiration.delete.mutationOptions({
       onSuccess: () => {
+        track('inspiration_deleted');
         queryClient.invalidateQueries(trpc.inspiration.listMine.queryFilter());
         onDeleted?.();
       },

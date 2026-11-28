@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
 import { ArrowRight, Loader2, Mail, PartyPopper } from 'lucide-react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
+import { track } from '../lib/analytics';
 import { isValidEmail, submitWaitlist } from '../lib/waitlist';
 
 type Status = 'idle' | 'loading' | 'error';
@@ -23,6 +24,7 @@ export function WaitlistForm({
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
 
   const alignClass = align === 'start' ? 'mx-auto lg:mx-0' : 'mx-auto';
 
@@ -51,6 +53,7 @@ export function WaitlistForm({
     if (status === 'loading') return;
 
     if (!isValidEmail(email)) {
+      track('waitlist_submit_failed', { position, reason: 'invalid_email' });
       setStatus('error');
       setError('Hmm, cette adresse e-mail ne semble pas valide.');
       return;
@@ -62,6 +65,7 @@ export function WaitlistForm({
       await submitWaitlist(email, position);
       onJoined(email);
     } catch {
+      track('waitlist_submit_failed', { position, reason: 'server_error' });
       setStatus('error');
       setError('Oups, un souci est survenu. Réessaie dans un instant.');
     }
@@ -83,6 +87,11 @@ export function WaitlistForm({
             aria-invalid={status === 'error'}
             placeholder="ton@email.com"
             value={email}
+            onFocus={() => {
+              if (started) return;
+              setStarted(true);
+              track('waitlist_form_started', { position });
+            }}
             onChange={(event) => {
               setEmail(event.target.value);
               if (status === 'error') {
@@ -90,7 +99,7 @@ export function WaitlistForm({
                 setError(null);
               }
             }}
-            className="h-13 w-full rounded-2xl border border-line bg-background/90 pl-11 pr-4 text-sm font-medium text-ink shadow-sm outline-none transition placeholder:text-ink-muted focus:border-cta focus:ring-4 focus:ring-cta/15"
+            className="h-13 w-full rounded-2xl border border-line bg-background/90 pl-11 pr-4 text-base font-medium text-ink sm:text-sm shadow-sm outline-none transition placeholder:text-ink-muted focus:border-cta focus:ring-4 focus:ring-cta/15"
           />
         </div>
         <button

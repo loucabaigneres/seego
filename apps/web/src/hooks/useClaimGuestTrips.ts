@@ -1,3 +1,4 @@
+import { track } from '@/lib/analytics';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { authClient } from '../lib/auth-client';
@@ -17,6 +18,7 @@ export function useClaimGuestTrips() {
       onSuccess: ({ claimedTripsCount }) => {
         // A new guest id will be generated if the user logs out and creates a trip again
         localStorage.removeItem(GUEST_ID_KEY);
+        if (claimedTripsCount > 0) track('guest_trips_claimed', { count: claimedTripsCount });
         if (claimedTripsCount > 0) queryClient.invalidateQueries();
       },
     }),

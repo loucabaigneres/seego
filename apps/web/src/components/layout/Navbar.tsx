@@ -1,3 +1,4 @@
+import { resetAnalytics, track } from '@/lib/analytics'
 import { authClient } from '@/lib/auth-client'
 import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
@@ -19,6 +20,8 @@ export function Navbar({ userActions }: NavbarProps) {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          track('logout')
+          resetAnalytics()
           navigate({ to: '/' })
         },
       },

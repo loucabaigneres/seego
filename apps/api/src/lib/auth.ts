@@ -53,14 +53,13 @@ export const auth = betterAuth({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
-    // ...(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET
-    //   ? {
-    //       apple: {
-    //         clientId: process.env.APPLE_CLIENT_ID,
-    //         clientSecret: process.env.APPLE_CLIENT_SECRET,
-    //       },
-    //     }
-    //   : {}),
+    // Native iOS only: the app sends the identity token from Sign in with Apple and Better Auth
+    // checks it against Apple's public keys, so no Services ID nor client secret is needed.
+    // The browser redirect flow (web, Android) would need both: it stays off for now.
+    apple: {
+      clientId: env.APPLE_APP_BUNDLE_IDENTIFIER,
+      appBundleIdentifier: env.APPLE_APP_BUNDLE_IDENTIFIER,
+    },
   },
   // Le front (app.seego.fr / *.vercel.app) et l'API sont sur des sites différents :
   // le cookie de session doit être SameSite=None; Secure pour être renvoyé en cross-site.

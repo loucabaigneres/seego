@@ -2,7 +2,7 @@
  * Géocodage d'adresses via Nominatim (OpenStreetMap). Gratuit, sans clé, mais avec une
  * politique d'usage stricte : User-Agent identifiable et ~1 requête/seconde. On l'utilise
  * ponctuellement (à l'import d'une inspiration) et on met les coordonnées en cache dans
- * `discovery_content.coordinates`, donc le volume reste faible.
+ * `places.lat` / `places.lng`, donc le volume reste faible.
  */
 
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';

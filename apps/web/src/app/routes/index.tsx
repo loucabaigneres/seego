@@ -3,6 +3,7 @@ import { HowItWorks } from '@/features/home/components/HowItWorks';
 import { SampleItinerary } from '@/features/home/components/SampleItinerary';
 import { StartChoices } from '@/features/home/components/StartChoices';
 import { useStartDirectTrip } from '@/features/home/hooks/useStartDirectTrip';
+import { track } from '@/lib/analytics';
 import { seo } from '@/lib/seo';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 
@@ -26,13 +27,24 @@ function IndexPage() {
       <HomeHero
         actions={
           <StartChoices
-            onGuide={() => navigate({ to: '/onboarding' })}
-            onSurprise={directTrip.start}
+            onGuide={() => {
+              track('trip_start_clicked', { mode: 'guided', source: 'hero' });
+              navigate({ to: '/onboarding' });
+            }}
+            onSurprise={() => {
+              track('trip_start_clicked', { mode: 'surprise', source: 'hero' });
+              directTrip.start();
+            }}
             isSurpriseLoading={directTrip.isStarting}
           />
         }
       />
-      <SampleItinerary onStart={() => navigate({ to: '/onboarding' })} />
+      <SampleItinerary
+        onStart={() => {
+          track('trip_start_clicked', { mode: 'guided', source: 'sample_itinerary' });
+          navigate({ to: '/onboarding' });
+        }}
+      />
       <HowItWorks />
     </div>
   );

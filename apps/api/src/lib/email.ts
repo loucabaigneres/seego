@@ -6,6 +6,8 @@ export const resend = new Resend(env.RESEND_API_KEY);
 
 const FROM_TRANSACTIONAL = 'Seego <noreply@mail.seego.fr>';
 export const FROM_MARKETING = 'Seego <hello@news.seego.fr>';
+/** Human-read inbox (Cloudflare Email Routing → team Gmail): replies to app emails land there. */
+export const REPLY_TO = 'Seego <contact@seego.fr>';
 
 export const TEMPLATES = {
   verifyEmailOtp: 'verify-email-otp',
@@ -22,13 +24,14 @@ async function sendTemplate(opts: {
   try {
     const { error } = await resend.emails.send({
       from: FROM_TRANSACTIONAL,
+      replyTo: REPLY_TO,
       to: opts.to,
       subject: opts.subject,
       template: { id: opts.template, variables: opts.variables },
     });
-    if (error) console.error('[email] Resend error (${opts.template}):', error);
+    if (error) console.error(`[email] Resend error (${opts.template}):`, error);
   } catch (err) {
-    console.error('[email] send failed (${opts.template}):', err);
+    console.error(`[email] send failed (${opts.template}):`, err);
   }
 }
 
@@ -57,4 +60,47 @@ export function sendWaitlistConfirmation(to: string) {
     template: TEMPLATES.waitlistConfirmation,
     variables: { UNSUBSCRIBE_URL: buildUnsubscribeUrl(to) },
   });
+}
+
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (char) => `&#${char.charCodeAt(0)};`);
+
+/**
+ * Security notice sent when the 'admin' role changes: to the account concerned and to every
+ * admin, so a mistaken or malicious change is noticed right away. Plain message (no Resend
+ * template) since it is internal.
+ */
+export async function sendAdminRoleNotice(opts: {
+  to: string[];
+  action: 'grant' | 'revoke';
+  targetEmail: string;
+  actorEmail: string;
+}) {
+  if (opts.to.length === 0) return;
+  const granted = opts.action === 'grant';
+  const subject = granted
+    ? `[Seego Admin] ${opts.targetEmail} est maintenant administrateur`
+    : `[Seego Admin] ${opts.targetEmail} n'est plus administrateur`;
+  const lines = [
+    granted
+      ? `Le compte ${opts.targetEmail} a reçu le rôle administrateur du back-office Seego.`
+      : `Le compte ${opts.targetEmail} n'a plus le rôle administrateur du back-office Seego.`,
+    `Modification faite par ${opts.actorEmail} le ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}.`,
+    "Si ce changement n'était pas prévu, préviens l'équipe immédiatement : un administrateur peut l'annuler depuis la page Administrateurs.",
+  ];
+  try {
+    // One message per recipient so admins never see each other's addresses.
+    const { error } = await resend.batch.send(
+      opts.to.map((to) => ({
+        from: FROM_TRANSACTIONAL,
+        to,
+        subject,
+        text: lines.join('\n\n'),
+        html: lines.map((line) => `<p>${escapeHtml(line)}</p>`).join(''),
+      })),
+    );
+    if (error) console.error('[email] Resend error (admin-role-notice):', error);
+  } catch (err) {
+    console.error('[email] send failed (admin-role-notice):', err);
+  }
 }

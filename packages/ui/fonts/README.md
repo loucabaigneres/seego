@@ -1,4 +1,4 @@
-# Seego fonts
+# Seego - Fonts
 
 Self-hosted **Fraunces** (titles) and **Hanken Grotesk** (everything else), both under the SIL Open Font License (`licenses/`).
 

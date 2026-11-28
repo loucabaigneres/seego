@@ -1,5 +1,6 @@
 import { ArrowUpRight, Clock, QrCode } from 'lucide-react';
 import { Reveal } from '../components/Reveal';
+import { track } from '../lib/analytics';
 import { LineReveal, SectionLabel } from './ui';
 
 const FORM_URL = 'https://tally.so/r/RWxa5d';
@@ -11,7 +12,7 @@ export function SurveySection() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
         {/* Pitch + button */}
         <div>
-          <SectionLabel index="03">Ton avis</SectionLabel>
+          <SectionLabel index="04">Ton avis</SectionLabel>
           <h2 className="mt-6 text-[clamp(2.4rem,5vw,4.5rem)] font-display font-normal leading-[0.95] tracking-tight text-ink">
             <LineReveal lines={['Aide-nous à', 'tracer la route.']} />
           </h2>
@@ -23,6 +24,7 @@ export function SurveySection() {
           <Reveal className="mt-8 flex flex-wrap items-center gap-4">
             <a
               href={FORM_URL}
+              onClick={() => track('survey_clicked')}
               target="_blank"
               rel="noreferrer"
               className="group inline-flex items-center gap-2 rounded-full bg-cta px-6 py-3.5 text-sm font-bold text-ink shadow-lg shadow-cta/30 transition hover:brightness-110 active:scale-95"
