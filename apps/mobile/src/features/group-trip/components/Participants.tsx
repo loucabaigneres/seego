@@ -24,13 +24,13 @@ import {
   ArrowLeftIcon,
   CheckIcon,
   ClipboardTextIcon,
-  DotsThreeVerticalIcon,
   InfoIcon,
   LinkSimpleIcon,
   MapPinIcon,
   ShareNetworkIcon,
   SignOutIcon,
   TrashIcon,
+  UserMinusIcon,
 } from '@/ui/icons';
 
 import type { GroupMember, useGroupTrip } from '../hooks/useGroupTrip';
@@ -173,8 +173,8 @@ function MemberRow({
         />
       ) : canRemove ? (
         <IconButton
-          label={`Options pour ${name}`}
-          icon={DotsThreeVerticalIcon}
+          label={`Retirer ${name} du voyage`}
+          icon={UserMinusIcon}
           onPress={onRemove}
           disabled={isRemoving}
           className={cn(isRemoving && 'opacity-50')}

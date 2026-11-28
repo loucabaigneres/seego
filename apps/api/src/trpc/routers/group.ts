@@ -5,11 +5,15 @@ import crypto from 'node:crypto';
 import { z } from 'zod';
 import type { Context } from '../context.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
+import { tripTitleSchema } from '../schemas/trip.js';
 
 // Upper case only, no 0/O nor 1/I: codes are read aloud and typed by hand. 32 symbols, so a
 // random byte modulo the length stays unbiased.
 const INVITE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const INVITE_CODE_LENGTH = 8;
+
+/** Title of a group trip the host has not named. */
+export const DEFAULT_GROUP_TRIP_TITLE = 'Nouveau voyage de groupe';
 
 export function generateInvitePayload() {
   const bytes = crypto.randomBytes(INVITE_CODE_LENGTH);
@@ -60,7 +64,7 @@ export const groupRouter = createTRPCRouter({
       z
         .object({
           tripId: z.uuid().optional(),
-          title: z.string().trim().min(1).max(80).optional(),
+          title: tripTitleSchema.optional(),
           destination: z.string().trim().min(1).optional(),
         })
         .optional(),
@@ -113,9 +117,10 @@ export const groupRouter = createTRPCRouter({
         .insert(trip)
         .values({
           userId: ctx.user.id,
-          // Replaced by "Voyage à <ville>" once the host has swiped its places.
-          title: input?.title ?? 'Nouveau voyage de groupe',
-          destination: input?.destination ?? 'Destination à définir',
+          // Unnamed: replaced by "Voyage à <ville>" once the host has swiped its places.
+          title: input?.title ?? DEFAULT_GROUP_TRIP_TITLE,
+          // null until the group picks its city: clients show their own placeholder.
+          destination: input?.destination ?? null,
           isGroup: true,
           inviteCode,
           inviteCodeExpiresAt,

@@ -6,7 +6,7 @@ import { IconButton, Screen, SegmentedControl, Text, Wordmark } from '@/ui';
 import { ArrowLeftIcon, XIcon } from '@/ui/icons';
 
 import { closeAuth } from '../lib/navigation';
-import { GoogleSignIn } from './GoogleSignIn';
+import { SocialSignIn } from './SocialSignIn';
 
 export type AuthTab = 'sign-in' | 'sign-up';
 
@@ -19,7 +19,7 @@ const TAB_HREFS = { 'sign-in': '/auth/sign-in', 'sign-up': '/auth/sign-up' } as 
 
 export interface AuthLayoutProps {
   title: string;
-  /** Sign-in and sign-up: tabs between the two, Google and a close button. Without it, a back arrow. */
+  /** Sign-in and sign-up: tabs between the two, Apple/Google and a close button. Without it, a back arrow. */
   tab?: AuthTab;
   overline?: string;
   subtitle?: string;
@@ -65,7 +65,7 @@ export function AuthLayout({ title, tab, overline, subtitle, children }: AuthLay
               // Back to that screen when it is under this one, else swap.
               onChange={(next) => next !== tab && router.dismissTo(TAB_HREFS[next])}
             />
-            <GoogleSignIn />
+            <SocialSignIn />
           </>
         )}
 

@@ -1,9 +1,23 @@
 import { TRPCError } from '@trpc/server';
 import { userOnboarding } from '@seego/database';
-import { and, count, desc, eq, inArray, isNull, like, or, sql } from 'drizzle-orm';
+import {
+  and,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  inArray,
+  isNull,
+  like,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { z } from 'zod';
-import { swipes, trip, user } from '../../lib/tables.js';
+import { activity, discoveryContent, swipes, trip, tripDay, user } from '../../lib/tables.js';
 import { createTRPCRouter, protectedProcedure } from '../init.js';
+import { tripTitleSchema } from '../schemas/trip.js';
 
 export const userRouter = createTRPCRouter({
   getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -38,6 +52,28 @@ export const userRouter = createTRPCRouter({
   }),
 
   getTrips: protectedProcedure.query(async ({ ctx }) => {
+    // Correlated subqueries built with Drizzle so `trip.id` renders qualified ("trip"."id").
+    // Day 0 holds the liked places, day -1 the alternative hotels, day 1+ the itinerary.
+    const tripDayIds = (dayFilter: SQL) =>
+      ctx.db
+        .select({ id: tripDay.id })
+        .from(tripDay)
+        .where(and(eq(tripDay.tripId, trip.id), dayFilter));
+    const activityCount = (dayFilter: SQL) =>
+      ctx.db.$count(
+        activity,
+        and(isNull(activity.deletedAt), inArray(activity.tripDayId, tripDayIds(dayFilter))),
+      );
+    // Same rule as the trip page: the first itinerary photo, else a liked place's.
+    const coverImage = ctx.db
+      .select({ url: discoveryContent.mainMediaUrl })
+      .from(activity)
+      .innerJoin(tripDay, eq(tripDay.id, activity.tripDayId))
+      .innerJoin(discoveryContent, eq(discoveryContent.id, activity.discoveryContentId))
+      .where(and(eq(tripDay.tripId, trip.id), gte(tripDay.dayIndex, 0), isNull(activity.deletedAt)))
+      .orderBy(sql`${tripDay.dayIndex} = 0`, tripDay.dayIndex, activity.orderIndex)
+      .limit(1);
+
     return await ctx.db
       .select({
         id: trip.id,
@@ -47,29 +83,13 @@ export const userRouter = createTRPCRouter({
         createdAt: trip.createdAt,
         startDate: trip.startDate,
         durationDays: trip.durationDays,
-        // Correlated subqueries in plain SQL: Drizzle drops the table name of columns interpolated
-        // into `sql` on a single-table select, so `${trip.id}` would render an ambiguous "id".
-        // Day 0 holds the liked places, day -1 the alternative hotels, day 1+ the itinerary.
-        daysCount: sql<number>`(
-          select count(*) from trip_day td where td.trip_id = "trip"."id" and td.day_index > 0
-        )`.mapWith(Number),
-        stepsCount: sql<number>`(
-          select count(*) from activity a join trip_day td on td.id = a.trip_day_id
-          where td.trip_id = "trip"."id" and td.day_index > 0 and a.deleted_at is null
-        )`.mapWith(Number),
-        likedCount: sql<number>`(
-          select count(*) from activity a join trip_day td on td.id = a.trip_day_id
-          where td.trip_id = "trip"."id" and td.day_index = 0 and a.deleted_at is null
-        )`.mapWith(Number),
-        // Same rule as the trip page: the first itinerary photo, else a liked place's.
-        coverImage: sql<string | null>`(
-          select dc.main_media_url from activity a
-          join trip_day td on td.id = a.trip_day_id
-          join discovery_content dc on dc.id = a.discovery_content_id
-          where td.trip_id = "trip"."id" and td.day_index >= 0 and a.deleted_at is null
-          order by td.day_index = 0, td.day_index, a.order_index
-          limit 1
-        )`,
+        daysCount: ctx.db.$count(
+          tripDay,
+          and(eq(tripDay.tripId, trip.id), gt(tripDay.dayIndex, 0)),
+        ),
+        stepsCount: activityCount(gt(tripDay.dayIndex, 0)),
+        likedCount: activityCount(eq(tripDay.dayIndex, 0)),
+        coverImage: sql<string | null>`(${coverImage})`,
       })
       .from(trip)
       .where(and(eq(trip.userId, ctx.user.id), isNull(trip.deletedAt)))
@@ -100,11 +120,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         tripId: z.string().uuid(),
-        title: z
-          .string()
-          .trim()
-          .min(1, 'Le titre ne peut pas être vide.')
-          .max(80, 'Le titre doit comporter au plus 80 caractères.'),
+        title: tripTitleSchema,
       }),
     )
     .mutation(async ({ ctx, input }) => {

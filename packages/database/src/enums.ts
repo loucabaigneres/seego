@@ -13,3 +13,4 @@ export const paymentStatusEnum = pgEnum('payment_status', [
   'refunded',
 ]);
 export const documentTypeEnum = pgEnum('document_type', ['free_summary', 'premium_guide']);
+export const adminRoleActionEnum = pgEnum('admin_role_action', ['grant', 'revoke']);

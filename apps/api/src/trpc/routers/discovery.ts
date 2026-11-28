@@ -8,6 +8,22 @@ import { rankDestinations, recommend } from '../../lib/recommendation/algorithm.
 import { activity, discoveryContent, swipes, trip, tripDay } from '../../lib/tables.js';
 import type { Context } from '../context.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';
+import { DEFAULT_GROUP_TRIP_TITLE } from './group.js';
+
+/**
+ * Title of a trip regenerated from swipes: "Voyage à <city>", unless the user named it.
+ * A title is ours (so replaceable) when empty, the unnamed group default, or the
+ * "Voyage à <destination>" we wrote last time.
+ */
+export function regeneratedTripTitle(
+  current: { title: string | null; destination: string | null },
+  city: string,
+): string {
+  const title = current.title?.trim();
+  const isAuto =
+    !title || title === DEFAULT_GROUP_TRIP_TITLE || title === `Voyage à ${current.destination}`;
+  return isAuto ? `Voyage à ${city}` : title;
+}
 
 // ─── Catalog ────────────────────────────────────────────────────────────────────
 
@@ -275,33 +291,8 @@ export const discoveryRouter = {
         .filter((s) => s.liked && s.item.city === top.city)
         .map((s) => s.item);
 
-      let targetTripId = input.tripId ?? undefined;
-
-      if (userId !== 'guest') {
-        const pendingGroupTrip = await ctx.db.query.trip.findFirst({
-          where: (t, { and, eq, or, isNull }) =>
-            and(
-              eq(t.userId, userId),
-              eq(t.isGroup, true),
-              or(
-                isNull(t.destination),
-                eq(t.destination, 'Destination à définir'),
-                eq(t.destination, 'Nouvelle aventure'),
-              ),
-            ),
-          orderBy: (t, { desc }) => [desc(t.createdAt)],
-        });
-
-        if (pendingGroupTrip) {
-          if (targetTripId && targetTripId !== pendingGroupTrip.id) {
-            await ctx.db
-              .delete(trip)
-              .where(eq(trip.id, targetTripId))
-              .catch(() => {});
-          }
-          targetTripId = pendingGroupTrip.id;
-        }
-      }
+      // Only the trip the client names: a group trip comes through the quiz with its id.
+      const targetTripId = input.tripId ?? undefined;
 
       // Steps 2 to 4 run in one transaction: a crash midway must not leave the
       // trip without its liked places (old day 0 deleted, new one not created).
@@ -309,11 +300,15 @@ export const discoveryRouter = {
         let tripId = targetTripId;
 
         if (tripId) {
-          // Mise à jour du voyage (conserve isGroup et inviteCode existants)
+          const current = await tx.query.trip.findFirst({
+            where: (t, { eq }) => eq(t.id, tripId!),
+            columns: { title: true, destination: true },
+          });
+          // Mise à jour du voyage (conserve isGroup, inviteCode et un titre choisi)
           await tx
             .update(trip)
             .set({
-              title: `Voyage à ${top.city}`,
+              title: regeneratedTripTitle(current ?? { title: null, destination: null }, top.city),
               destination: top.city,
               status: 'draft',
               updatedAt: new Date(),

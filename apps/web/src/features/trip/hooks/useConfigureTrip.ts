@@ -1,3 +1,4 @@
+import { track } from '@/lib/analytics';
 import { trpc } from '@/lib/trpc';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
@@ -47,9 +48,17 @@ export function useConfigureTrip(tripId: string | undefined) {
         tripId,
       });
       await generateMutation.mutateAsync({ tripId: result.tripId });
+      track('trip_configured', {
+        duration_days: tripDurationDays(data.startDate, endDate),
+        travelers: data.ages.length,
+        is_new_trip: !tripId,
+      });
       await barFilled;
       navigate({ to: '/trip/$tripId', params: { tripId: result.tripId } });
     } catch (error) {
+      track('trip_configuration_failed', {
+        message: error instanceof Error ? error.message : 'unknown',
+      });
       console.error('❌ Erreur lors de la création du voyage :', error);
       alert('Une erreur est survenue, regarde la console.');
       setIsSubmitting(false);

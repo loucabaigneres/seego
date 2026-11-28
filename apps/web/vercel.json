@@ -1,4 +1,11 @@
 {
+  "redirects": [
+    {
+      "source": "/ig",
+      "destination": "/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&utm_campaign=beta_launch",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",

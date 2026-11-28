@@ -11,17 +11,17 @@ import { ArrowLeftIcon, CaretRightIcon, CompassIcon, MapPinIcon, UsersThreeIcon 
 import type { useGroupTrip } from '../hooks/useGroupTrip';
 
 export interface GroupDestinationProps {
-  trip: { title: string | null; destination: string | null };
+  trip: { id: string; title: string | null; destination: string | null };
   group: ReturnType<typeof useGroupTrip>;
 }
 
 /**
  * A group trip with no city yet: the group types one, or the organizer finds it with the quiz
- * (`/onboarding` reuses the organizer's pending group trip, see `discovery.ts`).
+ * (`/onboarding?tripId=` fills this trip instead of creating one).
  */
 export function GroupDestination({ trip, group }: GroupDestinationProps) {
   const { destination, members } = group;
-  // The trip holds a placeholder ("Destination à définir") until a city is saved.
+  // No destination (null) until a city is saved.
   const city = isDestinationPending(destination.value) ? '' : destination.value.trim();
   const count = members.list.length;
   const save = () => destination.canSave && city && destination.save();
@@ -124,7 +124,7 @@ export function GroupDestination({ trip, group }: GroupDestinationProps) {
                 <Pressable
                   role="link"
                   aria-label="Trouver avec le quiz : 4 questions, puis on swipe des lieux"
-                  onPress={() => router.push('/onboarding')}
+                  onPress={() => router.push({ pathname: '/onboarding', params: { tripId: trip.id } })}
                   className="flex-row items-center gap-3.5 rounded-field bg-surface px-4 py-3.5 active:opacity-80"
                 >
                   <View className="size-10 items-center justify-center rounded-xl bg-background">

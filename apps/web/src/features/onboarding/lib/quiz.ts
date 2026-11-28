@@ -1,7 +1,7 @@
 import type { RouterInputs } from '@/lib/trpc';
 
-/** The quiz answers, exactly as `onboarding.submit` expects them (minus the guest id). */
-export type QuizAnswers = Omit<RouterInputs['onboarding']['submit'], 'guestId'>;
+/** The quiz answers, exactly as `onboarding.submit` expects them (minus the guest and trip ids). */
+export type QuizAnswers = Omit<RouterInputs['onboarding']['submit'], 'guestId' | 'tripId'>;
 export type QuizQuestion = keyof QuizAnswers;
 export type QuizOption<Q extends QuizQuestion> = QuizAnswers[Q][number];
 

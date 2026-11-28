@@ -2,6 +2,7 @@ import { waitlistLeads } from '@seego/database';
 import { isNotNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { sendWaitlistConfirmation } from '../../lib/email.js';
+import { upsertNewsletterContact } from '../../lib/newsletter.js';
 import { createTRPCRouter, publicProcedure } from '../init.js';
 
 // Marketing attribution captured from the landing page. Everything but the
@@ -50,6 +51,7 @@ export const waitlistRouter = createTRPCRouter({
 
     if (inserted.length > 0) {
       void sendWaitlistConfirmation(email);
+      void upsertNewsletterContact(email);
     }
 
     return { success: true };

@@ -30,7 +30,6 @@ export { ClipboardTextIcon } from 'phosphor-react-native/src/icons/ClipboardText
 export { CloudSunIcon } from 'phosphor-react-native/src/icons/CloudSun';
 export { CoffeeIcon } from 'phosphor-react-native/src/icons/Coffee';
 export { CompassIcon } from 'phosphor-react-native/src/icons/Compass';
-export { DotsThreeVerticalIcon } from 'phosphor-react-native/src/icons/DotsThreeVertical';
 export { DownloadSimpleIcon } from 'phosphor-react-native/src/icons/DownloadSimple';
 export { EnvelopeIcon } from 'phosphor-react-native/src/icons/Envelope';
 export { EyeIcon } from 'phosphor-react-native/src/icons/Eye';
@@ -65,6 +64,7 @@ export { SunIcon } from 'phosphor-react-native/src/icons/Sun';
 export { TrashIcon } from 'phosphor-react-native/src/icons/Trash';
 export { UserCircleIcon } from 'phosphor-react-native/src/icons/UserCircle';
 export { UserIcon } from 'phosphor-react-native/src/icons/User';
+export { UserMinusIcon } from 'phosphor-react-native/src/icons/UserMinus';
 export { UsersFourIcon } from 'phosphor-react-native/src/icons/UsersFour';
 export { UsersThreeIcon } from 'phosphor-react-native/src/icons/UsersThree';
 export { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';

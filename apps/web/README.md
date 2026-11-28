@@ -1,26 +1,39 @@
-# Seego — web
+# Seego - Web
 
-React 19 + Vite + TanStack Router app. Same journey as `apps/mobile`, for the browser.
+React 19 + Vite + TanStack Router app (https://app.seego.fr). Same journey as `apps/mobile`, for the browser.
 
 ## Run
 
 ```bash
-# .env must define VITE_API_URL (URL of apps/api)
-pnpm --filter @seego/web dev
+# .env must define VITE_API_URL (URL of apps/api), see below
+pnpm --filter "@seego/web" dev
 ```
 
 | Script      | What it does                                            |
 | ----------- | ------------------------------------------------------- |
 | `dev`       | Vite dev server on http://localhost:5173                |
 | `build`     | Typecheck (`tsc -b`) then production build              |
-| `typecheck` | `tsc --noEmit`                                          |
+| `typecheck` | `tsc -b`                                                |
 | `lint`      | ESLint (shared config, React Hooks, architecture rules) |
+| `preview`   | Preview the production build                            |
+
+No tests in this workspace: pure logic that needs tests lives in the API or is mirrored in mobile.
+
+### Environment (`src/config/env.ts`, validated with Zod)
+
+| Variable             | Notes                                                       |
+| -------------------- | ----------------------------------------------------------- |
+| `VITE_API_URL`       | Required. URL of the API (`http://localhost:3000` in local) |
+| `VITE_USE_API_PROXY` | `true` in prod Vercel only (see below), defaults to `false` |
+| `VITE_POSTHOG_KEY`   | Optional: without it, tracking is off                       |
+| `VITE_POSTHOG_HOST`  | Defaults to `https://eu.i.posthog.com`                      |
 
 ## Proxy API (Safari / cookies first-party)
 
 Safari bloque le cookie de session cross-site (front et API sur des sites différents). En prod,
-le front appelle donc `/api/*` sur son propre domaine, et `api/[...path].ts` (fonction edge Vercel)
-relaie vers l'API : le cookie est posé par le domaine du front.
+le front appelle donc `/api/*` sur son propre domaine : `vercel.json` réécrit ces requêtes vers
+`api/proxy.ts` (fonction edge Vercel), qui relaie vers l'API. Le cookie est posé par le domaine
+du front. `src/lib/api-url.ts` choisit entre proxy et appel direct.
 
 - Vercel (projet web) : `API_PROXY_TARGET=https://<url-de-l-api>` et `VITE_USE_API_PROXY=true`
   (+ `VITE_API_URL` reste requis, il n'est simplement plus utilisé en mode proxy).
@@ -28,6 +41,33 @@ relaie vers l'API : le cookie est posé par le domaine du front.
   devient `https://app.seego.fr/api/auth/callback/google`, sinon le cookie `state` OAuth est
   posé sur le domaine de l'API et le callback échoue.
 - En local, ne rien définir : le front appelle directement `VITE_API_URL`.
+
+## Analytics (PostHog) and acquisition
+
+- `src/lib/analytics.ts` starts PostHog opted out with `cookieless_mode: 'on_reject'`: until the
+  visitor accepts the banner (`components/layout/ConsentBanner.tsx`), or after a refusal,
+  pageviews are still counted, but without any cookie or local storage. Cookieless mode must be
+  enabled in the PostHog project settings, otherwise those events are dropped.
+- `src/lib/attribution.ts` reads the landing URL's `utm_*`, the referring domain and the landing
+  path once, in memory. On consent they are registered as `first_*` super properties (sent with
+  every later event) and copied to the person on sign-in (`hooks/useAnalyticsIdentity.ts`).
+- Instagram bio link: `https://app.seego.fr/ig`, a temporary redirect in `vercel.json` to
+  `/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&utm_campaign=beta_launch`. Source,
+  medium and content match what Instagram appends to bio links, so the duplicates agree whatever
+  their order; only `utm_campaign` is ours. Change the UTMs there, not in the bio.
+
+## SEO and legal pages
+
+- The whole app is kept out of search results: `vercel.json` sends `X-Robots-Tag: noindex, nofollow`
+  and `src/lib/seo.ts` mirrors it in the head tags. www.seego.fr (landing page) is what we rank.
+- `/mentions-legales` and `/confidentialite` (`features/legal`) share their publisher details with
+  the landing page: keep `features/legal/lib/legal.ts` in sync with `apps/landing-page/src/lib/legal.ts`.
+
+## Guests
+
+Visitors use the app before signing up: `hooks/useGuestId.ts` creates a `guestId` sent to the
+public tRPC procedures, and `hooks/useClaimGuestTrips.ts` attaches the guest's trips to the account
+after sign-in.
 
 ## Where things go
 
@@ -40,14 +80,17 @@ src/
     provider.tsx    Global providers (React Query…)
     router.tsx      Router instance and type registration
   features/<x>/     One folder per feature: auth, home, onboarding, discovery, trip, group-trip,
-    components/     inspiration, profile. UI specific to the feature, one component per file
+    components/     inspiration, profile, legal. UI specific to the feature, one component per file
     hooks/          useXxx: tRPC calls + state orchestration
     lib/            Pure functions (business rules, validation schemas, formatting)
     types.ts        Types of the feature, derived from RouterOutputs / RouterInputs
-  components/       Shared components used across features (layout, loading states…)
-  hooks/            Generic hooks reused across features (useGuestId, useRequireSession)
-  lib/              Preconfigured clients: tRPC + React Query, Better Auth
+  components/       Shared components used across features (layout, form fields, loading states…)
+  hooks/            Generic hooks reused across features (useGuestId, useClaimGuestTrips,
+                    useRequireSession, useAnalyticsIdentity)
+  lib/              Preconfigured clients and helpers: tRPC + React Query, Better Auth, API URL,
+                    analytics, attribution, SEO
   config/env.ts     Validated environment variables
+api/proxy.ts        Vercel edge proxy to the API (production)
 ```
 
 Import anything outside the current folder through the `@/` alias (`@/lib/trpc`,
@@ -63,4 +106,11 @@ Import anything outside the current folder through the `@/` alias (`@/lib/trpc`,
 2. No business logic in route files: put it in a feature hook or in `features/*/lib`.
 3. API types come from `RouterOutputs` / `RouterInputs` (`@/lib/trpc`), never from relative
    imports into `apps/api`.
-4. UI copy is French and uses "tu".
+4. No hard-coded colours: use the `@seego/ui` token classes (`bg-primary`, `text-ink-muted`…).
+5. Every query handles its loading, error (with retry) and empty states.
+6. UI copy is French and uses "tu".
+
+## Deployment
+
+Vercel project deployed by the `deploy-frontend` job of `.github/workflows/cd.yml`, after the API:
+`main` → production, `develop` → staging.
